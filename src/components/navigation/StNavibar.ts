@@ -1,14 +1,22 @@
 import styled from "styled-components";
 
-export const Logo = styled.div``;
+export const ProfileImg = styled.img`
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    background: white;
+    margin: 28px;
+`;
 
-export const ProfileImg = styled.img``;
+export const NavBtn = styled.div``;
 
 export const Ment = styled.p``;
 
-export const Mypage = styled.button``;
+export const Mypage = styled.li``;
 
 export const My = styled.div``;
+
+export const Main = styled.div``;
 
 export const Todo = styled.li``;
 

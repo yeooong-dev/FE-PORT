@@ -1,14 +1,20 @@
-import { Cal, Dm, Fam, Logo, Ment, My, Mypage, ProfileImg, Talk, Todo, Vac, We } from "./StNavibar";
+import { Link } from "react-router-dom";
+import { Cal, Dm, Fam, Ment, My, Main, Mypage, ProfileImg, Talk, Todo, Vac, We, NavBtn } from "./StNavibar";
 
 function NaviBar() {
     return (
         <>
-            <Logo>로고</Logo>
             <ProfileImg />
-            <Ment>nickname님 환영합니다.</Ment>
+            {/* <Ment>nickname님 환영합니다.</Ment> */}
+            <Link to='/login'>
+                <li>로그인</li>
+            </Link>
+
             <Mypage>마이페이지</Mypage>
-            <ul>
+
+            <NavBtn>
                 <My>
+                    <Main>홈</Main>
                     <Todo>오늘의 할일</Todo>
                     <Cal>나의 캘린더</Cal>
                     <Fam>경조사 체크</Fam>
@@ -20,9 +26,8 @@ function NaviBar() {
                     <Dm>쪽지보내기</Dm>
                 </We>
 
-                <li>로그인</li>
                 <li>다크모드</li>
-            </ul>
+            </NavBtn>
         </>
     );
 }
