@@ -18,6 +18,7 @@
     list-style: none;
     text-decoration: none;
     font-family: var(--font-main);
+    border: none;
 }
 
 :root {

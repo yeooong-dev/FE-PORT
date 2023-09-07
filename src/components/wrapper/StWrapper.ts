@@ -15,7 +15,7 @@ export const Left = styled.div`
     display: flex;
     align-items: center;
     flex-direction: column;
-    background: #2a3642;
+    background: #bdcaee;
     border-top-right-radius: 20px;
     border-bottom-right-radius: 20px;
 `;
@@ -33,7 +33,7 @@ export const Contents = styled.div`
 `;
 
 export const Logo = styled.div`
-    margin-top: 40px;
+    margin-top: 30px;
     padding-left: 4rem;
     font-size: 2.3rem;
     color: #2a3642;

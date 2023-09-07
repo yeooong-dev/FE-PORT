@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import NaviBar from "../navigation/NaviBar";
 import SearchBar from "../search/SearchBar";
 import { Contents, Left, Logo, Right, Wrap } from "./StWrapper";
@@ -11,7 +12,9 @@ function Wrapper() {
 
             <Right>
                 <Contents>
-                    <Logo>PORT</Logo>
+                    <Link to='/main'>
+                        <Logo>PORT</Logo>
+                    </Link>
                     <SearchBar />
                 </Contents>
             </Right>

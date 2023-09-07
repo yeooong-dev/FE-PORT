@@ -2,7 +2,7 @@ import { styled } from "styled-components";
 
 export const SearchWrap = styled.div`
     width: 28%;
-    height: 138px;
+    height: 107px;
     padding-right: 6rem;
     display: flex;
     align-items: center;
