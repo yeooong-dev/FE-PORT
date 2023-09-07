@@ -1,7 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Info from "../pages/main/Info";
 import Main from "../pages/main/Main";
-import Register from "../pages/register/Register";
+import Register from "../components/register/RegisterBox";
 import Login from "../pages/login/Login";
 import Todo from "../pages/todo/Todo";
 import Mypage from "../pages/mypage/Mypage";
