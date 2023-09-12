@@ -9,7 +9,7 @@ import { login } from "../../api/auth";
 function Login() {
   const [emailValue, setEmailValue] = useInput();
   const [pwValue, setPwValue] = useInput();
-  const [cookies, setCookie] = useCookies(["authorization"]);
+  const [cookies, setCookie] = useCookies(["authorization", "userEmail"]);
 
   const navigate = useNavigate();
 
@@ -20,8 +20,9 @@ function Login() {
 
     login({ email: emailValue, password: pwValue })
       .then((res) => {
-        const authId = res.data.authorization;
+        const authId = res.data.token;
         setCookie("authorization", "Bearer " + authId);
+        setCookie("userEmail", emailValue);
         alert("로그인이 완료되었습니다.");
         navigate("/main");
       })
