@@ -21,14 +21,24 @@ export const Left = styled.div`
 `;
 
 export const Right = styled.div`
-  width: 80%;
+  width: 90%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+`;
+
+export const Top = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 `;
 
 export const Contents = styled.div`
-  width: 100%;
+  width: 95%;
   height: 100vh;
   display: flex;
-  justify-content: space-between;
   background-color: #e8ecf5;
 `;
 

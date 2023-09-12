@@ -18,16 +18,25 @@ function Login() {
       alert("이메일과 비밀번호를 입력바랍니다.");
     }
 
-    login({ email: emailValue, pw: pwValue })
+    login({ email: emailValue, password: pwValue })
       .then((res) => {
-        const authId = res.data.Authorization;
-        setCookie("authorization", "Bearer" + authId);
+        const authId = res.data.authorization;
+        setCookie("authorization", "Bearer " + authId);
         alert("로그인이 완료되었습니다.");
         navigate("/main");
       })
       .catch((err) => {
-        alert(err.response.data.message || "다시 입력해주세요.");
-        console.log(err);
+        if (err.response) {
+          // 서버가 응답을 제공한 경우, 에러 메시지를 alert로 표시
+          console.error("Server response:", err.response.data);
+          alert(err.response.data.message);
+        } else if (err.request) {
+          // 요청이 보내졌으나 응답을 받지 못한 경우
+          console.error("No response received:", err.request);
+        } else {
+          // 요청을 만드는 동안 오류가 발생한 경우
+          console.error("Error creating request:", err.message);
+        }
       });
   };
 

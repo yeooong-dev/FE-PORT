@@ -4,13 +4,18 @@ import instance from "./instance";
 // 회원가입
 export const register = async ({
   email,
-  pw,
+  name,
+  password,
 }: {
   email: string;
-  pw: string;
+  name: string;
+  password: string;
 }) => {
-  const response = await instance.post(`/user`, { email, pw });
-  console.log(response);
+  const response = await instance.post(`/auth/register`, {
+    email,
+    name,
+    password,
+  });
   return response;
 };
 
@@ -18,15 +23,21 @@ export const register = async ({
 export const usercheckEmail = async (email?: string) => {
   const value = { email: email };
   const response = await axios.post(
-    `${process.env.REACT_APP_BE_SERVER}/api/auth/emailCheck`,
+    `${process.env.REACT_APP_BE_SERVER}/auth/checkEmail`,
     value
   );
   return response;
 };
 
 // 로그인
-export const login = async ({ email, pw }: { email: string; pw: string }) => {
-  const response = await instance.post(`/login`, { email, pw });
+export const login = async ({
+  email,
+  password,
+}: {
+  email: string;
+  password: string;
+}) => {
+  const response = await instance.post(`/auth/login`, { email, password });
   console.log(response);
   return response;
 };

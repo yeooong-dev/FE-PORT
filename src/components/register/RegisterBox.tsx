@@ -12,7 +12,7 @@ import {
   RegisterBtn,
 } from "./StRegister";
 import useInput from "../../hook/useInput";
-import { usercheckEmail } from "../../api/auth";
+import { register, usercheckEmail } from "../../api/auth";
 import { useState } from "react";
 
 function Register() {
@@ -62,7 +62,6 @@ function Register() {
   // 비밀번호 유효성 검사 : 대소문자, 특수문자, 숫자만 입력 가능, 8~15 글자
   const pwValidation = (e: React.ChangeEvent<HTMLInputElement>): void => {
     var regExp = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,}$/;
-    console.log("비밀번호 유효성 검사 ::", regExp.test(e.target.value));
 
     if (regExp.test(e.target.value)) {
       setPwMessage(VALID_PASSWORD_MESSAGE);
@@ -118,13 +117,24 @@ function Register() {
       return;
     }
 
-    // if (!isEmailChecked) {
-    //   alert("이메일 중복 확인 바랍니다.");
-    //   return;
-    // }
+    if (!isEmailChecked) {
+      alert("이메일 중복 확인 바랍니다.");
+      return;
+    }
 
-    alert("회원가입이 완료되었습니다.");
-    navigate("/login");
+    // 회원가입 요청
+    register({
+      email: emailValue,
+      name: nameValue,
+      password: pwValue,
+    })
+      .then((response) => {
+        alert("회원가입이 완료되었습니다.");
+        navigate("/login");
+      })
+      .catch((error) => {
+        alert("회원가입에 실패하였습니다. 다시 시도해 주세요.");
+      });
   };
 
   return (
@@ -176,7 +186,7 @@ function Register() {
         </div>
 
         <PwInput
-          type='text'
+          type='password'
           value={pwValue || ""}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setPwValue(e);
@@ -195,7 +205,7 @@ function Register() {
         </div>
 
         <PwConfilmInput
-          type='text'
+          type='password'
           value={pwconfirmValue || ""}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setPwConfirmValue(e);

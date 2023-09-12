@@ -2,11 +2,14 @@ import { Cookies } from "react-cookie";
 
 const useLogout = () => {
   const cookies = new Cookies();
-  const useLogout = () => {
+
+  const logout = () => {
     cookies.remove("authorization");
+
+    window.location.href = "/login";
   };
-  
-  return [useLogout];
+
+  return logout;
 };
 
 export default useLogout;

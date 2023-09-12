@@ -3,6 +3,7 @@ import { Cookies } from "react-cookie";
 
 const useIsLogin = (login: boolean = false) => {
   const [isLogin, setIsLogin] = useState(login);
+  const [loading, setLoading] = useState(true);
   const cookies = new Cookies();
 
   useEffect(() => {
@@ -11,9 +12,10 @@ const useIsLogin = (login: boolean = false) => {
     } else {
       setIsLogin(false);
     }
+    setLoading(false);
   }, []);
 
-  return [isLogin];
+  return [isLogin, loading];
 };
 
 export default useIsLogin;
