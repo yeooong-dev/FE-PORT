@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import Cookies from "universal-cookie";
+import instance from "../api/instance";
 
 interface User {
   name: string;
+  id: string; 
 }
 
 const useUser = () => {
@@ -11,20 +12,15 @@ const useUser = () => {
   const cookies = new Cookies();
   const token = cookies.get("authorization");
   const email = cookies.get("userEmail");
-  
-  console.log("Token:", token);
 
   useEffect(() => {
     const getUserInfo = async () => {
       if (!token || !email) return;
 
       try {
-        const response = await axios.get<User>(`/auth/user?email=${email}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        console.log("API response:", response);
+        const response = await instance.get<User>(`/auth/user?email=${email}`);
+
+        // console.log("API response:", response);
         setUser(response.data);
       } catch (error) {
         console.error("Failed to fetch user info", error);

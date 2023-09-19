@@ -38,6 +38,6 @@ export const login = async ({
   password: string;
 }) => {
   const response = await instance.post(`/auth/login`, { email, password });
-  console.log(response);
+
   return response;
 };

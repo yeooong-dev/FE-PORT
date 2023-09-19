@@ -14,13 +14,15 @@ import {
   Log,
 } from "./StNavibar";
 import { FiHome } from "react-icons/fi";
-import { BsCardChecklist, BsCalendarDate } from "react-icons/bs";
+import { LuListTodo, LuUser } from "react-icons/lu";
+import { RiCalendarCheckFill } from "react-icons/ri";
 import { BiMessageDetail } from "react-icons/bi";
 import { TbReportMoney } from "react-icons/tb";
 import { FaToggleOn, FaToggleOff } from "react-icons/fa";
+import { HiChevronDoubleLeft, HiChevronDoubleRight } from "react-icons/hi";
 import useIsLogin from "../../hook/useIsLogin";
 import useLogout from "../../hook/useLogout";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Logo } from "../wrapper/StWrapper";
 import useUser from "../../hook/UseUser";
 
@@ -28,70 +30,122 @@ function NaviBar() {
   const [isLogin] = useIsLogin();
   const logout = useLogout();
   const [activeMenu, setActiveMenu] = useState("main");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [width, setWidth] = useState("180px");
   const user = useUser();
 
-  return (
-    <Wrap>
-      <Link to='/main'>
-        <Logo>PORT</Logo>
-      </Link>
+  useEffect(() => {
+    setWidth(isSidebarOpen ? "180px" : "60px");
+  }, [isSidebarOpen]);
 
-      <ProfileImg />
-      <Ment>
-        {user && user.name ? `${user.name}님 환영합니다.` : "환영합니다."}
-      </Ment>
+  return (
+    <Wrap isSidebarOpen={isSidebarOpen}>
+      <div
+        className='open_btn'
+        onClick={() => {
+          setIsSidebarOpen((prev) => !prev);
+          setWidth((prev) => (prev === "180px" ? "60px" : "180px"));
+        }}
+      >
+        {isSidebarOpen ? (
+          <HiChevronDoubleLeft size='38' />
+        ) : (
+          <HiChevronDoubleRight size='38' />
+        )}
+      </div>
+
+      {isSidebarOpen && (
+        <>
+          <Link to='/main'>
+            <Logo>PORT</Logo>
+          </Link>
+
+          <ProfileImg />
+          <Ment>
+            {user && user.name ? `${user.name}님 환영합니다.` : "환영합니다."}
+          </Ment>
+        </>
+      )}
 
       <NavBtn>
         <Link to='/main' onClick={() => setActiveMenu("main")}>
-          <Main $active={activeMenu === "main"}>
-            <FiHome size='24' /> &nbsp; 홈
+          <Main $active={activeMenu === "main"} isSidebarOpen={isSidebarOpen}>
+            <FiHome size='24' />
+            {isSidebarOpen && (
+              <span style={{ marginLeft: "10px" }}>&nbsp; 홈</span>
+            )}
           </Main>
         </Link>
 
         <Link to='/todo' onClick={() => setActiveMenu("todo")}>
-          <Todo $active={activeMenu === "todo"}>
-            <BsCardChecklist size='24' />
-            &nbsp; 오늘의 할 일
+          <Todo $active={activeMenu === "todo"} isSidebarOpen={isSidebarOpen}>
+            <LuListTodo size='25' />
+            {isSidebarOpen && <span>&nbsp; 오늘의 할 일</span>}
           </Todo>
         </Link>
 
         <Link to='/calendar' onClick={() => setActiveMenu("calendar")}>
-          <Cal $active={activeMenu === "calendar"}>
-            <BsCalendarDate size='22' />
-            &nbsp; 나의 캘린더
+          <Cal
+            $active={activeMenu === "calendar"}
+            isSidebarOpen={isSidebarOpen}
+          >
+            <RiCalendarCheckFill size='23' />
+            {isSidebarOpen && <span>&nbsp; 나의 캘린더</span>}
           </Cal>
         </Link>
 
-        <Link to='/event' onClick={() => setActiveMenu("event")}>
-          <Fam $active={activeMenu === "event"}>
-            <TbReportMoney size='24' />
-            &nbsp; 경조사 기록
+        <Link
+          to='/event'
+          onClick={() => setActiveMenu("event")}
+          style={{ width }}
+        >
+          <Fam $active={activeMenu === "event"} isSidebarOpen={isSidebarOpen}>
+            <TbReportMoney size='25' />
+            {isSidebarOpen && <span>&nbsp; 경조사 기록</span>}
           </Fam>
         </Link>
 
-        <Link to='/chat' onClick={() => setActiveMenu("chat")}>
-          <Talk $active={activeMenu === "chat"}>
-            <BiMessageDetail size='23' />
-            &nbsp; 대화하기
+        <Link
+          to='/chat'
+          onClick={() => setActiveMenu("chat")}
+          style={{ width }}
+        >
+          <Talk $active={activeMenu === "chat"} isSidebarOpen={isSidebarOpen}>
+            <BiMessageDetail size='24' />
+            {isSidebarOpen && <span>&nbsp; 대화하기</span>}
           </Talk>
         </Link>
 
-        <Link to='/mypage' onClick={() => setActiveMenu("mypage")}>
-          <Mypage $active={activeMenu === "mypage"}>마이페이지</Mypage>
+        <Link
+          to='/mypage'
+          onClick={() => setActiveMenu("mypage")}
+          style={{ width }}
+        >
+          <Mypage
+            $active={activeMenu === "mypage"}
+            isSidebarOpen={isSidebarOpen}
+          >
+            <LuUser size='25' />
+            {isSidebarOpen && <span>&nbsp; 마이페이지</span>}
+          </Mypage>
         </Link>
 
-        <Dark>
-          <FaToggleOn size='30' color='#293642' />
-          {/* <FaToggleOff /> */}
-          &nbsp; Dark OFF
-        </Dark>
+        {isSidebarOpen && (
+          <>
+            <Dark>
+              <FaToggleOn size='30' color='#293642' />
+              {/* <FaToggleOff /> */}
+              &nbsp; Dark OFF
+            </Dark>
 
-        {isLogin ? (
-          <Log onClick={logout}>로그아웃</Log>
-        ) : (
-          <Link to='/login'>
-            <Log>로그인</Log>
-          </Link>
+            {isLogin ? (
+              <Log onClick={logout}>로그아웃</Log>
+            ) : (
+              <Link to='/login'>
+                <Log>로그인</Log>
+              </Link>
+            )}
+          </>
         )}
       </NavBtn>
     </Wrap>

@@ -2,15 +2,36 @@ import styled from "styled-components";
 
 interface MainProps {
   $active: boolean;
+  isSidebarOpen: boolean;
 }
 
-export const Wrap = styled.div`
-  width: 100%;
+interface WrapProps {
+  isSidebarOpen: boolean;
+}
+
+export const Wrap = styled.div<WrapProps>`
+  width: ${({ isSidebarOpen }) => (isSidebarOpen ? "100%" : "100px")};
+  transition: width 0.3s ease, margin-right 0.3s ease;
+  overflow: hidden;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  background: #bdcaee;
+  border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  margin-right: ${({ isSidebarOpen }) =>
+    isSidebarOpen ? "0px" : "calc(100% - 100px)"};
+  text-align: center;
+
+  .open_btn {
+    cursor: pointer;
+    position: absolute;
+    top: ${({ isSidebarOpen }) => (isSidebarOpen ? "2.8%" : "290px")};
+    left: ${({ isSidebarOpen }) => (isSidebarOpen ? "15%" : "30px")};
+    color: #51449d;
+  }
 `;
 
 export const ProfileImg = styled.img`
@@ -34,9 +55,9 @@ export const NavBtn = styled.div`
 `;
 
 export const Main = styled.button<MainProps>`
-  width: 180px;
+  width: ${({ isSidebarOpen }) => (isSidebarOpen ? "100%" : "50px")};
   height: 50px;
-  padding: 1.5rem;
+  padding: 0.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -46,6 +67,7 @@ export const Main = styled.button<MainProps>`
   font-size: 1rem;
   background: ${({ $active }) => ($active ? "#51449d" : "#f9f9f9")};
   color: ${({ $active }) => ($active ? "white" : "#51449d")};
+  overflow: visible;
 
   &:hover {
     background: #51449d;
@@ -55,11 +77,12 @@ export const Main = styled.button<MainProps>`
 `;
 
 export const Todo = styled.button<MainProps>`
-  width: 180px;
+  width: ${({ isSidebarOpen }) => (isSidebarOpen ? "100%" : "50px")};
   height: 50px;
-  padding: 1.5rem;
+  padding: 0.5rem;
   display: flex;
   justify-content: center;
+  overflow: visible;
   align-items: center;
   border-radius: 8px;
   margin-bottom: 15px;
@@ -76,11 +99,12 @@ export const Todo = styled.button<MainProps>`
 `;
 
 export const Cal = styled.button<MainProps>`
-  width: 180px;
+  width: ${({ isSidebarOpen }) => (isSidebarOpen ? "100%" : "50px")};
   height: 50px;
-  padding: 1.5rem;
+  padding: 0.5rem;
   display: flex;
   justify-content: center;
+  overflow: visible;
   align-items: center;
   border-radius: 8px;
   margin-bottom: 15px;
@@ -97,11 +121,12 @@ export const Cal = styled.button<MainProps>`
 `;
 
 export const Fam = styled.button<MainProps>`
-  width: 180px;
+  width: ${({ isSidebarOpen }) => (isSidebarOpen ? "100%" : "50px")};
   height: 50px;
-  padding: 1.5rem;
+  padding: 0.5rem;
   display: flex;
   justify-content: center;
+  overflow: visible;
   align-items: center;
   border-radius: 8px;
   margin-bottom: 15px;
@@ -118,11 +143,12 @@ export const Fam = styled.button<MainProps>`
 `;
 
 export const Talk = styled.button<MainProps>`
-  width: 180px;
+  width: ${({ isSidebarOpen }) => (isSidebarOpen ? "100%" : "50px")};
   height: 50px;
-  padding: 1.5rem;
+  padding: 0.5rem;
   display: flex;
   justify-content: center;
+  overflow: visible;
   align-items: center;
   border-radius: 8px;
   margin-bottom: 15px;
@@ -139,11 +165,12 @@ export const Talk = styled.button<MainProps>`
 `;
 
 export const Mypage = styled.button<MainProps>`
-  width: 180px;
+  width: ${({ isSidebarOpen }) => (isSidebarOpen ? "100%" : "50px")};
   height: 50px;
-  padding: 1.5rem;
+  padding: 0.5rem;
   display: flex;
   justify-content: center;
+  overflow: visible;
   align-items: center;
   border-radius: 8px;
   margin-bottom: 25px;

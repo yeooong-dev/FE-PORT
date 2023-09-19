@@ -3,7 +3,7 @@ import { styled } from "styled-components";
 export const SearchWrap = styled.div`
   width: auto;
   height: 107px;
-  padding-right: 6rem;
+  padding-right: 2rem;
   display: flex;
   align-items: center;
 `;
@@ -20,7 +20,7 @@ export const SearchInput = styled.input`
 `;
 
 export const SerchBtn = styled.button`
-  width: 50px;
+  width: 40px;
   height: 20px;
   border: none;
   background: none;

@@ -4,9 +4,10 @@ const useLogout = () => {
   const cookies = new Cookies();
 
   const logout = () => {
-    cookies.remove("authorization");
-
-    window.location.href = "/login";
+    if (window.confirm("로그아웃 하시겠습니까?")) {
+      cookies.remove("authorization");
+      window.location.href = "/login";
+    }
   };
 
   return logout;

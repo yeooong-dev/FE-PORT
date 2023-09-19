@@ -15,9 +15,6 @@ export const Left = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
-  background: #bdcaee;
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
 `;
 
 export const Right = styled.div`
@@ -39,12 +36,15 @@ export const Contents = styled.div`
   width: 95%;
   height: 100vh;
   display: flex;
+  align-items: center;
+  flex-direction: column;
   background-color: #e8ecf5;
+  text-align: center;
 `;
 
 export const Logo = styled.div`
   font-size: 2.3rem;
-  color: #2a3642;
+  color: #51449d;
   font-family: var(--font-logo);
   cursor: pointer;
 `;
