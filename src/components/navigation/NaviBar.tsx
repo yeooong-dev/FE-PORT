@@ -32,7 +32,7 @@ function NaviBar() {
   const [activeMenu, setActiveMenu] = useState("main");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [width, setWidth] = useState("180px");
-  const user = useUser();
+  const { user, setUser } = useUser();
 
   useEffect(() => {
     setWidth(isSidebarOpen ? "180px" : "60px");

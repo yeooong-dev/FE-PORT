@@ -4,7 +4,7 @@ import instance from "../api/instance";
 
 interface User {
   name: string;
-  id: string; 
+  id: string;
 }
 
 const useUser = () => {
@@ -30,7 +30,7 @@ const useUser = () => {
     getUserInfo();
   }, [token, email]);
 
-  return user;
+  return { user, setUser };
 };
 
 export default useUser;

@@ -16,17 +16,15 @@ import { RiEditCircleFill } from "react-icons/ri";
 import {
   imgAdd,
   imgGet,
-  imgUpdate,
   imgDelete,
   updateName,
   updatePassword,
   deleteAccount,
 } from "../../api/mypage";
-import axios from "axios";
 
 function Mypage() {
   Modal.setAppElement("#root");
-  const user = useUser();
+  const { user, setUser } = useUser();
   const [selectedTab, setSelectedTab] = useState<
     "nameEdit" | "pwEdit" | "deleteAccount" | null
   >(null);
@@ -37,6 +35,7 @@ function Mypage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   // 프로필 이미지 가져오기
   useEffect(() => {
@@ -44,7 +43,18 @@ function Mypage() {
       (async () => {
         try {
           const response = await imgGet(user.id);
-          setCurrentImage(response.data.imageUrl);
+          let imageUrl = response.data.imageUrl;
+          if (imageUrl) {
+            imageUrl = imageUrl.replace(
+              "https://yeong-port.s3.ap-northeast-2.amazonaws.com/",
+              ""
+            );
+            setCurrentImage(
+              "https://yeong-port.s3.ap-northeast-2.amazonaws.com/" + imageUrl
+            );
+          } else {
+            setCurrentImage(null);
+          }
         } catch (error: any) {
           console.error(error);
           if (error.response && error.response.status === 404) {
@@ -82,19 +92,9 @@ function Mypage() {
       case "pwEdit":
         return (
           <>
-            이메일 입력{" "}
-            <input value={email} onChange={(e) => setEmail(e.target.value)} />
-            <br />
-            변경 할 비밀번호{" "}
             <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <br />
-            비밀번호 확인{" "}
-            <input
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
             <br />
             <button onClick={handlePasswordChange}>비밀번호 변경하기</button>
@@ -131,38 +131,20 @@ function Mypage() {
   const handleImageUpload = async () => {
     if (profileImage && user?.id) {
       try {
-        const formData = new FormData();
-        formData.append("userId", user.id.toString());
-        formData.append("profileImage", profileImage);
-
-        await axios.post("http://localhost:8000/auth/profile/image", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  };
-
-  const handleImageUpdate = async () => {
-    if (profileImage && user?.id) {
-      try {
-        const formData = new FormData();
-        formData.append("userId", user.id);
-        formData.append("profileImage", profileImage);
-
-        await axios.put("http://localhost:8000/auth/profile/image", formData);
-
+        await imgAdd(user.id, profileImage);
         const response = await imgGet(user.id);
         setCurrentImage(response.data.imageUrl);
+        alert("프로필 이미지가 업로드되었습니다.");
       } catch (error) {
         console.error(error);
+        alert("프로필 이미지 업로드에 실패했습니다.");
       }
+    } else {
+      console.error("Profile image or user ID is not set");
     }
   };
 
+  // 프로필 삭제
   const handleImageDelete = async () => {
     if (user?.id) {
       try {
@@ -182,19 +164,46 @@ function Mypage() {
       alert("유저 정보를 불러오는데 실패했습니다. 다시 시도해주세요.");
       return;
     }
-
     try {
-      const response = await updateName(user.id, name, email);
+      await updateName(user.id, name, email, password);
       alert("이름이 성공적으로 변경되었습니다.");
+      setUser((prev) => {
+        if (prev === null) return null;
+        return { ...prev, name };
+      });
+      setName("");
+      setEmail("");
+      setPassword("");
+      
     } catch (error) {
-      alert("이름 변경에 실패하였습니다. 이메일 또는 비밀번호를 확인해주세요.");
+      alert("입력한 정보가 올바르지 않습니다.");
     }
   };
 
   // 비밀번호 변경 핸들러
   const handlePasswordChange = async () => {
+    if (user === null || user === undefined) {
+      alert("유저 정보를 불러오는데 실패했습니다. 다시 시도해주세요.");
+      return;
+    }
+
+    if (
+      !password ||
+      !newPassword ||
+      newPassword !== confirmPassword ||
+      !email
+    ) {
+      alert("모든 필드를 올바르게 입력해주세요.");
+      return;
+    }
+
     try {
-      const response = await updatePassword(password, newPassword, email);
+      const response = await updatePassword(
+        user.id,
+        password,
+        newPassword,
+        email
+      );
       alert("비밀번호가 성공적으로 변경되었습니다.");
     } catch (error) {
       alert("비밀번호 변경에 실패하였습니다. 현재 비밀번호를 확인해주세요.");
@@ -203,10 +212,21 @@ function Mypage() {
 
   // 계정 삭제 핸들러
   const handleAccountDelete = async () => {
+    if (user === null || user === undefined) {
+      alert("유저 정보를 불러오는데 실패했습니다. 다시 시도해주세요.");
+      return;
+    }
+
+    if (!password) {
+      alert("비밀번호를 입력해주세요.");
+      return;
+    }
+
     if (window.confirm("정말로 계정을 삭제하시겠습니까?")) {
       try {
-        const response = await deleteAccount();
+        const response = await deleteAccount(user.id, email, password);
         alert("계정이 성공적으로 삭제되었습니다.");
+        setUser(null); // 유저 정보를 null로 설정하여 로그아웃 상태를 표현
         // TODO: 계정 삭제 후 리다이렉트 로직 추가
       } catch (error) {
         alert("계정 삭제에 실패하였습니다.");
@@ -218,7 +238,12 @@ function Mypage() {
     <>
       <ContentTitle>마이페이지</ContentTitle>
       <Profile>
-        <BsFillPersonFill className='p_img' color='white' />
+        {currentImage ? (
+          <img src={currentImage} className='p_img' alt='프로필 이미지' />
+        ) : (
+          <img src='/person.png' className='p_img' alt='프로필 이미지' />
+        )}
+
         <div onClick={openModal}>
           <RiEditCircleFill className='edit' size='45' color='#51439d' />
         </div>
@@ -227,11 +252,11 @@ function Mypage() {
       </Profile>
 
       <Modal isOpen={isModalOpen} onRequestClose={closeModal}>
-        {currentImage ? (
-          <img src={currentImage} alt='현재 프로필 이미지' />
-        ) : (
-          <p>이미지가 없습니다.</p>
-        )}
+        currentImage ?
+        <img
+          src={currentImage ? currentImage : "/person.png"}
+          alt='현재 프로필 이미지'
+        />
         <input type='file' onChange={handleImageChange} />
         <button onClick={handleImageUpload}>업로드</button> <br />
         <button onClick={handleImageDelete}>이미지 삭제</button>
@@ -257,3 +282,4 @@ function Mypage() {
 }
 
 export default Mypage;
+
