@@ -11,7 +11,7 @@ import {
   PwInput,
   RegisterBtn,
 } from "./StRegister";
-import useInput from "../../hook/useInput";
+import useInput from "../../hook/UseInput";
 import { register, usercheckEmail } from "../../api/auth";
 import { useState } from "react";
 

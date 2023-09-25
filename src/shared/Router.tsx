@@ -11,7 +11,7 @@ import Vacation from "../pages/vacation/Vacation";
 import Dm from "../pages/dm/Dm";
 import Chat from "../pages/chat/Chat";
 import Calendar from "../pages/calendar/Calendar";
-import useIsLogin from "../hook/useIsLogin";
+import UseIsLogin from "../hook/UseIsLogin";
 import Wrapper from "../components/wrapper/Wrapper";
 
 interface ProtectedRouteProps {
@@ -19,7 +19,7 @@ interface ProtectedRouteProps {
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element }) => {
-  const [isLogin, loading] = useIsLogin();
+  const [isLogin, loading] = UseIsLogin();
   const navigate = useNavigate();
 
   useEffect(() => {

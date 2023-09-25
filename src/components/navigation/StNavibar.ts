@@ -30,15 +30,14 @@ export const Wrap = styled.div<WrapProps>`
     position: absolute;
     top: ${({ isSidebarOpen }) => (isSidebarOpen ? "2.8%" : "290px")};
     left: ${({ isSidebarOpen }) => (isSidebarOpen ? "15%" : "30px")};
-    color: #51449d;
+    color: #665c9e;
   }
 `;
 
 export const ProfileImg = styled.img`
-  width: 150px;
-  height: 150px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
-  background: white;
   margin: 30px;
 `;
 

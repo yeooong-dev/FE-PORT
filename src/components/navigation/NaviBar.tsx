@@ -19,24 +19,34 @@ import { RiCalendarCheckFill } from "react-icons/ri";
 import { BiMessageDetail } from "react-icons/bi";
 import { TbReportMoney } from "react-icons/tb";
 import { FaToggleOn, FaToggleOff } from "react-icons/fa";
-import { HiChevronDoubleLeft, HiChevronDoubleRight } from "react-icons/hi";
-import useIsLogin from "../../hook/useIsLogin";
-import useLogout from "../../hook/useLogout";
+import { PiHandSwipeLeft, PiHandSwipeRight } from "react-icons/pi";
+import { HiChevronDoubleLeft, HiChevronDoubleRight } from "react-icons/hi2";
+import useIsLogin from "../../hook/UseIsLogin";
+import UseLogout from "../../hook/UseLogout";
 import { useEffect, useState } from "react";
 import { Logo } from "../wrapper/StWrapper";
 import useUser from "../../hook/UseUser";
 
 function NaviBar() {
   const [isLogin] = useIsLogin();
-  const logout = useLogout();
+  const logout = UseLogout();
   const [activeMenu, setActiveMenu] = useState("main");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [width, setWidth] = useState("180px");
   const { user, setUser } = useUser();
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setWidth(isSidebarOpen ? "180px" : "60px");
   }, [isSidebarOpen]);
+
+  useEffect(() => {
+    if (user) {
+      setProfileImage(user.profileImage ? user.profileImage : "/person.png");
+      setLoading(false);
+    }
+  }, [user]);
 
   return (
     <Wrap isSidebarOpen={isSidebarOpen}>
@@ -48,9 +58,9 @@ function NaviBar() {
         }}
       >
         {isSidebarOpen ? (
-          <HiChevronDoubleLeft size='38' />
+          <HiChevronDoubleLeft size='35' />
         ) : (
-          <HiChevronDoubleRight size='38' />
+          <HiChevronDoubleRight size='35' />
         )}
       </div>
 
@@ -60,7 +70,19 @@ function NaviBar() {
             <Logo>PORT</Logo>
           </Link>
 
-          <ProfileImg />
+          {profileImage ? (
+            <ProfileImg
+              src={profileImage}
+              className='p_img'
+              alt='프로필 이미지'
+            />
+          ) : (
+            <ProfileImg
+              src='/person.png'
+              className='p_img'
+              alt='프로필 이미지'
+            />
+          )}
           <Ment>
             {user && user.name ? `${user.name}님 환영합니다.` : "환영합니다."}
           </Ment>

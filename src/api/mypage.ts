@@ -65,26 +65,22 @@ export const updateName = async (
 // 비밀번호 변경
 export const updatePassword = async (
   userId: string,
-  password: string,
+  email: string,
   newPassword: string,
-  email: string
+  currentPassword: string
 ) => {
   const response = await instance.put(`/auth/profile/password/${userId}`, {
-    password,
-    newPassword,
     email,
+    newPassword,
+    currentPassword,
   });
   return response;
 };
 
 // 회원 탈퇴
-export const deleteAccount = async (
-  userId: string,
-  password: string,
-  email: string
-) => {
+export const deleteAccount = async (userId: string, password: string) => {
   const response = await instance.delete(`/auth/profile/${userId}`, {
-    data: { password, email },
+    data: { password },
   });
   return response;
 };

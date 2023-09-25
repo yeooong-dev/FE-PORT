@@ -1,6 +1,6 @@
 import { Cookies } from "react-cookie";
 
-const useLogout = () => {
+const UseLogout = () => {
   const cookies = new Cookies();
 
   const logout = () => {
@@ -13,4 +13,4 @@ const useLogout = () => {
   return logout;
 };
 
-export default useLogout;
+export default UseLogout;

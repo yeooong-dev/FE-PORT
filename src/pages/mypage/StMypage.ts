@@ -1,9 +1,15 @@
 import styled from "styled-components";
 
+interface TabProps {
+  selected: boolean;
+  onClick: () => void;
+}
+
 export const ContentTitle = styled.h1`
   font-size: 1.5rem;
   margin-bottom: 20px;
-  color: #2e2e2e;
+  color: #4c4959;
+  font-family: var(--font-logo);
 `;
 
 export const Profile = styled.div`
@@ -20,12 +26,18 @@ export const Profile = styled.div`
   }
   .edit {
     cursor: pointer;
-    margin-left: 130px;
+    margin-top: -15px;
+    margin-left: 145px;
+
+    &:hover {
+      transform: scale(1.4);
+      transition: 0.3s;
+    }
   }
 
   .hi {
     font-size: 1.4rem;
-    margin-top: 40px;
+    margin-top: 45px;
     margin-bottom: 8px;
   }
 
@@ -35,13 +47,6 @@ export const Profile = styled.div`
     font-weight: 600;
     margin-bottom: 80px;
   }
-`;
-
-export const InfoTitle = styled.h3`
-  font-size: 1.2rem;
-  color: #2e2e2e;
-  margin-right: 68%;
-  margin-bottom: 15px;
 `;
 
 export const Info = styled.div`
@@ -59,51 +64,44 @@ export const Info = styled.div`
   padding: 20px;
 
   .con {
-    margin-top: 100px;
+    margin-top: 70px;
   }
 `;
 
 export const TabContainer = styled.div`
   display: flex;
   justify-content: center;
-  margin-bottom: 20px;
 `;
 
 export const NameEdit = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 150px;
-  height: 50px;
-  background: #ccd2e0;
-  border-radius: 10px;
-  margin-top: 10px;
-  margin-right: 20px;
-  cursor: pointer;
+  span {
+    margin-right: 10px;
+  }
+
+  input {
+    width: 300px;
+    height: 45px;
+    background: #e8ecf5;
+  }
 `;
 
-export const PwEdit = styled.div`
+export const Tab = styled.div<TabProps>`
   display: flex;
   justify-content: center;
   align-items: center;
   width: 150px;
   height: 50px;
-  background: #ccd2e0;
+  background: ${(props) => (props.selected ? "#51439d" : "#ccd2e0")};
+  color: ${(props) => (props.selected ? "white" : "2e2e2e")};
   border-radius: 10px;
   margin-top: 10px;
   margin-right: 20px;
   cursor: pointer;
-`;
 
-export const DeleteAccount = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 150px;
-  height: 50px;
-  background: #ccd2e0;
-  border-radius: 10px;
-  margin-top: 10px;
-  margin-right: 20px;
-  cursor: pointer;
+  .nameEditBtn {
+  }
+  .passwordEditBtn {
+  }
+  .deleteAccountEditBtn {
+  }
 `;

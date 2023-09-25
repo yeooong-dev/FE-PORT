@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContent, AuthWrap } from "../../components/register/StRegister";
 import { Logo } from "../../components/wrapper/StWrapper";
 import { EmailInputLogin, LoginBtn, PwInputLogin } from "./StLogin";
-import useInput from "../../hook/useInput";
+import useInput from "../../hook/UseInput";
 import { useCookies } from "react-cookie";
 import { login } from "../../api/auth";
 

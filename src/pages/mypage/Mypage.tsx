@@ -3,12 +3,10 @@ import useUser from "../../hook/UseUser";
 import Modal from "react-modal";
 import {
   ContentTitle,
-  DeleteAccount,
   Info,
-  InfoTitle,
   NameEdit,
   Profile,
-  PwEdit,
+  Tab,
   TabContainer,
 } from "./StMypage";
 import { BsFillPersonFill } from "react-icons/bs";
@@ -21,6 +19,7 @@ import {
   updatePassword,
   deleteAccount,
 } from "../../api/mypage";
+import { useNavigate } from "react-router-dom";
 
 function Mypage() {
   Modal.setAppElement("#root");
@@ -36,6 +35,7 @@ function Mypage() {
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const navigate = useNavigate();
 
   // 프로필 이미지 가져오기
   useEffect(() => {
@@ -74,36 +74,73 @@ function Mypage() {
       case "nameEdit":
         return (
           <>
-            변경 할 이름{" "}
-            <input value={name} onChange={(e) => setName(e.target.value)} />
+            <NameEdit>
+              <span>변경할 이름</span>
+              <input
+                type='text'
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </NameEdit>
             <br />
-            이메일 입력{" "}
-            <input value={email} onChange={(e) => setEmail(e.target.value)} />
+            <NameEdit>
+              <span>이메일</span>
+              <input
+                type='text'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </NameEdit>
             <br />
-            비밀번호 입력{" "}
-            <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+
+            <NameEdit>
+              <span>비밀번호</span>
+              <input
+                type='password'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </NameEdit>
             <br />
-            <button onClick={handleNameChange}>이름 변경하기</button>
+            <button onClick={handleNameChange}>이름 변경</button>
           </>
         );
       case "pwEdit":
         return (
           <>
+            이메일{" "}
             <input
+              type='text'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <br />
+            새로운 비밀번호
+            <input
+              type='password'
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+            <br />
+            비밀번호 확인
+            <input
+              type='password'
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
             <br />
-            <button onClick={handlePasswordChange}>비밀번호 변경하기</button>
+            <button onClick={handlePasswordChange}>비밀번호 변경</button>
           </>
         );
       case "deleteAccount":
         return (
           <>
-            비밀번호 입력 <input />
+            비밀번호 입력{" "}
+            <input
+              type='password'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
             <br />
             <button onClick={handleAccountDelete}>회원 탈퇴하기</button>
           </>
@@ -174,7 +211,6 @@ function Mypage() {
       setName("");
       setEmail("");
       setPassword("");
-      
     } catch (error) {
       alert("입력한 정보가 올바르지 않습니다.");
     }
@@ -188,8 +224,9 @@ function Mypage() {
     }
 
     if (
-      !password ||
+      !email ||
       !newPassword ||
+      !confirmPassword ||
       newPassword !== confirmPassword ||
       !email
     ) {
@@ -200,11 +237,14 @@ function Mypage() {
     try {
       const response = await updatePassword(
         user.id,
-        password,
+        email,
         newPassword,
-        email
+        confirmPassword
       );
       alert("비밀번호가 성공적으로 변경되었습니다.");
+      setEmail("");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (error) {
       alert("비밀번호 변경에 실패하였습니다. 현재 비밀번호를 확인해주세요.");
     }
@@ -224,10 +264,10 @@ function Mypage() {
 
     if (window.confirm("정말로 계정을 삭제하시겠습니까?")) {
       try {
-        const response = await deleteAccount(user.id, email, password);
+        const response = await deleteAccount(user.id, password);
         alert("계정이 성공적으로 삭제되었습니다.");
-        setUser(null); // 유저 정보를 null로 설정하여 로그아웃 상태를 표현
-        // TODO: 계정 삭제 후 리다이렉트 로직 추가
+        setUser(null);
+        navigate("/login");
       } catch (error) {
         alert("계정 삭제에 실패하였습니다.");
       }
@@ -236,7 +276,7 @@ function Mypage() {
 
   return (
     <>
-      <ContentTitle>마이페이지</ContentTitle>
+      <ContentTitle>회원 정보 변경</ContentTitle>
       <Profile>
         {currentImage ? (
           <img src={currentImage} className='p_img' alt='프로필 이미지' />
@@ -262,18 +302,29 @@ function Mypage() {
         <button onClick={handleImageDelete}>이미지 삭제</button>
       </Modal>
 
-      <InfoTitle>회원 정보 변경</InfoTitle>
       <Info>
         <TabContainer>
-          <NameEdit onClick={() => setSelectedTab("nameEdit")}>
+          <Tab
+            selected={selectedTab === "nameEdit"}
+            onClick={() => setSelectedTab("nameEdit")}
+            className='nameEditBtn'
+          >
             이름 변경
-          </NameEdit>
-          <PwEdit onClick={() => setSelectedTab("pwEdit")}>
+          </Tab>
+          <Tab
+            selected={selectedTab === "pwEdit"}
+            onClick={() => setSelectedTab("pwEdit")}
+            className='passwordEditBtn'
+          >
             비밀번호 변경
-          </PwEdit>
-          <DeleteAccount onClick={() => setSelectedTab("deleteAccount")}>
+          </Tab>
+          <Tab
+            selected={selectedTab === "deleteAccount"}
+            onClick={() => setSelectedTab("deleteAccount")}
+            className='deleteAccountEditBtn'
+          >
             회원 탈퇴
-          </DeleteAccount>
+          </Tab>
         </TabContainer>
         <div className='con'>{renderContent()}</div>
       </Info>
@@ -282,4 +333,3 @@ function Mypage() {
 }
 
 export default Mypage;
-

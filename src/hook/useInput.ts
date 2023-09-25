@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const useInput = (): [
+const UseInput = (): [
   string,
   React.ChangeEventHandler<HTMLInputElement>,
   () => void
@@ -15,4 +15,4 @@ const useInput = (): [
   return [value, handler, clear];
 };
 
-export default useInput;
+export default UseInput;

@@ -1,7 +1,11 @@
-import React from "react";
+import { ContentTitle } from "../mypage/StMypage";
 
 function Chat() {
-    return <div>chat</div>;
+  return (
+    <>
+      <ContentTitle>채팅방</ContentTitle>
+    </>
+  );
 }
 
 export default Chat;
