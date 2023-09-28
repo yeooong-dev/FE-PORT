@@ -8,8 +8,8 @@ import {
   Profile,
   Tab,
   TabContainer,
+  TabTop,
 } from "./StMypage";
-import { BsFillPersonFill } from "react-icons/bs";
 import { RiEditCircleFill } from "react-icons/ri";
 import {
   imgAdd,
@@ -26,7 +26,7 @@ function Mypage() {
   const { user, setUser } = useUser();
   const [selectedTab, setSelectedTab] = useState<
     "nameEdit" | "pwEdit" | "deleteAccount" | null
-  >(null);
+  >("nameEdit");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [currentImage, setCurrentImage] = useState<string | null>(null);
@@ -73,77 +73,75 @@ function Mypage() {
     switch (selectedTab) {
       case "nameEdit":
         return (
-          <>
+          <TabContainer>
             <NameEdit>
-              <span>변경할 이름</span>
               <input
                 type='text'
                 value={name}
                 onChange={(e) => setName(e.target.value)}
+                placeholder='변경할 이름 입력'
               />
-            </NameEdit>
-            <br />
-            <NameEdit>
-              <span>이메일</span>
+
               <input
                 type='text'
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder='이메일 입력'
               />
-            </NameEdit>
-            <br />
 
-            <NameEdit>
-              <span>비밀번호</span>
               <input
                 type='password'
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder='비밀번호 입력'
               />
+              <button onClick={handleNameChange}>이름 변경</button>
             </NameEdit>
-            <br />
-            <button onClick={handleNameChange}>이름 변경</button>
-          </>
+          </TabContainer>
         );
       case "pwEdit":
         return (
-          <>
-            이메일{" "}
-            <input
-              type='text'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <br />
-            새로운 비밀번호
-            <input
-              type='password'
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-            />
-            <br />
-            비밀번호 확인
-            <input
-              type='password'
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-            />
-            <br />
-            <button onClick={handlePasswordChange}>비밀번호 변경</button>
-          </>
+          <TabContainer>
+            <NameEdit>
+              <input
+                type='text'
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder='이메일 입력'
+              />
+
+              <input
+                type='password'
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                placeholder='변경할 비밀번호 입력'
+              />
+
+              <input
+                type='password'
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder='비밀번호 확인'
+              />
+
+              <button onClick={handlePasswordChange}>비밀번호 변경</button>
+            </NameEdit>
+          </TabContainer>
         );
       case "deleteAccount":
         return (
-          <>
-            비밀번호 입력{" "}
-            <input
-              type='password'
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <br />
-            <button onClick={handleAccountDelete}>회원 탈퇴하기</button>
-          </>
+          <TabContainer>
+            <NameEdit>
+              <input
+                type='password'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder='비밀번호 입력'
+              />
+              <br />
+              <button onClick={handleAccountDelete}>회원 탈퇴하기</button>
+            </NameEdit>
+          </TabContainer>
         );
       default:
         return null;
@@ -212,7 +210,7 @@ function Mypage() {
       setEmail("");
       setPassword("");
     } catch (error) {
-      alert("입력한 정보가 올바르지 않습니다.");
+      alert("모든 필드를 올바르게 입력해주세요.");
     }
   };
 
@@ -246,7 +244,7 @@ function Mypage() {
       setNewPassword("");
       setConfirmPassword("");
     } catch (error) {
-      alert("비밀번호 변경에 실패하였습니다. 현재 비밀번호를 확인해주세요.");
+      alert("비밀번호 변경에 실패하였습니다. 정보를 다시 확인해주세요.");
     }
   };
 
@@ -269,7 +267,7 @@ function Mypage() {
         setUser(null);
         navigate("/login");
       } catch (error) {
-        alert("계정 삭제에 실패하였습니다.");
+        alert("비밀번호를 다시 확인해주세요.");
       }
     }
   };
@@ -285,25 +283,120 @@ function Mypage() {
         )}
 
         <div onClick={openModal}>
-          <RiEditCircleFill className='edit' size='45' color='#51439d' />
+          <RiEditCircleFill className='edit' size='45' color='#595959' />
         </div>
         <p className='hi'>안녕하세요!</p>
         <p className='name'>{user && user.name ? `${user.name}님` : null}</p>
       </Profile>
 
-      <Modal isOpen={isModalOpen} onRequestClose={closeModal}>
-        currentImage ?
+      <Modal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        style={{
+          overlay: {
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+          },
+          content: {
+            width: "700px",
+            height: "600px",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            backgroundColor: "#f6f6f6",
+            border: "none",
+            borderRadius: "20px",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            position: "relative",
+          },
+        }}
+      >
+        <button
+          onClick={closeModal}
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            padding: "20px",
+            fontSize: "1.6rem",
+            background: "none",
+            cursor: "pointer",
+          }}
+        >
+          X
+        </button>
+        <p style={{ fontSize: "1.4rem", marginBottom: "30px" }}>
+          프로필 사진 변경
+        </p>
         <img
           src={currentImage ? currentImage : "/person.png"}
           alt='현재 프로필 이미지'
+          style={{
+            width: "230px",
+            height: "230px",
+            borderRadius: "50%",
+            marginBottom: "40px",
+          }}
         />
-        <input type='file' onChange={handleImageChange} />
-        <button onClick={handleImageUpload}>업로드</button> <br />
-        <button onClick={handleImageDelete}>이미지 삭제</button>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            marginBottom: "30px",
+          }}
+        >
+          <label
+            htmlFor='fileInput'
+            style={{
+              display: "inline-block",
+              width: "160px",
+              height: "40px",
+              lineHeight: "40px",
+              backgroundColor: "#ebebeb",
+              textAlign: "center",
+              cursor: "pointer",
+            }}
+          >
+            파일 선택
+          </label>
+          <input
+            type='file'
+            id='fileInput'
+            onChange={handleImageChange}
+            style={{ display: "none" }}
+          />
+          <button
+            onClick={handleImageUpload}
+            style={{
+              width: "160px",
+              height: "40px",
+              fontSize: "1rem",
+              cursor: "pointer",
+              backgroundColor: "#ccc",
+            }}
+          >
+            프로필 변경
+          </button>
+        </div>
+        <button
+          onClick={handleImageDelete}
+          style={{
+            width: "140px",
+            height: "40px",
+            fontSize: "1rem",
+            cursor: "pointer",
+            backgroundColor: "#ebebeb",
+          }}
+        >
+          이미지 삭제
+        </button>
       </Modal>
 
-      <Info>
-        <TabContainer>
+      <TabContainer>
+        <TabTop>
           <Tab
             selected={selectedTab === "nameEdit"}
             onClick={() => setSelectedTab("nameEdit")}
@@ -325,9 +418,10 @@ function Mypage() {
           >
             회원 탈퇴
           </Tab>
-        </TabContainer>
-        <div className='con'>{renderContent()}</div>
-      </Info>
+        </TabTop>
+
+        <Info>{renderContent()}</Info>
+      </TabContainer>
     </>
   );
 }

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { ContentTitle } from "../mypage/StMypage";
-import Calendar from "react-calendar";
 import {
   addCalendar,
   getCalendars,
@@ -8,6 +7,7 @@ import {
   deleteCalendar,
 } from "../../api/calendar";
 import Modal from "react-modal";
+import { StyledCalendar } from "./StCalendar";
 
 interface Schedule {
   id: number;
@@ -17,11 +17,18 @@ interface Schedule {
   user_id: number;
 }
 
-function CalendarComponent() {
+function Calendar() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [formData, setFormData] = useState({ date: "", time: "", title: "" });
+  const [formData, setFormData] = useState<{
+    date: string;
+    time: string;
+    title: string;
+  }>({ date: "", time: "", title: "" });
+  const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchSchedules = async () => {
@@ -37,26 +44,89 @@ function CalendarComponent() {
 
   const handleDateClick = (date: Date) => {
     setSelectedDate(date);
-    setFormData({ ...formData, date: date.toISOString().split("T")[0] });
+
+    const localDate = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .split("T")[0];
+
+    const selectedSchedule = schedules.find(
+      (schedule) => schedule.date === localDate
+    );
+    setSelectedSchedule(selectedSchedule || null);
+
+    if (selectedSchedule) {
+      setFormData(selectedSchedule);
+    } else {
+      setFormData({ date: localDate, time: "", title: "" });
+    }
+
     setModalOpen(true);
   };
 
   const handleSubmit = async () => {
     try {
-      await addCalendar({ user_id: 1, ...formData });
+      const user_id = 1;
+      const newSchedule = await addCalendar({ user_id, ...formData });
+      setSchedules([...schedules, newSchedule]);
       setModalOpen(false);
-      setFormData({ date: "", time: "", title: "" });
-      const updatedSchedules = await getCalendars();
-      setSchedules(updatedSchedules);
     } catch (error) {
       console.error("Error submitting schedule", error);
+    }
+  };
+
+  const handleUpdate = async () => {
+    if (!selectedSchedule) return;
+
+    try {
+      await updateCalendar(selectedSchedule.id, formData);
+      const updatedSchedules = schedules.map((schedule) =>
+        schedule.id === selectedSchedule.id
+          ? { ...selectedSchedule, ...formData }
+          : schedule
+      );
+      setSchedules(updatedSchedules);
+      setModalOpen(false);
+    } catch (error) {
+      console.error("Error updating schedule", error);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedSchedule) return;
+
+    try {
+      await deleteCalendar(selectedSchedule.id);
+      const updatedSchedules = schedules.filter(
+        (schedule) => schedule.id !== selectedSchedule.id
+      );
+      setSchedules(updatedSchedules);
+      setModalOpen(false);
+    } catch (error) {
+      console.error("Error deleting schedule", error);
     }
   };
 
   return (
     <>
       <ContentTitle>나의 캘린더</ContentTitle>
-      <Calendar onClickDay={(value: Date) => handleDateClick(value)} />
+      <StyledCalendar
+        onClickDay={(value: Date) => handleDateClick(value)}
+        calendarType={"US"}
+        locale={"en-US"}
+        formatShortWeekday={(locale: any, date: Date) =>
+          ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][date.getDay()]
+        }
+        tileClassName={({ date, view }: { date: Date; view: string }) => {
+          const dateString = date.toISOString().split("T")[0];
+          const hasSchedule = schedules.some(
+            (schedule) => schedule.date === dateString
+          );
+          return hasSchedule ? "has-schedule" : "";
+        }}
+      />
+
       {modalOpen && (
         <Modal
           isOpen={modalOpen}
@@ -77,6 +147,8 @@ function CalendarComponent() {
             }
           />
           <button onClick={handleSubmit}>추가</button>
+          {selectedSchedule?.id && <button onClick={handleUpdate}>수정</button>}
+          {selectedSchedule?.id && <button onClick={handleDelete}>삭제</button>}
           <button onClick={() => setModalOpen(false)}>닫기</button>
         </Modal>
       )}
@@ -84,4 +156,4 @@ function CalendarComponent() {
   );
 }
 
-export default CalendarComponent;
+export default Calendar;

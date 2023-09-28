@@ -79,8 +79,12 @@ export const updatePassword = async (
 
 // 회원 탈퇴
 export const deleteAccount = async (userId: string, password: string) => {
-  const response = await instance.delete(`/auth/profile/${userId}`, {
-    data: { password },
-  });
-  return response;
+  try {
+    const response = await instance.delete(`/auth/profile/${userId}`, {
+      data: { password },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
 };

@@ -23,18 +23,12 @@ export const Right = styled.div`
   display: flex;
   align-items: center;
   flex-direction: column;
-`;
-
-export const Top = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  overflow-x: hidden;
 `;
 
 export const Contents = styled.div`
   width: 95%;
-  height: 100vh;
+  height: 100%;
   display: flex;
   align-items: center;
   flex-direction: column;

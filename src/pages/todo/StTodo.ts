@@ -7,7 +7,7 @@ export const TodoWrap = styled.div`
   align-items: center;
   flex-direction: column;
   background: white;
-  border-radius: 40px;
+  border-radius: 20px;
   margin-top: 20px;
   box-shadow: 9px 9px 5px -5px rgba(79, 79, 79, 0.19);
   -webkit-box-shadow: 9px 9px 5px -5px rgba(79, 79, 79, 0.19);

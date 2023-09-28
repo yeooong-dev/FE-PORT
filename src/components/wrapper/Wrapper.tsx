@@ -1,7 +1,7 @@
 import { Outlet } from "react-router-dom";
 import NaviBar from "../navigation/NaviBar";
 import SearchBar from "../search/SearchBar";
-import { Contents, Left, Right, Top, Wrap } from "./StWrapper";
+import { Contents, Left, Right, Wrap } from "./StWrapper";
 
 function Wrapper() {
   return (
@@ -11,9 +11,7 @@ function Wrapper() {
       </Left>
 
       <Right>
-        <Top>
-          <SearchBar />
-        </Top>
+        <SearchBar />
 
         <Contents>
           <Outlet />

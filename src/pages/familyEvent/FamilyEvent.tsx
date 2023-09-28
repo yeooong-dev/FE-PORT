@@ -62,9 +62,10 @@ function FamilyEvent() {
       });
       setEvents([...events, newEvent]);
       clearInputs();
+      alert("추가 완료되었습니다. 이력보기에서 확인하세요.");
     } catch (error) {
       console.error(error);
-      alert("모든 항목을 입력바랍니다.")
+      alert("모든 항목을 입력바랍니다.");
     }
   };
 
@@ -147,27 +148,125 @@ function FamilyEvent() {
     <>
       <ContentTitle>경조사 기록</ContentTitle>
       <FamilyEventWrap>
-        <Modal isOpen={isModalOpen} onRequestClose={closeModal}>
-          <button onClick={closeModal}>X</button>
+        <Modal
+          isOpen={isModalOpen}
+          onRequestClose={closeModal}
+          style={{
+            overlay: {
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+            },
+            content: {
+              width: "56%",
+              height: "800px",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              backgroundColor: "#f6f6f6",
+              border: "none",
+              borderRadius: "20px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+            },
+          }}
+        >
+          <button
+            onClick={closeModal}
+            style={{
+              position: "absolute",
+              top: "10px",
+              right: "10px",
+              padding: "20px",
+              fontSize: "1.6rem",
+              background: "none",
+              cursor: "pointer",
+            }}
+          >
+            X
+          </button>
+          <p
+            style={{
+              fontSize: "1.5rem",
+              marginBottom: "20px",
+              textAlign: "center",
+            }}
+          >
+            경조사 기록 내역
+          </p>
+          <div
+            style={{
+              width: "80%",
+              height: "80px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              background: "lightgray",
+              padding: "10px",
+            }}
+          >
+            <div
+              style={{
+                width: "80%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-around",
+                background: "gray",
+                padding: "10px",
+              }}
+            >
+              <span>경조사 대상</span>
+              <span>경조사 날짜</span>
+              <span>경조사 유형</span>
+              <span>경조사 금액</span>
+            </div>
+          </div>
+
           {events.map((event) => (
-            <div key={event.id}>
-              <span>
-                경조사 대상: {event.target} - 경조사 날짜: {event.date} - 경조사
-                유형: {event.type} - 경조사 금액: {event.amount}원
-              </span>
-              <button
-                onClick={() => {
-                  console.log("수정 버튼 클릭됨!");
-                  setTarget(event.target);
-                  setDate(event.date);
-                  setType(event.type);
-                  setAmount(event.amount);
-                  openEditModal(event);
-                }}
-              >
-                수정
-              </button>
-              <button onClick={() => handleDeleteEvent(event.id)}>삭제</button>
+            <div
+              key={event.id}
+              style={{
+                width: "80%",
+                marginBottom: "20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "10px",
+                background: "gray",
+              }}
+            >
+              <span style={{ fontSize: "1.2rem" }}>{event.target}</span>
+              <span style={{ fontSize: "1.2rem" }}>{event.date}</span>
+              <span style={{ fontSize: "1.2rem" }}>{event.type}</span>
+              <span style={{ fontSize: "1.2rem" }}>{event.amount}원</span>
+              <div style={{ display: "flex", gap: "10px" }}>
+                <button
+                  onClick={() => {
+                    console.log("수정 버튼 클릭됨!");
+                    setTarget(event.target);
+                    setDate(event.date);
+                    setType(event.type);
+                    setAmount(event.amount);
+                    openEditModal(event);
+                  }}
+                  style={{
+                    fontSize: "1.2rem",
+                    borderBottom: "1px solid gray",
+                  }}
+                >
+                  수정
+                </button>
+                <button
+                  onClick={() => handleDeleteEvent(event.id)}
+                  style={{
+                    fontSize: "1.2rem",
+                    borderBottom: "1px solid gray",
+                  }}
+                >
+                  삭제
+                </button>{" "}
+              </div>
             </div>
           ))}
           <button onClick={handleDeleteAllEvents}>모든 이벤트 삭제</button>
@@ -233,7 +332,7 @@ function FamilyEvent() {
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setType(e.target.value)
             }
-            placeholder='경조사 유형'
+            placeholder='경조사 유형    ex) 결혼식'
           />
           <Amount
             type='number'
@@ -241,7 +340,7 @@ function FamilyEvent() {
             onChange={(e: ChangeEvent<HTMLInputElement>) =>
               setAmount(Number(e.target.value))
             }
-            placeholder='경조사 금액'
+            placeholder='경조사 금액    ex) 50,000'
           />
         </InputBox>
         <BtnBox>

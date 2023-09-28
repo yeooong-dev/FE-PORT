@@ -1,14 +1,14 @@
 import styled from "styled-components";
 
 export const FamilyEventWrap = styled.div`
-  width: 50%;
-  height: 700px;
+  width: 55%;
+  height: 750px;
   display: flex;
   align-items: center;
   flex-direction: column;
   background: white;
   border-radius: 40px;
-  margin-top: 70px;
+  margin-top: 40px;
   box-shadow: 9px 9px 5px -5px rgba(79, 79, 79, 0.19);
   -webkit-box-shadow: 9px 9px 5px -5px rgba(79, 79, 79, 0.19);
   -moz-box-shadow: 9px 9px 5px -5px rgba(79, 79, 79, 0.19);
@@ -55,7 +55,6 @@ export const Amount = styled.input`
   height: 35px;
   background: #f0f0f0;
   padding: 1rem;
-  margin-bottom: 20px;
   font-size: 1rem;
 `;
 
@@ -65,7 +64,7 @@ export const BtnBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -130px;
+  margin-top: -150px;
 
   .add {
     width: 40%;

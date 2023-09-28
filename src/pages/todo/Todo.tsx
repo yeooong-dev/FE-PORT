@@ -158,7 +158,7 @@ function Todo() {
           onRequestClose={closeModal}
           style={{
             overlay: {
-              backgroundColor: "rgba(0, 0, 0, 0.75)",
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
             },
             content: {
               width: "900px",

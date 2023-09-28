@@ -6,7 +6,7 @@ function SearchBar() {
         <SearchWrap>
             <SearchInput />
             <SerchBtn>
-                <BiSearchAlt size='30' color='#2a3642' />
+                <BiSearchAlt size='32' color='#51439d' />
             </SerchBtn>
         </SearchWrap>
     );

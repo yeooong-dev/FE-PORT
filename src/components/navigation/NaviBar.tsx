@@ -54,7 +54,7 @@ function NaviBar() {
         className='open_btn'
         onClick={() => {
           setIsSidebarOpen((prev) => !prev);
-          setWidth((prev) => (prev === "180px" ? "60px" : "180px"));
+          setWidth((prev) => (prev === "180px" ? "60px" : "18f0px"));
         }}
       >
         {isSidebarOpen ? (

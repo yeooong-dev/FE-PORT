@@ -1,10 +1,11 @@
 import { styled } from "styled-components";
 
 export const SearchWrap = styled.div`
-  width: auto;
   height: 107px;
-  padding-right: 2rem;
+  padding-right: 5rem;
+  width: 100%;
   display: flex;
+  justify-content: flex-end;
   align-items: center;
 `;
 
