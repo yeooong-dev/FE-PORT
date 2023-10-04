@@ -61,13 +61,14 @@ function Register() {
 
   // 비밀번호 유효성 검사 : 대소문자, 특수문자, 숫자만 입력 가능, 8~15 글자
   const pwValidation = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    var regExp = /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9]).{8,}$/;
+    var regExp =
+      /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9])[a-zA-Z!@#$%^*+=-0-9]{8,15}$/;
 
     if (regExp.test(e.target.value)) {
       setPwMessage(VALID_PASSWORD_MESSAGE);
     } else {
       setPwMessage(
-        "8글자 이상의 영문, 숫자, 특수문자가 필수로 포함된 비밀번호를 입력바랍니다."
+        "8~15글자 이내의 영문, 숫자, 특수문자가 필수로 포함된 비밀번호를 입력바랍니다."
       );
     }
   };
