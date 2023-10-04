@@ -63,16 +63,18 @@ function Register() {
   const pwValidation = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const regExp =
       /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9])[a-zA-Z!@#$%^*+=-0-9]{8,15}$/;
+    const password = e.target.value;
 
     const hasKorean = /[\uAC00-\uD7A3]/;
-    if (hasKorean.test(e.target.value)) {
-      setPwMessage(
-        "8~15글자 이내의 영문, 숫자, 특수문자가 필수로 포함된 비밀번호를 입력바랍니다."
-      );
+
+    // 한글 포함 체크
+    if (hasKorean.test(password)) {
+      setPwMessage("한글은 포함될 수 없습니다.");
       return;
     }
 
-    if (regExp.test(e.target.value)) {
+    // 정규식 조건 체크
+    if (regExp.test(password)) {
       setPwMessage(VALID_PASSWORD_MESSAGE);
     } else {
       setPwMessage(
@@ -128,6 +130,11 @@ function Register() {
 
     if (!isEmailChecked) {
       alert("이메일 중복 확인 바랍니다.");
+      return;
+    }
+
+    if (pwMessage !== VALID_PASSWORD_MESSAGE) {
+      alert(pwMessage);
       return;
     }
 
