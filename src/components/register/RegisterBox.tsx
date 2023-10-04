@@ -61,8 +61,16 @@ function Register() {
 
   // 비밀번호 유효성 검사 : 대소문자, 특수문자, 숫자만 입력 가능, 8~15 글자
   const pwValidation = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    var regExp =
+    const regExp =
       /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9])[a-zA-Z!@#$%^*+=-0-9]{8,15}$/;
+
+    const hasKorean = /[\uAC00-\uD7A3]/;
+    if (hasKorean.test(e.target.value)) {
+      setPwMessage(
+        "8~15글자 이내의 영문, 숫자, 특수문자가 필수로 포함된 비밀번호를 입력바랍니다."
+      );
+      return;
+    }
 
     if (regExp.test(e.target.value)) {
       setPwMessage(VALID_PASSWORD_MESSAGE);
