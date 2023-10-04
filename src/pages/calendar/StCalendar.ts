@@ -2,8 +2,8 @@ import styled from "styled-components";
 import Calendar from "react-calendar";
 
 export const StyledCalendar = styled(Calendar)`
-  width: 60%;
-  background: none;
+  width: 80%;
+  background: white;
   margin-top: 30px;
 
   .react-calendar__navigation {
@@ -81,7 +81,7 @@ export const StyledCalendar = styled(Calendar)`
   }
 
   .react-calendar__tile {
-    height: 120px;
+    height: 100px;
     background-color: #f6f6f6;
     cursor: pointer;
     background: none;

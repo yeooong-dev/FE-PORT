@@ -62,7 +62,8 @@ function Register() {
   // 비밀번호 유효성 검사 : 대소문자, 특수문자, 숫자만 입력 가능, 8~15 글자
   const pwValidation = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const regExp =
-      /^(?=.*[a-zA-Z])(?=.*[!@#$%^*+=-])(?=.*[0-9])[a-zA-Z!@#$%^*+=-0-9]{8,15}$/;
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,15}$/;
+
     const password = e.target.value;
 
     const hasKorean = /[\uAC00-\uD7A3]/;
@@ -130,11 +131,6 @@ function Register() {
 
     if (!isEmailChecked) {
       alert("이메일 중복 확인 바랍니다.");
-      return;
-    }
-
-    if (pwMessage !== VALID_PASSWORD_MESSAGE) {
-      alert(pwMessage);
       return;
     }
 
