@@ -9,7 +9,6 @@ import {
 } from "../../api/familyEvents";
 import { IoTrashOutline } from "react-icons/io5";
 import { BsPencil } from "react-icons/bs";
-import { ContentTitle } from "../mypage/StMypage";
 import {
   Amount,
   BtnBox,
@@ -148,7 +147,6 @@ function FamilyEvent() {
 
   return (
     <>
-      <ContentTitle>경조사 기록</ContentTitle>
       <FamilyEventWrap>
         <Modal
           isOpen={isModalOpen}

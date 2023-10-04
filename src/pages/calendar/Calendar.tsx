@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { ContentTitle } from "../mypage/StMypage";
 import {
   addCalendar,
   getCalendars,
@@ -110,7 +109,6 @@ function Calendar() {
 
   return (
     <>
-      <ContentTitle>나의 캘린더</ContentTitle>
       <StyledCalendar
         onClickDay={(value: Date) => handleDateClick(value)}
         calendarType={"US"}

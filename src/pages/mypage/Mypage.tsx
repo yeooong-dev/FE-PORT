@@ -1,15 +1,7 @@
 import React, { useState, useEffect } from "react";
 import useUser from "../../hook/UseUser";
 import Modal from "react-modal";
-import {
-  ContentTitle,
-  Info,
-  NameEdit,
-  Profile,
-  Tab,
-  TabContainer,
-  TabTop,
-} from "./StMypage";
+import { Info, NameEdit, Profile, Tab, TabContainer, TabTop } from "./StMypage";
 import { RiEditCircleFill } from "react-icons/ri";
 import {
   imgAdd,
@@ -20,10 +12,12 @@ import {
   deleteAccount,
 } from "../../api/mypage";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../../components/navigation/userContext";
 
 function Mypage() {
   Modal.setAppElement("#root");
   const { user, setUser } = useUser();
+  const { state, dispatch } = useUserContext();
   const [selectedTab, setSelectedTab] = useState<
     "nameEdit" | "pwEdit" | "deleteAccount" | null
   >("nameEdit");
@@ -170,6 +164,12 @@ function Mypage() {
         const response = await imgGet(user.id);
         setCurrentImage(response.data.imageUrl);
         alert("프로필 이미지가 업로드되었습니다.");
+
+        const newImageUrl = response.data.imageUrl;
+        dispatch({
+          type: "SET_USER",
+          payload: { name: state.name, profileImage: newImageUrl },
+        });
       } catch (error) {
         console.error(error);
         alert("프로필 이미지 업로드에 실패했습니다.");
@@ -186,6 +186,10 @@ function Mypage() {
         await imgDelete(user.id);
         setCurrentImage(null);
         alert("프로필 이미지가 삭제되었습니다.");
+        dispatch({
+          type: "SET_USER",
+          payload: { name: state.name, profileImage: "" },
+        });
       } catch (error) {
         console.error(error);
         alert("이미지 삭제에 실패했습니다.");
@@ -209,6 +213,11 @@ function Mypage() {
       setName("");
       setEmail("");
       setPassword("");
+
+      dispatch({
+        type: "SET_USER",
+        payload: { name: name, profileImage: state.profileImage },
+      });
     } catch (error) {
       alert("모든 필드를 올바르게 입력해주세요.");
     }
@@ -274,7 +283,6 @@ function Mypage() {
 
   return (
     <>
-      <ContentTitle>회원 정보 변경</ContentTitle>
       <Profile>
         {currentImage ? (
           <img src={currentImage} className='p_img' alt='프로필 이미지' />

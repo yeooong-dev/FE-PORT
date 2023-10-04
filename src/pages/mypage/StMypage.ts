@@ -5,19 +5,13 @@ interface TabProps {
   onClick: () => void;
 }
 
-export const ContentTitle = styled.h1`
-  font-size: 1.8rem;
-  margin-bottom: 30px;
-  color: #4c4959;
-  font-family: var(--font-title);
-`;
-
 export const Profile = styled.div`
   .p_img {
     width: 180px;
     height: 180px;
     border-radius: 50%;
     background: #ccd2e0;
+    margin-top: 30px;
     margin-bottom: 20px;
   }
 
@@ -125,6 +119,6 @@ export const NameEdit = styled.div`
     background: #51439d;
     color: white;
     cursor: pointer;
-    border-radius:10px;
+    border-radius: 10px;
   }
 `;

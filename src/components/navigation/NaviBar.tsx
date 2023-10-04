@@ -25,7 +25,7 @@ import useIsLogin from "../../hook/UseIsLogin";
 import UseLogout from "../../hook/UseLogout";
 import { useEffect, useState } from "react";
 import { Logo } from "../wrapper/StWrapper";
-import useUser from "../../hook/UseUser";
+import { useUserContext } from "./userContext";
 
 function NaviBar() {
   const [isLogin] = useIsLogin();
@@ -33,20 +33,11 @@ function NaviBar() {
   const [activeMenu, setActiveMenu] = useState("main");
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [width, setWidth] = useState("180px");
-  const { user, setUser } = useUser();
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { state } = useUserContext();
 
   useEffect(() => {
     setWidth(isSidebarOpen ? "180px" : "60px");
   }, [isSidebarOpen]);
-
-  useEffect(() => {
-    if (user) {
-      setProfileImage(user.profileImage ? user.profileImage : "/person.png");
-      setLoading(false);
-    }
-  }, [user]);
 
   return (
     <Wrap isSidebarOpen={isSidebarOpen}>
@@ -54,7 +45,7 @@ function NaviBar() {
         className='open_btn'
         onClick={() => {
           setIsSidebarOpen((prev) => !prev);
-          setWidth((prev) => (prev === "180px" ? "60px" : "18f0px"));
+          setWidth((prev) => (prev === "180px" ? "60px" : "180px"));
         }}
       >
         {isSidebarOpen ? (
@@ -69,10 +60,9 @@ function NaviBar() {
           <Link to='/main'>
             <Logo>PORT</Logo>
           </Link>
-
-          {profileImage ? (
+          {state.profileImage ? (
             <ProfileImg
-              src={profileImage}
+              src={`${state.profileImage}?${new Date().getTime()}`}
               className='p_img'
               alt='프로필 이미지'
             />
@@ -84,7 +74,7 @@ function NaviBar() {
             />
           )}
           <Ment>
-            {user && user.name ? `${user.name}님 환영합니다.` : "환영합니다."}
+            {state.name ? `${state.name}님 환영합니다.` : "환영합니다."}
           </Ment>
         </>
       )}

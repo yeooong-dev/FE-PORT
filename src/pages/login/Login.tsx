@@ -5,11 +5,18 @@ import { EmailInputLogin, LoginBtn, PwInputLogin } from "./StLogin";
 import useInput from "../../hook/UseInput";
 import { useCookies } from "react-cookie";
 import { login } from "../../api/auth";
+import { useUserContext } from "../../components/navigation/userContext";
 
 function Login() {
   const [emailValue, setEmailValue] = useInput();
   const [pwValue, setPwValue] = useInput();
-  const [cookies, setCookie] = useCookies(["authorization", "userEmail"]);
+  const [cookies, setCookie] = useCookies([
+    "authorization",
+    "userEmail",
+    "userName",
+    "userImage",
+  ]);
+  const { dispatch } = useUserContext();
 
   const navigate = useNavigate();
 
@@ -23,6 +30,15 @@ function Login() {
         const authId = res.data.token;
         setCookie("authorization", "Bearer " + authId);
         setCookie("userEmail", emailValue);
+
+        dispatch({
+          type: "SET_USER",
+          payload: {
+            name: res.data.user.name,
+            profileImage: res.data.user.profile_image,
+          },
+        });
+
         alert("로그인이 완료되었습니다.");
         navigate("/main");
       })

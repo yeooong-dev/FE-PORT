@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { ContentTitle } from "../mypage/StMypage";
 import { TodoTop, TodoWrap, Todos } from "./StTodo";
 import Modal from "react-modal";
 import { IoTrashOutline } from "react-icons/io5";
@@ -140,7 +139,6 @@ function Todo() {
 
   return (
     <>
-      <ContentTitle>오늘의 할일</ContentTitle>
       <TodoWrap>
         <TodoTop>
           <div>
