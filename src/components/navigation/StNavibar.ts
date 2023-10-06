@@ -17,7 +17,7 @@ export const Wrap = styled.div<WrapProps>`
   display: flex;
   justify-content: center;
   align-items: center;
-
+  flex-direction: column;
   background: #bdcaee;
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;

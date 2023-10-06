@@ -61,21 +61,20 @@ function Register() {
 
   // 비밀번호 유효성 검사 : 대소문자, 특수문자, 숫자만 입력 가능, 8~15 글자
   const pwValidation = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const regExp =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])[A-Za-z0-9!@#$%^&*]{8,15}$/;
-
     const password = e.target.value;
 
-    const hasKorean = /[\uAC00-\uD7A3]/;
-
     // 한글 포함 체크
+    const hasKorean = /[\uAC00-\uD7A3]/;
     if (hasKorean.test(password)) {
       setPwMessage("한글은 포함될 수 없습니다.");
       return;
     }
 
-    // 정규식 조건 체크
-    if (regExp.test(password)) {
+    // 나머지 조건 (영문자, 숫자, 특수문자 포함, 길이 8~15글자):
+    const passwordRegex =
+      /^(?![\uAC00-\uD7A3]*$)(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,15}$/;
+
+    if (passwordRegex.test(password)) {
       setPwMessage(VALID_PASSWORD_MESSAGE);
     } else {
       setPwMessage(
@@ -201,8 +200,8 @@ function Register() {
           type='password'
           value={pwValue || ""}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setPwValue(e);
             pwValidation(e);
+            setPwValue(e);
           }}
           placeholder='비밀번호를 입력해주세요.'
         />

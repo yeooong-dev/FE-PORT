@@ -2,14 +2,18 @@ import instance from "./instance";
 
 interface CalendarAddPayload {
   user_id: number;
-  date: string;
-  time: string;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
   title: string;
 }
 
 interface CalendarUpdatePayload {
-  date: string;
-  time: string;
+  startDate: string;
+  endDate: string;
+  startTime: string;
+  endTime: string;
   title: string;
 }
 

@@ -164,7 +164,7 @@ function Todo() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              backgroundColor: "#d4d4d4",
+              backgroundColor: "#dddddd",
               border: "none",
               borderRadius: "10px",
               display: "flex",
