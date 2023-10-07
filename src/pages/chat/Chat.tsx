@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { ChatWrap, LeftWrap, RightWrap } from "./StChat";
-import { createRoom, getRoom, getUsers, postMessage } from "../../api/chat";
+import {
+  createRoom,
+  getInteractedUsers,
+  getRoom,
+  getUsers,
+  postMessage,
+  removeUserFromRoom,
+} from "../../api/chat";
 import { imgGet } from "../../api/mypage";
 import { HiOutlinePencilAlt } from "react-icons/hi";
 
@@ -25,9 +32,25 @@ function Chat() {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [interactedUsers, setInteractedUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const loadMessages = async () => {
+      if (selectedUser) {
+        try {
+          const roomMessages = await getRoom(selectedUser.roomId);
+          setMessages(roomMessages.chats || []);
+        } catch (error) {
+          console.error("Error loading messages", error);
+        }
+      }
+    };
+    loadMessages();
+  }, [selectedUser]);
+
+  useEffect(() => {
+    const fetchAllUsers = async () => {
       try {
         const fetchedUsers = await getUsers();
         const usersWithImages = await Promise.all(
@@ -51,80 +74,80 @@ function Chat() {
             }
           })
         );
-        setUsers(usersWithImages || []);
+        setAllUsers(usersWithImages || []);
       } catch (error) {
         console.error(error);
       }
     };
-    fetchUsers();
-  }, []);
 
-  useEffect(() => {
-    const loadMessages = async () => {
-      if (selectedUser) {
-        try {
-          const roomMessages = await getRoom(selectedUser.roomId);
-          setMessages(roomMessages.chats || []);
-        } catch (error) {
-          console.error("Error loading messages", error);
-        }
+    const fetchInteractedUsers = async () => {
+      try {
+        const interacted = await getInteractedUsers();
+        setInteractedUsers(interacted || []);
+      } catch (error) {
+        console.error("Error fetching interacted users", error);
       }
     };
 
-    loadMessages();
+    fetchAllUsers();
+    fetchInteractedUsers();
   }, [selectedUser]);
+
+  useEffect(() => {
+    const loadInitialMessages = async () => {
+      if (interactedUsers.length > 0) {
+        const initialUser = interactedUsers[0];
+        setSelectedUser(initialUser);
+        const roomMessages = await getRoom(initialUser.roomId);
+        setMessages(roomMessages.chats || []);
+      }
+    };
+    loadInitialMessages();
+  }, [interactedUsers]);
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      const interacted = await getInteractedUsers();
+      setInteractedUsers(interacted || []);
+
+      if (interacted && interacted[0]) {
+        const roomMessages = await getRoom(interacted[0].roomId);
+        setMessages(roomMessages.chats || []);
+        setSelectedUser(interacted[0]);
+      }
+    };
+    fetchInitialData();
+  }, []);
 
   const handleNewChat = async (userId: number) => {
     try {
       const roomName = `Room_${Date.now()}`;
       const room = await createRoom([userId], roomName);
-      if (room) {
-        const user = users.find((user) => user.id === userId);
-        if (user) {
-          const updatedUser = { ...user, roomId: room.id };
-          setSelectedUser(updatedUser);
+      const newUser = allUsers.find((u) => u.id === userId);
 
-          const roomMessages = await getRoom(room.id);
-          if (roomMessages && Array.isArray(roomMessages.chats)) {
-            setMessages(roomMessages.chats);
-          } else {
-            console.error("Invalid response:", roomMessages);
-          }
-        }
-        setModalIsOpen(false);
+      if (newUser && room) {
+        const updatedUser = { ...newUser, roomId: room.id };
+        setInteractedUsers((prev) => [updatedUser, ...prev]);
+        setSelectedUser(updatedUser);
       }
+
+      setModalIsOpen(false);
     } catch (error) {
       console.error("Error in handleNewChat", error);
     }
   };
 
   const handleSendMessage = async () => {
-    console.log("handleSendMessage is called!");
     if (selectedUser && inputValue.trim()) {
       try {
         const roomId = selectedUser.roomId;
         const userId = Number(selectedUser.id);
-
-        if (
-          typeof roomId !== "number" ||
-          Number.isNaN(roomId) ||
-          !Number.isInteger(roomId) ||
-          roomId <= 0
-        ) {
-          console.error("Invalid roomId:", roomId);
-          return;
-        }
-        if (Number.isNaN(userId) || !Number.isInteger(userId) || userId <= 0) {
-          console.error("Invalid userId:", userId);
-          return;
-        }
 
         const newMessageResponse = await postMessage(
           roomId,
           userId,
           inputValue
         );
-        console.log(newMessageResponse);
 
         setMessages((prevMessages) => [
           ...prevMessages,
@@ -135,10 +158,30 @@ function Chat() {
           },
         ]);
 
+        setInteractedUsers((prev) => {
+          return prev.map((user) => {
+            if (user.id === selectedUser?.id) {
+              return { ...user, lastMessage: inputValue };
+            }
+            return user;
+          });
+        });
+
         setInputValue("");
       } catch (error) {
         console.error("Error in handleSendMessage", error);
       }
+    }
+  };
+
+  const handleLeaveChatRoom = async (userId: number) => {
+    try {
+      if (selectedUser?.roomId) {
+        await removeUserFromRoom(selectedUser.roomId, userId);
+        setInteractedUsers((prev) => prev.filter((user) => user.id !== userId));
+      }
+    } catch (error) {
+      console.error("Error leaving chat room", error);
     }
   };
 
@@ -190,7 +233,7 @@ function Chat() {
             >
               PORT 사용자들
             </h5>
-            {users.map((user) => (
+            {allUsers.map((user) => (
               <div
                 key={user.id}
                 style={{
@@ -233,7 +276,7 @@ function Chat() {
             ))}
           </div>
         </Modal>
-        {users.map((user) => (
+        {interactedUsers.map((user) => (
           <div
             key={user.id}
             onClick={() => setSelectedUser(user)}
@@ -248,6 +291,9 @@ function Chat() {
               <p>{user.name}</p>
               <p>{user.lastMessage}</p>
             </div>
+            <button onClick={() => handleLeaveChatRoom(user.id)}>
+              채팅 나가기
+            </button>
           </div>
         ))}
       </LeftWrap>
@@ -265,7 +311,6 @@ function Chat() {
               />
               <button
                 onClick={() => {
-                  console.log("Send button is clicked!");
                   handleSendMessage();
                 }}
               >
@@ -333,5 +378,4 @@ function Chat() {
     </ChatWrap>
   );
 }
-
 export default Chat;

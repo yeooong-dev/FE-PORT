@@ -38,6 +38,17 @@ function FamilyEvent() {
   const [events, setEvents] = useState<Event[]>([]);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editEventId, setEditEventId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const eventsPerPage = 7;
+
+  const indexOfLastEvent = currentPage * eventsPerPage;
+  const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
+  const currentEvents = events.slice(indexOfFirstEvent, indexOfLastEvent);
+
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(events.length / eventsPerPage); i++) {
+    pageNumbers.push(i);
+  }
 
   useEffect(() => {
     fetchEvents();
@@ -156,7 +167,7 @@ function FamilyEvent() {
               backgroundColor: "rgba(0, 0, 0, 0.5)",
             },
             content: {
-              width: "80%",
+              width: "68%",
               height: "800px",
               top: "50%",
               left: "50%",
@@ -169,6 +180,8 @@ function FamilyEvent() {
               alignItems: "center",
               justifyContent: "center",
               position: "relative",
+              overflowY: "auto",
+              padding: "2.5rem",
             },
           }}
         >
@@ -258,8 +271,9 @@ function FamilyEvent() {
             </div>
           </div>
 
-          {events.map((event) => (
+          {currentEvents.map((event) => (
             <div
+              key={event.id}
               style={{
                 width: "90%",
                 height: "80px",
@@ -272,10 +286,11 @@ function FamilyEvent() {
                 key={event.id}
                 style={{
                   width: "100%",
-                  height: "80px",
+                  height: "70px",
                   borderBottom: "1.5px solid #d9d9d9",
                   display: "flex",
                   alignItems: "center",
+                  marginTop: "-20px",
                 }}
               >
                 <span
@@ -360,6 +375,29 @@ function FamilyEvent() {
               </div>
             </div>
           ))}
+          <div>
+            {pageNumbers.map((number) => (
+              <button
+                key={number}
+                onClick={() => setCurrentPage(number)}
+                style={{
+                  width:"30px",
+                  height:"30px",
+                  fontSize: "1.2rem",
+                  margin: "0.5rem",
+                  background: "none",
+                  cursor: "pointer",
+                  borderRadius: "50%",
+                  backgroundColor:
+                    currentPage === number ? "#51439d" : "transparent",
+                  color: currentPage === number ? "white" : "black",
+                }}
+              >
+                {number}
+              </button>
+            ))}
+          </div>
+
           {events.length > 0 && (
             <button
               onClick={() => {
