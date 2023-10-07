@@ -46,16 +46,18 @@ export const StyledCalendar = styled(Calendar)`
     position: relative;
   }
 
-  .react-calendar__tile.has-schedule::after {
+  .has-schedule::after {
     content: "";
+    display: block;
+    width: 50px;
+    height: 50px;
+    background: red;
     position: absolute;
     bottom: 5px;
     left: 50%;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: #51439d;
     transform: translateX(-50%);
+    border-radius: 50%;
+    z-index: 99;
   }
 
   .react-calendar__month-view__weekdays__weekday {
@@ -70,6 +72,7 @@ export const StyledCalendar = styled(Calendar)`
   }
 
   .react-calendar__tile {
+    position: relative;
     height: 120px;
     background-color: #f6f6f6;
     cursor: pointer;
@@ -152,5 +155,28 @@ export const StyledCalendar = styled(Calendar)`
   .react-calendar__tile:enabled:hover,
   .react-calendar__tile:enabled:focus {
     background-color: #e6e6e6;
+  }
+
+  .year-modal-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px;
+  }
+
+  .year-button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #f6f6f6;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+  .year-button:hover {
+    background-color: #d5dae3;
   }
 `;

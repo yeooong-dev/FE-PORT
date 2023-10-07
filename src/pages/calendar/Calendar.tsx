@@ -7,8 +7,6 @@ import {
 } from "../../api/calendar";
 import Modal from "react-modal";
 import { CustomNavi, StyledCalendar } from "./StCalendar";
-import { IoTrashOutline } from "react-icons/io5";
-import { BsPencil, BsCheckLg } from "react-icons/bs";
 
 interface Schedule {
   id: number;
@@ -45,6 +43,9 @@ function Calendar() {
   const [selectedSchedule, setSelectedSchedule] = useState<Schedule | null>(
     null
   );
+  const [yearModalOpen, setYearModalOpen] = useState(false);
+  const [filteredSchedules, setFilteredSchedules] = useState<Schedule[]>([]);
+
   useEffect(() => {
     const fetchSchedules = async () => {
       try {
@@ -56,6 +57,30 @@ function Calendar() {
     };
     fetchSchedules();
   }, []);
+
+  const isWithinRange = (date: string, startDate: string, endDate: string) => {
+    return date >= startDate && date <= endDate;
+  };
+
+  const updateFilteredSchedules = (dateString: string) => {
+    const schedulesForTheDate = schedules.filter(
+      (schedule) =>
+        dateString >= schedule.startDate && dateString <= schedule.endDate
+    );
+    setFilteredSchedules(schedulesForTheDate);
+  };
+
+  useEffect(() => {
+    if (selectedDate) {
+      const localDate = new Date(
+        selectedDate.getTime() - selectedDate.getTimezoneOffset() * 60000
+      )
+        .toISOString()
+        .split("T")[0];
+      updateFilteredSchedules(localDate);
+    }
+  }, [schedules, selectedDate]);
+
   const handleDateClick = (date: Date) => {
     setSelectedDate(date);
     const localDate = new Date(
@@ -63,15 +88,7 @@ function Calendar() {
     )
       .toISOString()
       .split("T")[0];
-    const selectedSchedules = schedules.filter(
-      (schedule) =>
-        schedule.startDate <= localDate && schedule.endDate >= localDate
-    );
-    if (selectedSchedules.length > 0) {
-      setSelectedSchedule(selectedSchedules[0]);
-    } else {
-      setSelectedSchedule(null);
-    }
+
     setFormData({
       startDate: localDate,
       endDate: localDate,
@@ -83,12 +100,18 @@ function Calendar() {
     setIsModalOpen(true);
   };
 
-  const openModal = () => {
-    setIsModalOpen(true);
-  };
-
   const closeModal = () => {
     setIsModalOpen(false);
+  };
+
+  const selectMonthAndCloseModal = (month: number) => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), month));
+    setYearModalOpen(false);
+  };
+
+  const selectYear = (year: number) => {
+    setCurrentMonth(new Date(year, currentMonth.getMonth()));
+    setView("decade");
   };
 
   const isValidForm = () => {
@@ -172,16 +195,9 @@ function Calendar() {
     }
   };
 
-  const toggleYearView = () => {
-    if (view === "month") {
-      setView("year");
-    } else if (view === "year" || view === "decade") {
-      setView("month");
-    }
-  };
-
-  const openYearSelection = () => {
-    setView("decade");
+  const openYearAndMonthSelection = () => {
+    setView("month");
+    setYearModalOpen(true);
   };
 
   return (
@@ -197,7 +213,7 @@ function Calendar() {
         >
           &lt;
         </button>
-        <span onClick={openYearSelection}>
+        <span onClick={openYearAndMonthSelection}>
           {currentMonth.getFullYear()}
           {"."}
           {currentMonth.toLocaleString("ko", { month: "long" })}
@@ -213,6 +229,106 @@ function Calendar() {
           &gt;
         </button>
       </CustomNavi>
+
+      {yearModalOpen && (
+        <Modal
+          isOpen={yearModalOpen}
+          onRequestClose={() => setYearModalOpen(false)}
+          closeTimeoutMS={200}
+          style={{
+            overlay: {
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+            },
+            content: {
+              width: "35%",
+              height: "50vh",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              backgroundColor: "#f6f6f6",
+              border: "none",
+              borderRadius: "20px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            },
+          }}
+        >
+          {view === "month" ? (
+            // 년도 선택
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                flexDirection: "row",
+                maxWidth: "100%",
+                height: "90%",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {Array.from(
+                { length: 12 },
+                (_, i) => currentMonth.getFullYear() - 5 + i
+              ).map((year) => (
+                <button
+                  key={year}
+                  onClick={() => selectYear(year)}
+                  style={{
+                    display: "flex",
+                    fontSize: "2rem",
+                    whiteSpace: "nowrap",
+                    width: "30%",
+                    background: "none",
+                    cursor: "pointer",
+                    color: "#67686b",
+                    transition: "color 0.3s ease",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {year}
+                </button>
+              ))}
+            </div>
+          ) : (
+            // 월 선택
+            <div
+              style={{
+                display: "flex",
+                flexWrap: "wrap",
+                flexDirection: "row",
+                maxWidth: "100%",
+                height: "90%",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                <button
+                  key={month}
+                  onClick={() => selectMonthAndCloseModal(month - 1)}
+                  style={{
+                    display: "flex",
+                    fontSize: "2rem",
+                    whiteSpace: "nowrap",
+                    width: "30%",
+                    background: "none",
+                    cursor: "pointer",
+                    color: "#67686b",
+                    transition: "color 0.3s ease",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {month}월
+                </button>
+              ))}
+            </div>
+          )}
+        </Modal>
+      )}
 
       <StyledCalendar
         key={currentMonth.toString()}
@@ -240,9 +356,8 @@ function Calendar() {
         }}
         tileContent={({ date: tileDate }: { date: Date }) => {
           const dateString = tileDate.toISOString().split("T")[0];
-          const daySchedules = schedules.filter(
-            (schedule) =>
-              schedule.startDate <= dateString && schedule.endDate >= dateString
+          const daySchedules = schedules.filter((schedule) =>
+            isWithinRange(dateString, schedule.startDate, schedule.endDate)
           );
           return daySchedules.map((schedule) => (
             <div key={schedule.id}>{schedule.title}</div>
@@ -261,7 +376,7 @@ function Calendar() {
             },
             content: {
               width: "60%",
-              height: "800px",
+              height: "900px",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
@@ -303,10 +418,10 @@ function Calendar() {
               flexDirection: "column",
             }}
           >
+            <h3 style={{ marginBottom: "20px", color: "gray" }}>
+              일정 추가하기
+            </h3>
             <div>
-              <h3 style={{ marginBottom: "10px", color: "gray" }}>
-                일정 추가하기
-              </h3>
               <input
                 type='date'
                 value={formData.startDate}
@@ -338,6 +453,9 @@ function Calendar() {
                   marginRight: "10px",
                 }}
               />
+            </div>
+
+            <div>
               <input
                 type='time'
                 value={formData.startTime}
@@ -369,75 +487,136 @@ function Calendar() {
                   marginRight: "10px",
                 }}
               />
-              <input
-                type='text'
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                placeholder='일정을 추가해주세요.'
-                style={{
-                  width: "603px",
-                  height: "30px",
-                  padding: "1rem",
-                  fontSize: "1.1rem",
-                  cursor: "pointer",
-                  marginRight: "10px",
-                  marginBottom: "10px",
-                }}
-              />
-              <button
-                onClick={handleSubmit}
-                style={{
-                  width: "635px",
-                  height: "60px",
-                  padding: "1rem",
-                  fontSize: "1.3rem",
-                  cursor: "pointer",
-                  marginRight: "10px",
-                  background: "#91a5d9",
-                  fontWeight: "bold",
-                  color: "white",
-                  marginBottom: "50px",
-                }}
-              >
-                추가
-              </button>
             </div>
 
-            <div
+            <input
+              type='text'
+              value={formData.title}
+              onChange={(e) =>
+                setFormData({ ...formData, title: e.target.value })
+              }
+              placeholder='일정을 추가해주세요.'
               style={{
-                width: "80%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
+                width: "603px",
+                height: "30px",
+                padding: "1rem",
+                fontSize: "1.1rem",
+                cursor: "pointer",
+                marginRight: "10px",
+                marginBottom: "10px",
+              }}
+            />
+            <button
+              onClick={handleSubmit}
+              style={{
+                width: "635px",
+                height: "60px",
+                padding: "1rem",
+                fontSize: "1.3rem",
+                cursor: "pointer",
+                marginRight: "10px",
+                background: "#91a5d9",
+                fontWeight: "bold",
+                color: "white",
+                marginBottom: "50px",
               }}
             >
-              <div>
-                <h3 style={{ marginBottom: "10px", color: "gray" }}>
-                  일정 목록
-                </h3>
-                {schedules.map((schedule) => (
-                  <div key={schedule.id} style={{ marginBottom: "10px" }}>
-                    <span>{schedule.title} </span>
-                    <span>
-                      {schedule.startDate} ~ {schedule.endDate}
+              추가
+            </button>
+
+            <h3
+              style={{
+                marginBottom: "20px",
+                color: "gray",
+              }}
+            >
+              일정 목록
+            </h3>
+            <div
+              style={{
+                width: "70%",
+                overflowY: "auto",
+                maxHeight: "300px",
+                borderRadius: "10px",
+                border: "1.5px solid #ccd1de",
+                padding: "2rem",
+              }}
+            >
+              {filteredSchedules.map((schedule) => (
+                <div
+                  key={schedule.id}
+                  style={{
+                    marginBottom: "10px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: "1.3rem",
+                      color: "#91a5d9",
+                      fontWeight: "bold",
+                      marginBottom: "15px",
+                    }}
+                  >
+                    {schedule.title}
+                  </p>
+                  <div
+                    style={{
+                      marginBottom: "5px",
+                      paddingBottom: "20px",
+                      borderBottom: "1.5px solid #ccd1de",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontSize: "1.2rem",
+                        color: "gray",
+                        marginRight: "30px",
+                      }}
+                    >
+                      {schedule.startDate} - {schedule.endDate}
                     </span>
-                    <button onClick={() => handleEditClick(schedule)}>
-                      {edit === schedule.id ? <BsCheckLg /> : <BsPencil />}
+                    <button
+                      onClick={() => handleEditClick(schedule)}
+                      style={{
+                        background: "none",
+                        marginRight: "10px",
+                        cursor: "pointer",
+                        width: "90px",
+                        height: "40px",
+                        border: "2px solid #c4c6cc",
+                        fontSize: "1.1rem",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      {edit === schedule.id ? "확인" : "수정"}
                     </button>
                     <button
                       onClick={() => {
-                        if (window.confirm("기록을 삭제하시겠습니까?"))
+                        if (window.confirm("기록을 삭제하시겠습니까?")) {
+                          setSelectedSchedule(schedule);
                           handleDelete();
+                        }
+                      }}
+                      style={{
+                        background: "none",
+                        cursor: "pointer",
+                        width: "90px",
+                        height: "40px",
+                        border: "2px solid #d66851",
+                        fontSize: "1.1rem",
+                        borderRadius: "5px",
+                        color: "#d66851",
                       }}
                     >
-                      <IoTrashOutline />
+                      삭제
                     </button>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         </Modal>
