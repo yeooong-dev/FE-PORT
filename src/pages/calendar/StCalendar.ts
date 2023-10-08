@@ -1,7 +1,11 @@
 import styled from "styled-components";
 import Calendar from "react-calendar";
 
-export const CustomNavi = styled.div`
+interface darkProps {
+  darkMode: boolean;
+}
+
+export const CustomNavi = styled.div<darkProps>`
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9,7 +13,7 @@ export const CustomNavi = styled.div`
   font-size: 1.8rem;
   margin-top: 30px;
   font-weight: bold;
-  color: #2e2e2e;
+  color: ${({ darkMode }) => (darkMode ? "#fff" : "#2e2e2e")};
 
   span {
     cursor: pointer;
@@ -27,9 +31,9 @@ export const CustomNavi = styled.div`
   }
 `;
 
-export const StyledCalendar = styled(Calendar)`
+export const StyledCalendar = styled(Calendar)<darkProps>`
   width: 75%;
-  background: #fcfcfc;
+  background: ${({ darkMode }) => (darkMode ? "#4e5057" : "#fcfcfc")};
   margin-top: 50px;
   border-radius: 20px;
 
@@ -61,16 +65,16 @@ export const StyledCalendar = styled(Calendar)`
   }
 
   .react-calendar__month-view__weekdays__weekday {
-    color: #474747;
     height: 50px;
     line-height: 50px;
     font-size: 1.3rem;
     border-bottom: 1px solid #dedede;
     font-weight: bold;
-    background: #d5dae3;
     border-radius: 0;
+    background: ${({ darkMode }) => (darkMode ? "#323336" : "#d5dae3")};
+    color: ${({ darkMode }) => (darkMode ? "white" : "#474747")};
   }
-
+//323336
   .react-calendar__tile {
     position: relative;
     height: 120px;
@@ -79,6 +83,7 @@ export const StyledCalendar = styled(Calendar)`
     background: none;
     font-size: 1.1rem;
     border-bottom: 1px solid #dedede;
+    color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
   }
 
   .react-calendar__tile--now {
@@ -133,6 +138,7 @@ export const StyledCalendar = styled(Calendar)`
     position: relative;
     font-weight: bold;
   }
+
   .react-calendar__month-view__days__day:nth-last-child(1) {
     border-bottom-right-radius: 20px;
   }
@@ -149,12 +155,13 @@ export const StyledCalendar = styled(Calendar)`
   }
 
   .react-calendar__month-view__days__day--neighboringMonth {
-    background: #f5f5f5;
-    color: #cccccc;
+    background: ${({ darkMode }) => (darkMode ? "#323336" : "#f5f5f5")};
+    color: ${({ darkMode }) => (darkMode ? "white" : "#cccccc")};
   }
   .react-calendar__tile:enabled:hover,
   .react-calendar__tile:enabled:focus {
     background-color: #e6e6e6;
+    color: ${({ darkMode }) => (darkMode ? "#2e2e2e" : "#e6e6e6")};
   }
 
   .year-modal-container {

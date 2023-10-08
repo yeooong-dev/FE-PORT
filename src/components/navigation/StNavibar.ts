@@ -7,6 +7,11 @@ interface MainProps {
 
 interface WrapProps {
   isSidebarOpen: boolean;
+  darkMode: boolean;
+}
+
+interface MentProps {
+  darkMode: boolean;
 }
 
 export const Wrap = styled.div<WrapProps>`
@@ -18,7 +23,7 @@ export const Wrap = styled.div<WrapProps>`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  background: #bdcaee;
+  background: ${({ darkMode }) => (darkMode ? "#323336" : "#d7e0f7")};
   border-top-right-radius: 20px;
   border-bottom-right-radius: 20px;
   margin-right: ${({ isSidebarOpen }) =>
@@ -30,7 +35,7 @@ export const Wrap = styled.div<WrapProps>`
     position: absolute;
     top: ${({ isSidebarOpen }) => (isSidebarOpen ? "2.8%" : "290px")};
     left: ${({ isSidebarOpen }) => (isSidebarOpen ? "15%" : "30px")};
-    color: #665c9e;
+    color: ${({ darkMode }) => (darkMode ? "#fff" : "#665c9e")};
   }
 `;
 
@@ -41,10 +46,10 @@ export const ProfileImg = styled.img`
   margin: 30px;
 `;
 
-export const Ment = styled.p`
+export const Ment = styled.p<MentProps>`
   margin-bottom: 20px;
   font-size: 1.3rem;
-  color: #293642;
+  color: ${({ darkMode }) => (darkMode ? "#fff" : "#293642")};
 `;
 
 export const NavBtn = styled.div`
@@ -185,7 +190,7 @@ export const Mypage = styled.button<MainProps>`
   }
 `;
 
-export const Dark = styled.li`
+export const Dark = styled.li<MentProps>`
   width: 170px;
   height: 50px;
   display: flex;
@@ -193,15 +198,15 @@ export const Dark = styled.li`
   justify-content: center;
   margin-bottom: 60px;
   font-size: 1.2rem;
-  color: #293642;
+  color: ${({ darkMode }) => (darkMode ? "#fff" : "#293642")};
   font-weight: 900;
   cursor: pointer;
 `;
 
-export const Log = styled.li`
+export const Log = styled.li<MentProps>`
   cursor: pointer;
   font-size: 1.2rem;
-  color: #293642;
+  color: ${({ darkMode }) => (darkMode ? "#fff" : "#293642")};
   text-align: center;
   margin-bottom: 20px;
 `;

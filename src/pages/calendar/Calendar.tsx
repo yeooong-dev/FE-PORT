@@ -7,6 +7,7 @@ import {
 } from "../../api/calendar";
 import Modal from "react-modal";
 import { CustomNavi, StyledCalendar } from "./StCalendar";
+import { useDarkMode } from "../../components/darkmode/DarkModeContext";
 
 interface Schedule {
   id: number;
@@ -45,6 +46,7 @@ function Calendar() {
   );
   const [yearModalOpen, setYearModalOpen] = useState(false);
   const [filteredSchedules, setFilteredSchedules] = useState<Schedule[]>([]);
+  const { darkMode, toggleDarkMode } = useDarkMode();
 
   useEffect(() => {
     const fetchSchedules = async () => {
@@ -202,7 +204,7 @@ function Calendar() {
 
   return (
     <>
-      <CustomNavi>
+      <CustomNavi darkMode={darkMode}>
         <button
           onClick={() => {
             setCurrentMonth(
@@ -245,7 +247,7 @@ function Calendar() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              backgroundColor: "#f6f6f6",
+              backgroundColor: darkMode ? "#333" : "#f6f6f6",
               border: "none",
               borderRadius: "20px",
               display: "flex",
@@ -282,7 +284,7 @@ function Calendar() {
                     width: "30%",
                     background: "none",
                     cursor: "pointer",
-                    color: "#67686b",
+                    color: darkMode ? "white" : "#67686b",
                     transition: "color 0.3s ease",
                     justifyContent: "center",
                     alignItems: "center",
@@ -316,7 +318,7 @@ function Calendar() {
                     width: "30%",
                     background: "none",
                     cursor: "pointer",
-                    color: "#67686b",
+                    color: darkMode ? "white" : "#67686b",
                     transition: "color 0.3s ease",
                     justifyContent: "center",
                     alignItems: "center",
@@ -331,6 +333,7 @@ function Calendar() {
       )}
 
       <StyledCalendar
+        darkMode={darkMode}
         key={currentMonth.toString()}
         value={currentMonth}
         onClickDay={(value: Date) => handleDateClick(value)}
@@ -380,7 +383,7 @@ function Calendar() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              backgroundColor: "#f6f6f6",
+              backgroundColor: darkMode ? "#333" : "#f6f6f6",
               border: "none",
               borderRadius: "20px",
               display: "flex",
@@ -515,10 +518,10 @@ function Calendar() {
                 fontSize: "1.3rem",
                 cursor: "pointer",
                 marginRight: "10px",
-                background: "#91a5d9",
                 fontWeight: "bold",
-                color: "white",
                 marginBottom: "50px",
+                backgroundColor: darkMode ? "#7568ba" : "#91a5d9",
+                color: "white",
               }}
             >
               추가
@@ -556,7 +559,7 @@ function Calendar() {
                   <p
                     style={{
                       fontSize: "1.3rem",
-                      color: "#91a5d9",
+                      color: darkMode ? "white" : "#91a5d9",
                       fontWeight: "bold",
                       marginBottom: "15px",
                     }}
@@ -588,6 +591,7 @@ function Calendar() {
                         width: "90px",
                         height: "40px",
                         border: "2px solid #c4c6cc",
+                        color: darkMode ? "white" : "black",
                         fontSize: "1.1rem",
                         borderRadius: "5px",
                       }}

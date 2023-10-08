@@ -1,11 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Logo } from "../wrapper/StWrapper";
 import {
   AuthContent,
   AuthWrap,
   EmailBox,
   EmailCheck,
   EmailInput,
+  Logo,
   NameInput,
   PwConfilmInput,
   PwInput,

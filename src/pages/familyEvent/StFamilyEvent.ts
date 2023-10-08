@@ -1,17 +1,18 @@
 import styled from "styled-components";
 
-export const FamilyEventWrap = styled.div`
+interface darkProps {
+  darkMode: boolean;
+}
+
+export const FamilyEventWrap = styled.div<darkProps>`
   width: 55%;
   height: 750px;
   display: flex;
   align-items: center;
   flex-direction: column;
-  background: white;
+  background: ${({ darkMode }) => (darkMode ? "#323336" : "white")};
   border-radius: 40px;
   margin-top: 80px;
-  box-shadow: 9px 9px 5px -5px rgba(79, 79, 79, 0.19);
-  -webkit-box-shadow: 9px 9px 5px -5px rgba(79, 79, 79, 0.19);
-  -moz-box-shadow: 9px 9px 5px -5px rgba(79, 79, 79, 0.19);
 `;
 
 export const InputBox = styled.div`

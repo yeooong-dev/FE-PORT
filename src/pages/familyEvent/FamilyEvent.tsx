@@ -18,6 +18,7 @@ import {
   Target,
   Type,
 } from "./StFamilyEvent";
+import { useDarkMode } from "../../components/darkmode/DarkModeContext";
 
 interface Event {
   id: number;
@@ -40,6 +41,7 @@ function FamilyEvent() {
   const [editEventId, setEditEventId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 7;
+  const { darkMode } = useDarkMode();
 
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
@@ -158,7 +160,7 @@ function FamilyEvent() {
 
   return (
     <>
-      <FamilyEventWrap>
+      <FamilyEventWrap darkMode={darkMode}>
         <Modal
           isOpen={isModalOpen}
           onRequestClose={closeModal}
@@ -172,7 +174,7 @@ function FamilyEvent() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              backgroundColor: "#f6f6f6",
+              backgroundColor: darkMode ? "#333" : "#f6f6f6",
               border: "none",
               borderRadius: "20px",
               display: "flex",
@@ -186,16 +188,20 @@ function FamilyEvent() {
           }}
         >
           <button
-            onClick={closeModal}
             style={{
               position: "absolute",
-              top: "10px",
-              right: "10px",
-              padding: "20px",
-              fontSize: "1.6rem",
-              background: "none",
+              top: "20px",
+              right: "20px",
+              backgroundColor: "#858087",
+              border: "none",
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              fontSize: "1.3rem",
               cursor: "pointer",
+              color: "white",
             }}
+            onClick={closeModal}
           >
             X
           </button>
@@ -205,7 +211,7 @@ function FamilyEvent() {
               marginBottom: "20px",
               textAlign: "center",
               fontWeight: "bold",
-              color: "#2e2e2e",
+              color: darkMode ? "white" : "#2e2e2e",
             }}
           >
             경조사 기록 내역
@@ -280,6 +286,7 @@ function FamilyEvent() {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
+                color: darkMode ? "white" : "#2e2e2e",
               }}
             >
               <div
@@ -354,9 +361,10 @@ function FamilyEvent() {
                       cursor: "pointer",
                       background: "none",
                       marginRight: "10px",
+                      color: darkMode ? "white" : "#51439d",
                     }}
                   >
-                    <BsPencil size='25' color='#51439d' />
+                    <BsPencil size='25' />
                   </button>
                   <button
                     onClick={() => {
@@ -367,9 +375,10 @@ function FamilyEvent() {
                       fontSize: "1.2rem",
                       cursor: "pointer",
                       background: "none",
+                      color: darkMode ? "white" : "#51439d",
                     }}
                   >
-                    <IoTrashOutline size='25' color='#51439d' />
+                    <IoTrashOutline size='25' />
                   </button>
                 </div>
               </div>
@@ -381,8 +390,8 @@ function FamilyEvent() {
                 key={number}
                 onClick={() => setCurrentPage(number)}
                 style={{
-                  width:"30px",
-                  height:"30px",
+                  width: "30px",
+                  height: "30px",
                   fontSize: "1.2rem",
                   margin: "0.5rem",
                   background: "none",
@@ -432,7 +441,7 @@ function FamilyEvent() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              backgroundColor: "#f6f6f6",
+              backgroundColor: darkMode ? "#333" : "#f6f6f6",
               border: "none",
               borderRadius: "20px",
               display: "flex",
@@ -444,16 +453,20 @@ function FamilyEvent() {
           }}
         >
           <button
-            onClick={closeEditModal}
             style={{
               position: "absolute",
-              top: "10px",
-              right: "10px",
-              padding: "20px",
-              fontSize: "1.6rem",
-              background: "none",
+              top: "20px",
+              right: "20px",
+              backgroundColor: "#858087",
+              border: "none",
+              width: "40px",
+              height: "40px",
+              borderRadius: "50%",
+              fontSize: "1.3rem",
               cursor: "pointer",
+              color: "white",
             }}
+            onClick={closeModal}
           >
             X
           </button>

@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from "react";
 import useUser from "../../hook/UseUser";
 import Modal from "react-modal";
-import { Info, NameEdit, Profile, Tab, TabContainer, TabTop } from "./StMypage";
+import {
+  Info,
+  NameEdit,
+  Profile,
+  Tab,
+  TabContainer,
+  TabTop,
+  Wrap,
+} from "./StMypage";
 import { RiEditCircleFill } from "react-icons/ri";
 import {
   imgAdd,
@@ -13,6 +21,7 @@ import {
 } from "../../api/mypage";
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../components/navigation/userContext";
+import { useDarkMode } from "../../components/darkmode/DarkModeContext";
 
 function Mypage() {
   Modal.setAppElement("#root");
@@ -30,6 +39,7 @@ function Mypage() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
+  const { darkMode } = useDarkMode();
 
   // 프로필 이미지 가져오기
   useEffect(() => {
@@ -67,7 +77,7 @@ function Mypage() {
     switch (selectedTab) {
       case "nameEdit":
         return (
-          <TabContainer>
+          <TabContainer darkMode={darkMode}>
             <NameEdit>
               <input
                 type='text'
@@ -95,7 +105,7 @@ function Mypage() {
         );
       case "pwEdit":
         return (
-          <TabContainer>
+          <TabContainer darkMode={darkMode}>
             <NameEdit>
               <input
                 type='text'
@@ -124,7 +134,7 @@ function Mypage() {
         );
       case "deleteAccount":
         return (
-          <TabContainer>
+          <TabContainer darkMode={darkMode}>
             <NameEdit>
               <input
                 type='password'
@@ -282,8 +292,8 @@ function Mypage() {
   };
 
   return (
-    <>
-      <Profile>
+    <Wrap>
+      <Profile darkMode={darkMode}>
         {currentImage ? (
           <img src={currentImage} className='p_img' alt='프로필 이미지' />
         ) : (
@@ -291,7 +301,7 @@ function Mypage() {
         )}
 
         <div onClick={openModal}>
-          <RiEditCircleFill className='edit' size='45' color='#595959' />
+          <RiEditCircleFill className='edit' size='45' color='#51439d' />
         </div>
         <p className='hi'>안녕하세요!</p>
         <p className='name'>{user && user.name ? `${user.name}님` : null}</p>
@@ -310,7 +320,7 @@ function Mypage() {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            backgroundColor: "#f6f6f6",
+            backgroundColor: darkMode ? "#333" : "#f6f6f6",
             border: "none",
             borderRadius: "20px",
             display: "flex",
@@ -322,20 +332,30 @@ function Mypage() {
         }}
       >
         <button
-          onClick={closeModal}
           style={{
             position: "absolute",
-            top: "10px",
-            right: "10px",
-            padding: "20px",
-            fontSize: "1.6rem",
-            background: "none",
+            top: "20px",
+            right: "20px",
+            backgroundColor: "#858087",
+            border: "none",
+            width: "40px",
+            height: "40px",
+            borderRadius: "50%",
+            fontSize: "1.3rem",
             cursor: "pointer",
+            color: "white",
           }}
+          onClick={closeModal}
         >
           X
         </button>
-        <p style={{ fontSize: "1.4rem", marginBottom: "30px" }}>
+        <p
+          style={{
+            fontSize: "1.4rem",
+            marginBottom: "30px",
+            color: darkMode ? "white" : "black",
+          }}
+        >
           프로필 사진 변경
         </p>
         <img
@@ -403,12 +423,13 @@ function Mypage() {
         </button>
       </Modal>
 
-      <TabContainer>
-        <TabTop>
+      <TabContainer darkMode={darkMode}>
+        <TabTop darkMode={darkMode}>
           <Tab
             selected={selectedTab === "nameEdit"}
             onClick={() => setSelectedTab("nameEdit")}
             className='nameEditBtn'
+            darkMode={darkMode}
           >
             이름 변경
           </Tab>
@@ -416,6 +437,7 @@ function Mypage() {
             selected={selectedTab === "pwEdit"}
             onClick={() => setSelectedTab("pwEdit")}
             className='passwordEditBtn'
+            darkMode={darkMode}
           >
             비밀번호 변경
           </Tab>
@@ -423,6 +445,7 @@ function Mypage() {
             selected={selectedTab === "deleteAccount"}
             onClick={() => setSelectedTab("deleteAccount")}
             className='deleteAccountEditBtn'
+            darkMode={darkMode}
           >
             회원 탈퇴
           </Tab>
@@ -430,7 +453,7 @@ function Mypage() {
 
         <Info>{renderContent()}</Info>
       </TabContainer>
-    </>
+    </Wrap>
   );
 }
 

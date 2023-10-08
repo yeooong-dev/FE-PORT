@@ -5,7 +5,15 @@ interface TabProps {
   onClick: () => void;
 }
 
-export const Profile = styled.div`
+interface darkProps {
+  darkMode: boolean;
+}
+
+export const Wrap = styled.div`
+  width: 60%;
+`;
+
+export const Profile = styled.div<darkProps>`
   .p_img {
     width: 180px;
     height: 180px;
@@ -33,39 +41,56 @@ export const Profile = styled.div`
     font-size: 1.6rem;
     margin-top: 45px;
     margin-bottom: 8px;
-    color: #2e2e2e;
     letter-spacing: 5px;
+    color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
   }
 
   .name {
     font-size: 2rem;
-    color: #51439d;
     font-weight: 600;
     margin-bottom: 40px;
     letter-spacing: 5px;
+    color: ${({ darkMode }) => (darkMode ? "white" : "#51439d")};
   }
 `;
 
-export const TabContainer = styled.div`
-  width: 55%;
+export const TabContainer = styled.div<darkProps>`
+  width: 100%;
   display: flex;
   justify-content: center;
   flex-direction: column;
+  height: 490px;
+  background: ${({ darkMode }) => (darkMode ? "#333" : "#f6f6f6")};
+  color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
 `;
 
-export const TabTop = styled.div`
+export const TabTop = styled.div<darkProps>`
   width: 100%;
   display: flex;
 `;
 
-export const Tab = styled.div<TabProps>`
+export const Tab = styled.div<TabProps & darkProps>`
   width: 100%;
   height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: ${(props) => (props.selected ? "#f4f4f6" : "#dcdee3")};
-  color: ${(props) => (props.selected ? "#51439d" : "#ababab")};
+  background: ${(props) =>
+    props.darkMode
+      ? props.selected
+        ? "#333"
+        : "#555"
+      : props.selected
+      ? "#f4f4f6"
+      : "#dcdee3"};
+  color: ${(props) =>
+    props.darkMode
+      ? props.selected
+        ? "#fff"
+        : "#ccc"
+      : props.selected
+      ? "#51439d"
+      : "#ababab"};
   cursor: pointer;
   font-size: 1.25rem;
   border-top: 1px solid #cfcfcf;
@@ -98,7 +123,7 @@ export const Info = styled.div`
 
 export const NameEdit = styled.div`
   width: 100%;
-  height: 450px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;

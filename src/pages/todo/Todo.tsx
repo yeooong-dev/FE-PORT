@@ -10,6 +10,7 @@ import {
   todoToggleCheck,
   todoUpdate,
 } from "../../api/todo";
+import { useDarkMode } from "../../components/darkmode/DarkModeContext";
 Modal.setAppElement("#root");
 
 interface TodoItem {
@@ -25,6 +26,7 @@ function Todo() {
   const [editTodoId, setEditTodoId] = useState<number | null>(null);
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [checkedTodoIds, setCheckedTodoIds] = useState<number[]>([]);
+  const { darkMode } = useDarkMode();
 
   // 날짜,요일
   const currentDate = new Date();
@@ -139,8 +141,8 @@ function Todo() {
 
   return (
     <>
-      <TodoWrap>
-        <TodoTop>
+      <TodoWrap darkMode={darkMode}>
+        <TodoTop darkMode={darkMode}>
           <div>
             <p className='date'>{`${dayName} ,${currentDate.getFullYear()}.${
               currentDate.getMonth() + 1
@@ -224,7 +226,7 @@ function Todo() {
           </button>
         </Modal>
 
-        <Todos>
+        <Todos darkMode={darkMode}>
           {todos.map((todo) => (
             <div
               className={`between ${

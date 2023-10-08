@@ -1,5 +1,12 @@
 import { styled } from "styled-components";
 
+export const Logo = styled.div`
+  font-size: 2.3rem;
+  color: #51449d;
+  font-family: var(--font-logo);
+  cursor: pointer;
+`;
+
 export const AuthWrap = styled.div`
   width: 100%;
   height: 100vh;

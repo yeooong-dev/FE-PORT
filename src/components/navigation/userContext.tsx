@@ -46,6 +46,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   useEffect(() => {
     localStorage.setItem("user", JSON.stringify(state));
   }, [state]);
+
   return (
     <UserContext.Provider value={{ state, dispatch }}>
       {children}

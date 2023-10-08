@@ -11,20 +11,22 @@ export const SearchWrap = styled.div`
 
 export const SearchInput = styled.input`
   width: 280px;
-  height: 43px;
+  height: 50px;
   border: none;
   border-radius: 8px;
   padding-left: 1.5rem;
-  -webkit-box-shadow: 3px 3px 7px 1px #cacdd5;
-  box-shadow: 3px 3px 7px 1px #cacdd5;
   margin-right: 10px;
 `;
 
-export const SerchBtn = styled.button`
+export const SerchBtn = styled.button<{ darkMode: boolean }>`
   width: 40px;
   height: 20px;
   border: none;
   background: none;
   margin-bottom: 8px;
   cursor: pointer;
+
+  .icon {
+    color: ${({ darkMode }) => (darkMode ? "#fff" : "#293642")};
+  }
 `;

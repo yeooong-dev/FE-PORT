@@ -1,20 +1,21 @@
 import styled from "styled-components";
 
-export const TodoWrap = styled.div`
+interface darkProps {
+  darkMode: boolean;
+}
+
+export const TodoWrap = styled.div<darkProps>`
   width: 75%;
   height: 820px;
   display: flex;
   align-items: center;
   flex-direction: column;
-  background: white;
+  background: ${({ darkMode }) => (darkMode ? "#323336" : "white")};
   border-radius: 10px;
   margin-top: 50px;
-  box-shadow: 9px 9px 5px -5px rgba(79, 79, 79, 0.19);
-  -webkit-box-shadow: 9px 9px 5px -5px rgba(79, 79, 79, 0.19);
-  -moz-box-shadow: 9px 9px 5px -5px rgba(79, 79, 79, 0.19);
 `;
 
-export const TodoTop = styled.div`
+export const TodoTop = styled.div<darkProps>`
   width: 75%;
   display: flex;
   justify-content: space-between;
@@ -26,14 +27,14 @@ export const TodoTop = styled.div`
 
     .date{
         font-size:1.4rem;
-        color:#777777;
         font-weight:900;
         margin-bottom:20px;
+        color: ${({ darkMode }) => (darkMode ? "white" : "#777777")};
     }
     .num {
         font-size:1.2rem;
-        color:#51439d;
         font-weight:900;
+        color: ${({ darkMode }) => (darkMode ? "white" : "#51439d")};
     }
   }
 
@@ -56,7 +57,7 @@ export const TodoTop = styled.div`
   }
 `;
 
-export const Todos = styled.div`
+export const Todos = styled.div<darkProps>`
   width: 75%;
   display: flex;
   justify-content: space-between;
@@ -112,7 +113,8 @@ export const Todos = styled.div`
 
       .text {
         font-size: 1.2rem;
-        color: #555555;
+        color: ${({ darkMode }) => (darkMode ? "white" : "#555555")};
+        font-weight: bold;
       }
 
       .text.checked {

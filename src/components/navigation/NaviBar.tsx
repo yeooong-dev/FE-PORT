@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   Cal,
   Fam,
@@ -19,28 +19,66 @@ import { RiCalendarCheckFill } from "react-icons/ri";
 import { BiMessageDetail } from "react-icons/bi";
 import { TbReportMoney } from "react-icons/tb";
 import { FaToggleOn, FaToggleOff } from "react-icons/fa";
-import { PiHandSwipeLeft, PiHandSwipeRight } from "react-icons/pi";
 import { HiChevronDoubleLeft, HiChevronDoubleRight } from "react-icons/hi2";
 import useIsLogin from "../../hook/UseIsLogin";
 import UseLogout from "../../hook/UseLogout";
 import { useEffect, useState } from "react";
 import { Logo } from "../wrapper/StWrapper";
 import { useUserContext } from "./userContext";
+import { useDarkMode } from "../darkmode/DarkModeContext";
 
-function NaviBar() {
+interface NaviBarProps {
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
   const [isLogin] = useIsLogin();
   const logout = UseLogout();
   const [activeMenu, setActiveMenu] = useState("main");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [width, setWidth] = useState("180px");
+
   const { state } = useUserContext();
+  const location = useLocation();
+  const { darkMode, toggleDarkMode } = useDarkMode();
+  const userProfileFromLocalStorage = JSON.parse(
+    localStorage.getItem("user") || "{}"
+  );
+  const imageUrl =
+    userProfileFromLocalStorage.profileImage || state.profileImage;
 
   useEffect(() => {
     setWidth(isSidebarOpen ? "180px" : "60px");
   }, [isSidebarOpen]);
 
+  useEffect(() => {
+    switch (location.pathname) {
+      case "/main":
+        setActiveMenu("main");
+        break;
+      case "/todo":
+        setActiveMenu("todo");
+        break;
+      case "/calendar":
+        setActiveMenu("calendar");
+        break;
+      case "/event":
+        setActiveMenu("event");
+        break;
+      case "/chat":
+        setActiveMenu("chat");
+        break;
+      case "/mypage":
+        setActiveMenu("mypage");
+        break;
+      default:
+        setActiveMenu("main");
+        break;
+    }
+  }, [location.pathname]);
+
   return (
-    <Wrap isSidebarOpen={isSidebarOpen}>
+    <Wrap isSidebarOpen={isSidebarOpen} darkMode={darkMode}>
       <div
         className='open_btn'
         onClick={() => {
@@ -58,14 +96,10 @@ function NaviBar() {
       {isSidebarOpen && (
         <>
           <Link to='/main'>
-            <Logo>PORT</Logo>
+            <Logo darkMode={darkMode}>PORT</Logo>
           </Link>
           {state.profileImage ? (
-            <ProfileImg
-              src={`${state.profileImage}?${new Date().getTime()}`}
-              className='p_img'
-              alt='프로필 이미지'
-            />
+            <ProfileImg src={imageUrl} className='p_img' alt='프로필 이미지' />
           ) : (
             <ProfileImg
               src='/person.png'
@@ -73,7 +107,7 @@ function NaviBar() {
               alt='프로필 이미지'
             />
           )}
-          <Ment>
+          <Ment darkMode={darkMode}>
             {state.name ? `${state.name}님 환영합니다.` : "환영합니다."}
           </Ment>
         </>
@@ -144,17 +178,22 @@ function NaviBar() {
 
         {isSidebarOpen && (
           <>
-            <Dark>
-              <FaToggleOn size='30' color='#293642' />
-              {/* <FaToggleOff /> */}
-              &nbsp; Dark OFF
+            <Dark onClick={toggleDarkMode} darkMode={darkMode}>
+              {darkMode ? (
+                <FaToggleOn size='30' color='white' />
+              ) : (
+                <FaToggleOff size='30' color='#6c6594' />
+              )}
+              &nbsp; {darkMode ? "Dark ON" : "Dark OFF"}
             </Dark>
 
             {isLogin ? (
-              <Log onClick={logout}>로그아웃</Log>
+              <Log onClick={logout} darkMode={darkMode}>
+                로그아웃
+              </Log>
             ) : (
               <Link to='/login'>
-                <Log>로그인</Log>
+                <Log darkMode={darkMode}>로그인</Log>
               </Link>
             )}
           </>

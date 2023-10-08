@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContent, AuthWrap } from "../../components/register/StRegister";
-import { Logo } from "../../components/wrapper/StWrapper";
+import { AuthContent, AuthWrap, Logo } from "../../components/register/StRegister";
 import { EmailInputLogin, LoginBtn, PwInputLogin } from "./StLogin";
 import useInput from "../../hook/UseInput";
 import { useCookies } from "react-cookie";
