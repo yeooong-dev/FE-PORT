@@ -34,7 +34,7 @@ interface NaviBarProps {
 
 function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
   const [isLogin] = useIsLogin();
-  const logout = UseLogout();
+  const { logout } = UseLogout();
   const [activeMenu, setActiveMenu] = useState("main");
   const [width, setWidth] = useState("180px");
 

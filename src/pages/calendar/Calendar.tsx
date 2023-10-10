@@ -8,6 +8,8 @@ import {
 import Modal from "react-modal";
 import { CustomNavi, StyledCalendar } from "./StCalendar";
 import { useDarkMode } from "../../components/darkmode/DarkModeContext";
+import CustomAlert from "../../components/alert/CustomAlert";
+import CustomConfirm from "../../components/alert/CustomConfirm";
 
 interface Schedule {
   id: number;
@@ -45,7 +47,10 @@ function Calendar() {
     null
   );
   const [yearModalOpen, setYearModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [filteredSchedules, setFilteredSchedules] = useState<Schedule[]>([]);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
   const { darkMode, toggleDarkMode } = useDarkMode();
 
   useEffect(() => {
@@ -53,12 +58,18 @@ function Calendar() {
       try {
         const data = await getCalendars();
         setSchedules(data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching schedules", error);
+        setLoading(false);
       }
     };
     fetchSchedules();
   }, []);
+
+  useEffect(() => {
+    console.log("schedules", schedules);
+  }, [schedules]);
 
   const isWithinRange = (date: string, startDate: string, endDate: string) => {
     return date >= startDate && date <= endDate;
@@ -135,13 +146,13 @@ function Calendar() {
       handleUpdate();
       setEdit(null);
     } else {
-      alert("Please finish editing the current item first!");
+      setAlertMessage("Please finish editing the current item first!");
     }
   };
 
   const handleSubmit = async () => {
     if (!isValidForm()) {
-      alert("모든 칸을 채워주세요.");
+      setAlertMessage("모든 항목을 입력해주세요.");
       return;
     }
     try {
@@ -197,13 +208,73 @@ function Calendar() {
     }
   };
 
+  const handleDeleteConfirmation = () => {
+    handleDelete();
+    setShowConfirm(false);
+  };
+
   const openYearAndMonthSelection = () => {
     setView("month");
     setYearModalOpen(true);
   };
 
+  const tileClassName = ({ date }: { date: Date }) => {
+    const dateString = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .split("T")[0];
+
+    for (let schedule of schedules) {
+      if (isWithinRange(dateString, schedule.startDate, schedule.endDate)) {
+        return "has-schedule";
+      }
+    }
+    return "";
+  };
+
+  const tileContent = ({ date, view }: { date: Date; view: string }) => {
+    if (view !== "month") return null;
+
+    const dateString = new Date(
+      date.getTime() - date.getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .split("T")[0];
+
+    const hasSchedule = schedules.some((schedule) =>
+      isWithinRange(dateString, schedule.startDate, schedule.endDate)
+    );
+
+    console.log("Date:", dateString, "Has Schedule:", hasSchedule);
+
+    if (hasSchedule) {
+      return (
+        <div
+          style={{
+            borderRadius: "50%",
+            backgroundColor: "red",
+            width: "10px",
+            height: "10px",
+            position: "absolute",
+            bottom: "5px",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
+        ></div>
+      );
+    }
+    return null;
+  };
+
   return (
     <>
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          onClose={() => setAlertMessage(null)}
+        />
+      )}
       <CustomNavi darkMode={darkMode}>
         <button
           onClick={() => {
@@ -334,7 +405,7 @@ function Calendar() {
 
       <StyledCalendar
         darkMode={darkMode}
-        key={currentMonth.toString()}
+        key={schedules.length}
         value={currentMonth}
         onClickDay={(value: Date) => handleDateClick(value)}
         onViewChange={({ view }: { view: string }) => {
@@ -349,23 +420,8 @@ function Calendar() {
           })} ${date.getFullYear()}`
         }
         formatDay={(locale: any, date: Date) => `${date.getDate()}`}
-        tileClassName={({ date, view }: { date: Date; view: string }) => {
-          const dateString = date.toISOString().split("T")[0];
-          const hasSchedule = schedules.some(
-            (schedule) =>
-              schedule.startDate <= dateString && schedule.endDate >= dateString
-          );
-          return hasSchedule ? "has-schedule" : "";
-        }}
-        tileContent={({ date: tileDate }: { date: Date }) => {
-          const dateString = tileDate.toISOString().split("T")[0];
-          const daySchedules = schedules.filter((schedule) =>
-            isWithinRange(dateString, schedule.startDate, schedule.endDate)
-          );
-          return daySchedules.map((schedule) => (
-            <div key={schedule.id}>{schedule.title}</div>
-          ));
-        }}
+        tileClassName={tileClassName}
+        tileContent={tileContent}
       />
 
       {isModalOpen && (
@@ -520,7 +576,7 @@ function Calendar() {
                 marginRight: "10px",
                 fontWeight: "bold",
                 marginBottom: "50px",
-                backgroundColor: darkMode ? "#7568ba" : "#91a5d9",
+                backgroundColor: darkMode ? "#51439d" : "#91a5d9",
                 color: "white",
               }}
             >
@@ -598,13 +654,16 @@ function Calendar() {
                     >
                       {edit === schedule.id ? "확인" : "수정"}
                     </button>
+                    {showConfirm && (
+                      <CustomConfirm
+                        message='기록을 삭제하시겠습니까?'
+                        onConfirm={handleDeleteConfirmation}
+                        onCancel={() => setShowConfirm(false)}
+                      />
+                    )}
+
                     <button
-                      onClick={() => {
-                        if (window.confirm("기록을 삭제하시겠습니까?")) {
-                          setSelectedSchedule(schedule);
-                          handleDelete();
-                        }
-                      }}
+                      onClick={() => setShowConfirm(true)}
                       style={{
                         background: "none",
                         cursor: "pointer",

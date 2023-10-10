@@ -34,38 +34,29 @@ function Chat() {
   const [inputValue, setInputValue] = useState("");
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [interactedUsers, setInteractedUsers] = useState<User[]>([]);
-
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
-    const loadMessages = async () => {
-      if (selectedUser) {
-        try {
-          const roomMessages = await getRoom(selectedUser.roomId);
-          setMessages(roomMessages.chats || []);
-        } catch (error) {
-          console.error("Error loading messages", error);
-        }
-      }
-    };
-    loadMessages();
-  }, [selectedUser]);
-
-  useEffect(() => {
-    const fetchAllUsers = async () => {
+    const fetchData = async () => {
+      setLoading(true);
       try {
-        const fetchedUsers = await getUsers();
+        const [fetchedUsers, interacted] = await Promise.all([
+          getUsers(),
+          getInteractedUsers(),
+        ]);
+
         const usersWithImages = await Promise.all(
           fetchedUsers.map(async (user: any) => {
             try {
               const response = await imgGet(user.id);
               let imageUrl = response.data.imageUrl;
               if (imageUrl) {
-                imageUrl = imageUrl.replace(
-                  "https://yeong-port.s3.ap-northeast-2.amazonaws.com/",
-                  ""
-                );
                 imageUrl =
                   "https://yeong-port.s3.ap-northeast-2.amazonaws.com/" +
-                  imageUrl;
+                  imageUrl
+                    .split(
+                      "https://yeong-port.s3.ap-northeast-2.amazonaws.com/"
+                    )
+                    .join("");
               }
               return { ...user, profile_image: imageUrl };
             } catch (error) {
@@ -74,24 +65,18 @@ function Chat() {
             }
           })
         );
-        setAllUsers(usersWithImages || []);
-      } catch (error) {
-        console.error(error);
-      }
-    };
 
-    const fetchInteractedUsers = async () => {
-      try {
-        const interacted = await getInteractedUsers();
+        setAllUsers(usersWithImages || []);
         setInteractedUsers(interacted || []);
       } catch (error) {
-        console.error("Error fetching interacted users", error);
+        console.error(error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchAllUsers();
-    fetchInteractedUsers();
-  }, [selectedUser]);
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const loadInitialMessages = async () => {
@@ -107,15 +92,20 @@ function Chat() {
 
   useEffect(() => {
     const fetchInitialData = async () => {
-      const interacted = await getInteractedUsers();
-      setInteractedUsers(interacted || []);
+      try {
+        const interacted = await getInteractedUsers();
+        setInteractedUsers(interacted || []);
 
-      if (interacted && interacted[0]) {
-        const roomMessages = await getRoom(interacted[0].roomId);
-        setMessages(roomMessages.chats || []);
-        setSelectedUser(interacted[0]);
+        if (interacted && interacted[0]) {
+          const roomMessages = await getRoom(interacted[0].roomId);
+          setMessages(roomMessages.chats || []);
+          setSelectedUser(interacted[0]);
+        }
+      } catch (error) {
+        console.error(error);
       }
     };
+
     fetchInitialData();
   }, []);
 
@@ -142,13 +132,13 @@ function Chat() {
       try {
         const roomId = selectedUser.roomId;
         const userId = Number(selectedUser.id);
-
         const newMessageResponse = await postMessage(
           roomId,
           userId,
           inputValue
         );
 
+        // 기존 메시지 목록에 새 메시지 추가
         setMessages((prevMessages) => [
           ...prevMessages,
           {
@@ -158,15 +148,14 @@ function Chat() {
           },
         ]);
 
-        setInteractedUsers((prev) => {
-          return prev.map((user) => {
-            if (user.id === selectedUser?.id) {
-              return { ...user, lastMessage: inputValue };
-            }
-            return user;
-          });
-        });
-
+        const updatedUser = {
+          ...selectedUser,
+          lastMessage: inputValue,
+        };
+        setInteractedUsers((prev) => [
+          updatedUser,
+          ...prev.filter((user) => user.id !== selectedUser.id),
+        ]);
         setInputValue("");
       } catch (error) {
         console.error("Error in handleSendMessage", error);
@@ -187,194 +176,200 @@ function Chat() {
 
   return (
     <ChatWrap>
-      <LeftWrap>
-        <button onClick={() => setModalIsOpen(true)} className='addBtn'>
-          <HiOutlinePencilAlt size='33' color='#51439d' />
-        </button>
-        <Modal
-          isOpen={modalIsOpen}
-          onRequestClose={() => setModalIsOpen(false)}
-          contentLabel='User List Modal'
-          style={{
-            overlay: {
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-            },
-            content: {
-              width: "40%",
-              height: "800px",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              backgroundColor: "#f6f6f6",
-              border: "none",
-              borderRadius: "20px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-            },
-          }}
-        >
-          <div
-            style={{
-              width: "100%",
-              display: "flex",
-              alignItems: "center",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-          >
-            <h5
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <>
+          <LeftWrap>
+            <button onClick={() => setModalIsOpen(true)} className='addBtn'>
+              <HiOutlinePencilAlt size='33' color='#51439d' />
+            </button>
+            <Modal
+              isOpen={modalIsOpen}
+              onRequestClose={() => setModalIsOpen(false)}
+              contentLabel='User List Modal'
               style={{
-                fontSize: "1.5rem",
-                marginBottom: "60px",
-              }}
-            >
-              PORT 사용자들
-            </h5>
-            {allUsers.map((user) => (
-              <div
-                key={user.id}
-                style={{
-                  width: "100%",
-                  height: "80px",
+                overlay: {
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                },
+                content: {
+                  width: "40%",
+                  height: "800px",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  backgroundColor: "#f6f6f6",
+                  border: "none",
+                  borderRadius: "20px",
                   display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "1.3rem",
-                  fontWeight: "bold",
-                  borderBottom: "1.5px solid #e8e8e8",
-                  padding: "15px",
+                  position: "relative",
+                },
+              }}
+            >
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  justifyContent: "center",
                 }}
+              >
+                <h5
+                  style={{
+                    fontSize: "1.5rem",
+                    marginBottom: "60px",
+                  }}
+                >
+                  PORT 사용자들
+                </h5>
+                {allUsers.map((user) => (
+                  <div
+                    key={user.id}
+                    style={{
+                      width: "100%",
+                      height: "80px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      fontSize: "1.3rem",
+                      fontWeight: "bold",
+                      borderBottom: "1.5px solid #e8e8e8",
+                      padding: "15px",
+                    }}
+                  >
+                    <img
+                      src={user.profile_image || "/path-to-your-default-image"}
+                      alt={`${user.name}'s profile`}
+                      style={{
+                        width: "80px",
+                        marginRight: "30px",
+                      }}
+                    />
+                    {user.name}
+                    <button
+                      onClick={() => handleNewChat(user.id)}
+                      style={{
+                        marginLeft: "100px",
+                        width: "150px",
+                        height: "50px",
+                        borderRadius: "10px",
+                        background: "#51439d",
+                        color: "white",
+                        fontSize: "1.1rem",
+                        cursor: "pointer",
+                      }}
+                    >
+                      채팅하기
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </Modal>
+            {interactedUsers.map((user) => (
+              <div
+                key={user.id}
+                onClick={() => setSelectedUser(user)}
+                className='list'
               >
                 <img
                   src={user.profile_image || "/path-to-your-default-image"}
                   alt={`${user.name}'s profile`}
-                  style={{
-                    width: "80px",
-                    marginRight: "30px",
-                  }}
+                  style={{ width: "80px", height: "80px", borderRadius: "50%" }}
                 />
-                {user.name}
-                <button
-                  onClick={() => handleNewChat(user.id)}
-                  style={{
-                    marginLeft: "100px",
-                    width: "150px",
-                    height: "50px",
-                    borderRadius: "10px",
-                    background: "#51439d",
-                    color: "white",
-                    fontSize: "1.1rem",
-                    cursor: "pointer",
-                  }}
-                >
-                  채팅하기
+                <div className='flex'>
+                  <p>{user.name}</p>
+                  <p>{user.lastMessage}</p>
+                </div>
+                <button onClick={() => handleLeaveChatRoom(user.id)}>
+                  채팅 나가기
                 </button>
               </div>
             ))}
-          </div>
-        </Modal>
-        {interactedUsers.map((user) => (
-          <div
-            key={user.id}
-            onClick={() => setSelectedUser(user)}
-            className='list'
-          >
-            <img
-              src={user.profile_image || "/path-to-your-default-image"}
-              alt={`${user.name}'s profile`}
-              style={{ width: "80px", height: "80px", borderRadius: "50%" }}
-            />
-            <div className='flex'>
-              <p>{user.name}</p>
-              <p>{user.lastMessage}</p>
-            </div>
-            <button onClick={() => handleLeaveChatRoom(user.id)}>
-              채팅 나가기
-            </button>
-          </div>
-        ))}
-      </LeftWrap>
-      <RightWrap>
-        {selectedUser ? (
-          <>
-            <h3>{selectedUser.name}</h3>
+          </LeftWrap>
+          <RightWrap>
+            {selectedUser ? (
+              <>
+                <h3>{selectedUser.name}</h3>
 
-            <div>
-              <input
-                type='text'
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder='메시지를 입력하세요.'
-              />
-              <button
-                onClick={() => {
-                  handleSendMessage();
-                }}
-              >
-                전송
-              </button>
-            </div>
-            {messages.map((message) =>
-              message.user ? (
-                <div
-                  key={message.id}
-                  style={{
-                    display: "flex",
-                    flexDirection:
-                      message.user.id === selectedUser?.id
-                        ? "row-reverse"
-                        : "row",
-                    alignItems: "center",
-                    marginBottom: "10px",
-                  }}
-                >
-                  <img
-                    src={
-                      message.user.profile_image ||
-                      "/path-to-your-default-image"
-                    }
-                    alt={`${message.user.name}'s profile`}
-                    style={{
-                      borderRadius: "50%",
-                      width: "30px",
-                      height: "30px",
-                      objectFit: "cover",
-                      marginRight:
-                        message.user.id === selectedUser?.id ? "0" : "10px",
-                      marginLeft:
-                        message.user.id === selectedUser?.id ? "10px" : "0",
-                    }}
+                <div>
+                  <input
+                    type='text'
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    placeholder='메시지를 입력하세요.'
                   />
-                  <div
-                    style={{
-                      background:
-                        message.user.id === selectedUser?.id
-                          ? "#ACE1AF"
-                          : "#E0FFFF",
-                      padding: "10px",
-                      borderRadius: "10px",
-                      maxWidth: "70%",
+                  <button
+                    onClick={() => {
+                      handleSendMessage();
                     }}
                   >
-                    <span style={{ fontWeight: "bold" }}>
-                      {message.user.id !== selectedUser?.id
-                        ? message.user.name
-                        : ""}
-                    </span>
-
-                    <p style={{ margin: "5px 0 0 0" }}>{message.content}</p>
-                  </div>
+                    전송
+                  </button>
                 </div>
-              ) : null
+                {messages.map((message) =>
+                  message.user ? (
+                    <div
+                      key={message.id}
+                      style={{
+                        display: "flex",
+                        flexDirection:
+                          message.user.id === selectedUser?.id
+                            ? "row-reverse"
+                            : "row",
+                        alignItems: "center",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      <img
+                        src={
+                          message.user.profile_image ||
+                          "/path-to-your-default-image"
+                        }
+                        alt={`${message.user.name}'s profile`}
+                        style={{
+                          borderRadius: "50%",
+                          width: "30px",
+                          height: "30px",
+                          objectFit: "cover",
+                          marginRight:
+                            message.user.id === selectedUser?.id ? "0" : "10px",
+                          marginLeft:
+                            message.user.id === selectedUser?.id ? "10px" : "0",
+                        }}
+                      />
+                      <div
+                        style={{
+                          background:
+                            message.user.id === selectedUser?.id
+                              ? "#ACE1AF"
+                              : "#E0FFFF",
+                          padding: "10px",
+                          borderRadius: "10px",
+                          maxWidth: "70%",
+                        }}
+                      >
+                        <span style={{ fontWeight: "bold" }}>
+                          {message.user.id !== selectedUser?.id
+                            ? message.user.name
+                            : ""}
+                        </span>
+
+                        <p style={{ margin: "5px 0 0 0" }}>{message.content}</p>
+                      </div>
+                    </div>
+                  ) : null
+                )}
+              </>
+            ) : (
+              "채팅할 사용자를 선택해주세요!"
             )}
-          </>
-        ) : (
-          "채팅할 사용자를 선택해주세요!"
-        )}
-      </RightWrap>
+          </RightWrap>
+        </>
+      )}
     </ChatWrap>
   );
 }

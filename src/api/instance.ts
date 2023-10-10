@@ -1,5 +1,6 @@
 import axios from "axios";
 import { Cookies } from "react-cookie";
+import UseLogout from "../hook/UseLogout";
 
 const cookies = new Cookies();
 
@@ -19,6 +20,19 @@ instance.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+
+instance.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      const { forceLogout } = UseLogout();
+      forceLogout();
+    }
     return Promise.reject(error);
   }
 );

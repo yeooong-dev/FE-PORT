@@ -19,6 +19,8 @@ import {
   Type,
 } from "./StFamilyEvent";
 import { useDarkMode } from "../../components/darkmode/DarkModeContext";
+import CustomAlert from "../../components/alert/CustomAlert";
+import CustomConfirm from "../../components/alert/CustomConfirm";
 
 interface Event {
   id: number;
@@ -42,6 +44,12 @@ function FamilyEvent() {
   const [currentPage, setCurrentPage] = useState(1);
   const eventsPerPage = 7;
   const { darkMode } = useDarkMode();
+  const [alertType, setAlertType] = useState<"error" | "success" | undefined>();
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+  const [showSingleDeleteConfirm, setShowSingleDeleteConfirm] = useState(false);
+  const [showAllDeleteConfirm, setShowAllDeleteConfirm] = useState(false);
 
   const indexOfLastEvent = currentPage * eventsPerPage;
   const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
@@ -66,6 +74,18 @@ function FamilyEvent() {
   };
 
   const handleAddEvent = async () => {
+    if (
+      !target ||
+      !date ||
+      !type ||
+      typeof amount !== "number" ||
+      amount === 0
+    ) {
+      setAlertMessage("모든 창을 입력해주세요.");
+      setAlertType("error");
+      return;
+    }
+
     try {
       const newEvent = await addFamilyEvent({
         user_id: userId,
@@ -76,36 +96,40 @@ function FamilyEvent() {
       });
       setEvents([...events, newEvent]);
       clearInputs();
-      alert("추가 완료되었습니다. 이력보기에서 확인하세요.");
+      setAlertType("success");
+      setAlertMessage("추가 완료되었습니다. 이력보기에서 확인하세요.");
     } catch (error) {
       console.error(error);
-      alert("모든 항목을 입력바랍니다.");
+      setAlertType("error");
+      setAlertMessage("모든 항목을 입력해주세요.");
     }
   };
 
   const handleUpdateEvent = async () => {
     if (editEventId == null) return;
 
+    if (
+      !target ||
+      !date ||
+      !type ||
+      typeof amount !== "number" ||
+      amount === 0
+    ) {
+      setAlertMessage("모든 창을 입력해주세요.");
+      setAlertType("error");
+      return;
+    }
+
     try {
-      if (
-        target &&
-        date &&
-        type &&
-        typeof amount === "number" &&
-        amount !== 0
-      ) {
-        const updatedEvent = await updateFamilyEvent(editEventId, {
-          target,
-          date,
-          type,
-          amount,
-        });
-        setEvents(events.map((e) => (e.id === editEventId ? updatedEvent : e)));
-        closeEditModal();
-        clearInputs();
-      } else {
-        console.error("All fields are required");
-      }
+      const updatedEvent = await updateFamilyEvent(editEventId, {
+        target,
+        date,
+        type,
+        amount,
+      });
+      setEvents(events.map((e) => (e.id === editEventId ? updatedEvent : e)));
+      closeEditModal();
+      clearInputs();
     } catch (error) {
       console.error(error);
     }
@@ -126,6 +150,23 @@ function FamilyEvent() {
       setEvents([]);
     } catch (error) {
       console.error(error);
+    }
+  };
+
+  const openDeleteAllConfirmation = () => {
+    setShowConfirm(true);
+  };
+
+  const handleConfirmDeleteAllEvents = async () => {
+    await handleDeleteAllEvents();
+    setShowConfirm(false);
+  };
+
+  const handleDeleteConfirmation = () => {
+    if (selectedEventId !== null) {
+      handleDeleteEvent(selectedEventId);
+      setSelectedEventId(null);
+      setShowConfirm(false);
     }
   };
 
@@ -158,8 +199,42 @@ function FamilyEvent() {
     setIsEditModalOpen(false);
   };
 
+  const handleUpdateEventConfirm = async () => {
+    if (
+      !target ||
+      !date ||
+      !type ||
+      typeof amount !== "number" ||
+      amount === 0
+    ) {
+      setAlertMessage("모든 창을 입력해주세요.");
+      setAlertType("error");
+      return;
+    }
+
+    try {
+      await handleUpdateEvent();
+      setAlertMessage("수정 완료되었습니다.");
+      setAlertType("success");
+    } catch (error) {
+      setAlertMessage("에러 발생. 다시 시도해주세요.");
+      setAlertType("error");
+    }
+  };
+
   return (
     <>
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          type={alertType}
+          onClose={() => {
+            setAlertMessage(null);
+            setAlertType(undefined);
+          }}
+        />
+      )}
+
       <FamilyEventWrap darkMode={darkMode}>
         <Modal
           isOpen={isModalOpen}
@@ -366,10 +441,18 @@ function FamilyEvent() {
                   >
                     <BsPencil size='25' />
                   </button>
+                  {showSingleDeleteConfirm && (
+                    <CustomConfirm
+                      message='기록을 삭제하시겠습니까?'
+                      onConfirm={handleDeleteConfirmation}
+                      onCancel={() => setShowSingleDeleteConfirm(false)}
+                    />
+                  )}
                   <button
                     onClick={() => {
-                      if (window.confirm("기록을 삭제하시겠습니까?"))
-                        handleDeleteEvent(event.id);
+                      setSelectedEventId(event.id);
+                      setShowSingleDeleteConfirm(true);
+                      setShowAllDeleteConfirm(false);
                     }}
                     style={{
                       fontSize: "1.2rem",
@@ -407,11 +490,20 @@ function FamilyEvent() {
             ))}
           </div>
 
+          {showAllDeleteConfirm && (
+            <CustomConfirm
+              message='모든 기록을 삭제하시겠습니까?'
+              onConfirm={handleConfirmDeleteAllEvents}
+              onCancel={() => setShowAllDeleteConfirm(false)}
+            />
+          )}
+
           {events.length > 0 && (
             <button
               onClick={() => {
-                if (window.confirm("모든 기록을 삭제하시겠습니까?"))
-                  handleDeleteAllEvents();
+                openDeleteAllConfirmation();
+                setShowAllDeleteConfirm(true);
+                setShowSingleDeleteConfirm(false);
               }}
               style={{
                 marginTop: "20px",
@@ -466,7 +558,7 @@ function FamilyEvent() {
               cursor: "pointer",
               color: "white",
             }}
-            onClick={closeModal}
+            onClick={closeEditModal}
           >
             X
           </button>
@@ -521,9 +613,7 @@ function FamilyEvent() {
               }}
             />
             <button
-              onClick={() => {
-                if (window.confirm("수정하시겠습니까?")) handleUpdateEvent();
-              }}
+              onClick={handleUpdateEventConfirm}
               style={{
                 width: "500px",
                 height: "65px",

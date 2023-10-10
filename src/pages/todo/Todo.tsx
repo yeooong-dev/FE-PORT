@@ -11,6 +11,7 @@ import {
   todoUpdate,
 } from "../../api/todo";
 import { useDarkMode } from "../../components/darkmode/DarkModeContext";
+import CustomAlert from '../../components/alert/CustomAlert';
 Modal.setAppElement("#root");
 
 interface TodoItem {
@@ -26,6 +27,7 @@ function Todo() {
   const [editTodoId, setEditTodoId] = useState<number | null>(null);
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [checkedTodoIds, setCheckedTodoIds] = useState<number[]>([]);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const { darkMode } = useDarkMode();
 
   // 날짜,요일
@@ -83,7 +85,7 @@ function Todo() {
       setIsModalOpen(false);
     } catch (error) {
       console.error(error);
-      alert("항목을 추가하는 데 실패하였습니다.");
+      setAlertMessage("항목을 추가하는 데 실패하였습니다.");
     }
   };
 
@@ -141,6 +143,12 @@ function Todo() {
 
   return (
     <>
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          onClose={() => setAlertMessage(null)}
+        />
+      )}
       <TodoWrap darkMode={darkMode}>
         <TodoTop darkMode={darkMode}>
           <div>

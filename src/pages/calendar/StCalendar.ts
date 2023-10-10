@@ -37,6 +37,42 @@ export const StyledCalendar = styled(Calendar)<darkProps>`
   margin-top: 50px;
   border-radius: 20px;
 
+  .has-schedule {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    z-index: 9999;
+    background-color: red !important;
+  }
+
+  .has-schedule-indicator {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+  }
+
+  .has-schedule::after {
+    content: "";
+    display: block;
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    bottom: 20px;
+    // left: 50%;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    z-index: 9999;
+    background-color: red !important;
+  }
+
   .react-calendar__navigation {
     display: none;
   }
@@ -44,24 +80,6 @@ export const StyledCalendar = styled(Calendar)<darkProps>`
   .react-calendar__navigation button:first-child,
   .react-calendar__navigation button:last-child {
     display: none;
-  }
-
-  .react-calendar__tile.has-schedule {
-    position: relative;
-  }
-
-  .has-schedule::after {
-    content: "";
-    display: block;
-    width: 50px;
-    height: 50px;
-    background: red;
-    position: absolute;
-    bottom: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    z-index: 99;
   }
 
   .react-calendar__month-view__weekdays__weekday {
@@ -74,7 +92,7 @@ export const StyledCalendar = styled(Calendar)<darkProps>`
     background: ${({ darkMode }) => (darkMode ? "#323336" : "#d5dae3")};
     color: ${({ darkMode }) => (darkMode ? "white" : "#474747")};
   }
-//323336
+
   .react-calendar__tile {
     position: relative;
     height: 120px;
