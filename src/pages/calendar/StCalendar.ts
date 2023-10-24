@@ -9,69 +9,39 @@ export const CustomNavi = styled.div<darkProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 75%;
+  width: 70%;
   font-size: 1.8rem;
-  margin-top: 30px;
   font-weight: bold;
   color: ${({ darkMode }) => (darkMode ? "#fff" : "#2e2e2e")};
 
   span {
     cursor: pointer;
+    font-family: var(--font-title);
+    font-size: 1.5rem;
   }
 
   button {
     width: 40px;
     height: 40px;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     background: #fcfcfc;
     border-radius: 50%;
     margin: 0px 60px;
+    padding: 0 0 10px 0;
     color: #c2c2c2;
     cursor: pointer;
+    font-family: var(--font-title);
   }
 `;
 
 export const StyledCalendar = styled(Calendar)<darkProps>`
-  width: 75%;
+  width: 65%;
   background: ${({ darkMode }) => (darkMode ? "#4e5057" : "#fcfcfc")};
-  margin-top: 50px;
+  margin-top: 30px;
   border-radius: 20px;
-
-  .has-schedule {
-    width: 100px;
-    height: 100px;
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    z-index: 9999;
-    background-color: red !important;
-  }
-
-  .has-schedule-indicator {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    width: 10px;
-    height: 10px;
-    background-color: red;
-    border-radius: 50%;
-  }
-
-  .has-schedule::after {
-    content: "";
-    display: block;
-    width: 100px;
-    height: 100px;
-    position: absolute;
-    bottom: 20px;
-    // left: 50%;
-    transform: translateX(-50%);
-    border-radius: 50%;
-    z-index: 9999;
-    background-color: red !important;
-  }
+  box-shadow: 10px 10px 7px 1px rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 10px 10px 7px 1px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 10px 10px 7px 1px rgba(0, 0, 0, 0.15);
 
   .react-calendar__navigation {
     display: none;
@@ -83,8 +53,8 @@ export const StyledCalendar = styled(Calendar)<darkProps>`
   }
 
   .react-calendar__month-view__weekdays__weekday {
-    height: 50px;
-    line-height: 50px;
+    height: 80px;
+    line-height: 80px;
     font-size: 1.3rem;
     border-bottom: 1px solid #dedede;
     font-weight: bold;
@@ -179,7 +149,7 @@ export const StyledCalendar = styled(Calendar)<darkProps>`
   .react-calendar__tile:enabled:hover,
   .react-calendar__tile:enabled:focus {
     background-color: #e6e6e6;
-    color: ${({ darkMode }) => (darkMode ? "#2e2e2e" : "#e6e6e6")};
+    color: black;
   }
 
   .year-modal-container {

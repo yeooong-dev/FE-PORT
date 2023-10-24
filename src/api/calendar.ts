@@ -29,7 +29,6 @@ export const addCalendar = async (data: CalendarAddPayload) => {
 export const getCalendars = async () => {
   try {
     const response = await instance.get(`calendar/getAll`);
-    console.log(response.data);
     
     return response.data;
   } catch (error) {

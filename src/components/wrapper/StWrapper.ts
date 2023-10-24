@@ -27,13 +27,14 @@ export const Right = styled.div<RightProps>`
   height: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-direction: column;
   overflow-x: hidden;
+  position: relative;
 `;
 
 export const Contents = styled.div<{ darkMode: boolean }>`
-  width: 95%;
-  height: 100%;
+  width: 100%;
   display: flex;
   align-items: center;
   flex-direction: column;

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { TodoTop, TodoWrap, Todos } from "./StTodo";
+import { Title, TodoTop, TodoWrap, Todos } from "./StTodo";
 import Modal from "react-modal";
 import { IoTrashOutline } from "react-icons/io5";
 import { BsPencil, BsCheckLg } from "react-icons/bs";
@@ -11,7 +11,7 @@ import {
   todoUpdate,
 } from "../../api/todo";
 import { useDarkMode } from "../../components/darkmode/DarkModeContext";
-import CustomAlert from '../../components/alert/CustomAlert';
+import CustomAlert from "../../components/alert/CustomAlert";
 Modal.setAppElement("#root");
 
 interface TodoItem {
@@ -149,6 +149,7 @@ function Todo() {
           onClose={() => setAlertMessage(null)}
         />
       )}
+      <Title>오늘의 할 일</Title>
       <TodoWrap darkMode={darkMode}>
         <TodoTop darkMode={darkMode}>
           <div>
@@ -174,9 +175,9 @@ function Todo() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              backgroundColor: "#dddddd",
+              backgroundColor: "#ebebeb",
               border: "none",
-              borderRadius: "10px",
+              borderRadius: "5px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -206,7 +207,7 @@ function Todo() {
           <input
             autoFocus
             style={{
-              width: "600px",
+              width: "550px",
               height: "70px",
               backgroundColor: "white",
               paddingLeft: "1rem",
@@ -221,11 +222,11 @@ function Todo() {
           <button
             className='AddBtn'
             style={{
-              width: "150px",
+              width: "200px",
               height: "70px",
               fontSize: "1.2rem",
               cursor: "pointer",
-              backgroundColor: "#51439d",
+              backgroundColor: "#6b60a6",
               color: "white",
             }}
             onClick={handleAddTodo}

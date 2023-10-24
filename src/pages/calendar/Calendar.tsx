@@ -67,10 +67,6 @@ function Calendar() {
     fetchSchedules();
   }, []);
 
-  useEffect(() => {
-    console.log("schedules", schedules);
-  }, [schedules]);
-
   const isWithinRange = (date: string, startDate: string, endDate: string) => {
     return date >= startDate && date <= endDate;
   };
@@ -194,17 +190,28 @@ function Calendar() {
     }
   };
 
+  const handleDeleteClick = (schedule: Schedule) => {
+    setSelectedSchedule(schedule);
+    setShowConfirm(true);
+  };
+
   const handleDelete = async () => {
     if (!selectedSchedule) return;
 
     try {
-      await deleteCalendar(selectedSchedule.id);
-      const updatedSchedules = schedules.filter(
-        (schedule) => schedule.id !== selectedSchedule.id
-      );
-      setSchedules(updatedSchedules);
+      const response = await deleteCalendar(selectedSchedule.id);
+      if (response && response.error) {
+        setAlertMessage(response.error);
+      } else {
+        const updatedSchedules = schedules.filter(
+          (schedule) => schedule.id !== selectedSchedule.id
+        );
+        setSchedules(updatedSchedules);
+        setAlertMessage("일정이 성공적으로 삭제되었습니다.");
+      }
     } catch (error) {
       console.error("Error deleting schedule", error);
+      setAlertMessage("일정 삭제 중 오류가 발생했습니다.");
     }
   };
 
@@ -245,8 +252,6 @@ function Calendar() {
     const hasSchedule = schedules.some((schedule) =>
       isWithinRange(dateString, schedule.startDate, schedule.endDate)
     );
-
-    console.log("Date:", dateString, "Has Schedule:", hasSchedule);
 
     if (hasSchedule) {
       return (
@@ -663,7 +668,7 @@ function Calendar() {
                     )}
 
                     <button
-                      onClick={() => setShowConfirm(true)}
+                      onClick={() => handleDeleteClick(schedule)}
                       style={{
                         background: "none",
                         cursor: "pointer",

@@ -24,8 +24,8 @@ export const Wrap = styled.div<WrapProps>`
   align-items: center;
   flex-direction: column;
   background: ${({ darkMode }) => (darkMode ? "#323336" : "#d7e0f7")};
-  border-top-right-radius: 20px;
-  border-bottom-right-radius: 20px;
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
   margin-right: ${({ isSidebarOpen }) =>
     isSidebarOpen ? "0px" : "calc(100% - 100px)"};
   text-align: center;

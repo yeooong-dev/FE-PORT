@@ -4,15 +4,28 @@ interface darkProps {
   darkMode: boolean;
 }
 
+export const Title = styled.h1`
+  width: 65%;
+  margin-bottom: 20px;
+  color: #5d5b66;
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  padding-left: 2rem;
+`;
+
 export const TodoWrap = styled.div<darkProps>`
-  width: 75%;
-  height: 820px;
+  width: 65%;
+  height: 800px;
   display: flex;
   align-items: center;
   flex-direction: column;
   background: ${({ darkMode }) => (darkMode ? "#323336" : "white")};
-  border-radius: 10px;
-  margin-top: 50px;
+  border-radius: 5px;
+  box-shadow: 10px 10px 7px 1px rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 10px 10px 7px 1px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 10px 10px 7px 1px rgba(0, 0, 0, 0.15);
 `;
 
 export const TodoTop = styled.div<darkProps>`
@@ -26,13 +39,13 @@ export const TodoTop = styled.div<darkProps>`
     text-align:left;
 
     .date{
-        font-size:1.4rem;
+        font-size:1.6rem;
         font-weight:900;
         margin-bottom:20px;
         color: ${({ darkMode }) => (darkMode ? "white" : "#777777")};
     }
     .num {
-        font-size:1.2rem;
+        font-size:1.3rem;
         font-weight:900;
         color: ${({ darkMode }) => (darkMode ? "white" : "#51439d")};
     }
@@ -81,7 +94,7 @@ export const Todos = styled.div<darkProps>`
       position: absolute;
       left: 0px;
       right: 0;
-      bottom: -15px;
+      bottom: 0px;
       border-bottom: 1.3px solid #d6d6d6;
       transition: bottom 0.3s ease;
     }
@@ -136,12 +149,12 @@ export const Todos = styled.div<darkProps>`
       }
 
       .pen {
-        margin-left: 20px;
+        margin-left: 30px;
         cursor: pointer;
       }
 
       .trash {
-        margin-left: 10px;
+        margin-left: 20px;
         cursor: pointer;
       }
     }

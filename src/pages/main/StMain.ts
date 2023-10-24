@@ -30,7 +30,7 @@ export const WrapTodo = styled.div<darkProps>`
   h1 {
     font-size: 1.6rem;
     text-align: left;
-    font-family: var(--mainpage);
+    font-family: var(--font-title);
     margin-bottom: 20px;
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
   }
@@ -85,7 +85,7 @@ export const WrapEvent = styled.div<darkProps>`
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
     font-size: 1.6rem;
     text-align: left;
-    font-family: var(--mainpage);
+    font-family: var(--font-title);
     margin-bottom: 20px;
   }
 
@@ -152,7 +152,7 @@ export const WrapCalendar = styled.div<darkProps>`
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
     font-size: 1.6rem;
     text-align: left;
-    font-family: var(--mainpage);
+    font-family: var(--font-title);
     margin-bottom: 40px;
     margin-left: 205px;
   }

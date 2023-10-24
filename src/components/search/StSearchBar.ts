@@ -7,6 +7,8 @@ export const SearchWrap = styled.div`
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  position: absolute;
+  top: 0;
 `;
 
 export const SearchInput = styled.input`
