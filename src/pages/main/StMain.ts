@@ -133,16 +133,15 @@ export const WrapEvent = styled.div<darkProps>`
 export const WrapRight = styled.div`
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 80vh;
+  width: 50%;
+  height: 100%;
   align-items: flex-start;
   justify-content: flex-start;
-  margin-top: 40px;
 `;
 
 export const WrapCalendar = styled.div<darkProps>`
   width: 100%;
-  height: 100%;
+  height: 0;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -160,7 +159,24 @@ export const WrapCalendar = styled.div<darkProps>`
   > div {
     transform: scale(0.8);
     transform-origin: center;
-    margin: -25px 140px;
     padding: 0;
+  }
+`;
+
+export const WrapSocket = styled.div<darkProps>`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  flex-direction: column;
+
+  h1 {
+    color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
+    font-size: 1.6rem;
+    text-align: left;
+    font-family: var(--font-title);
+    margin-bottom: 40px;
+    margin-left: 205px;
   }
 `;

@@ -36,6 +36,7 @@ function Calendar() {
   const [view, setView] = useState<"month" | "decade" | "year">("month");
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
   const [formData, setFormData] = useState<FormData>({
     startDate: "",
     endDate: "",
@@ -67,7 +68,17 @@ function Calendar() {
     fetchSchedules();
   }, []);
 
+  useEffect(() => {
+    console.log(schedules);
+    const testDate = new Date("2023-10-29");
+    console.log(
+      `tileClassName for ${testDate}:`,
+      tileClassName({ date: testDate })
+    );
+  }, [schedules]);
+
   const isWithinRange = (date: string, startDate: string, endDate: string) => {
+    console.log("Date:", date, "Start:", startDate, "End:", endDate);
     return date >= startDate && date <= endDate;
   };
 
@@ -142,7 +153,7 @@ function Calendar() {
       handleUpdate();
       setEdit(null);
     } else {
-      setAlertMessage("Please finish editing the current item first!");
+      setAlertMessage("수정 후 확인을 눌러주세요!");
     }
   };
 
@@ -155,6 +166,8 @@ function Calendar() {
       const user_id = 1;
       const newSchedule = await addCalendar({ user_id, ...formData });
       setSchedules([...schedules, newSchedule]);
+      setCurrentMonth(new Date(currentMonth));
+      setForceUpdate((prev) => prev + 1);
       setFormData({
         startDate: "",
         endDate: "",
@@ -226,14 +239,11 @@ function Calendar() {
   };
 
   const tileClassName = ({ date }: { date: Date }) => {
-    const dateString = new Date(
-      date.getTime() - date.getTimezoneOffset() * 60000
-    )
-      .toISOString()
-      .split("T")[0];
+    const dateString = date.toISOString().split("T")[0];
 
     for (let schedule of schedules) {
       if (isWithinRange(dateString, schedule.startDate, schedule.endDate)) {
+        console.log("Matching date:", dateString);
         return "has-schedule";
       }
     }
@@ -243,15 +253,14 @@ function Calendar() {
   const tileContent = ({ date, view }: { date: Date; view: string }) => {
     if (view !== "month") return null;
 
-    const dateString = new Date(
-      date.getTime() - date.getTimezoneOffset() * 60000
-    )
-      .toISOString()
-      .split("T")[0];
+    const dateString = date.toISOString().split("T")[0];
+    console.log("Checking date:", dateString); // 추가
 
     const hasSchedule = schedules.some((schedule) =>
       isWithinRange(dateString, schedule.startDate, schedule.endDate)
     );
+
+    console.log("Has schedule for", dateString, ":", hasSchedule);
 
     if (hasSchedule) {
       return (
@@ -259,8 +268,8 @@ function Calendar() {
           style={{
             borderRadius: "50%",
             backgroundColor: "red",
-            width: "10px",
-            height: "10px",
+            width: "100px",
+            height: "100px",
             position: "absolute",
             bottom: "5px",
             left: "50%",
@@ -410,7 +419,7 @@ function Calendar() {
 
       <StyledCalendar
         darkMode={darkMode}
-        key={schedules.length}
+        key={forceUpdate}
         value={currentMonth}
         onClickDay={(value: Date) => handleDateClick(value)}
         onViewChange={({ view }: { view: string }) => {
@@ -646,7 +655,7 @@ function Calendar() {
                     <button
                       onClick={() => handleEditClick(schedule)}
                       style={{
-                        background: "none",
+                        background: edit === schedule.id ? "#c4c6cc" : "none",
                         marginRight: "10px",
                         cursor: "pointer",
                         width: "90px",

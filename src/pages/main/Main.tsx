@@ -7,6 +7,7 @@ import {
   WrapEvent,
   WrapLeft,
   WrapRight,
+  WrapSocket,
   WrapTodo,
 } from "./StMain";
 import { useEffect, useState } from "react";
@@ -147,6 +148,10 @@ function Main() {
           </Link>
           <Calendar />
         </WrapCalendar>
+
+        <WrapSocket darkMode={darkMode}>
+          <h1>대화하기 &nbsp; {">"}</h1>
+        </WrapSocket>
       </WrapRight>
     </Wrap>
   );

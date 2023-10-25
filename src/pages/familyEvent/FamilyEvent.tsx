@@ -16,6 +16,7 @@ import {
   FamilyEventWrap,
   InputBox,
   Target,
+  Title,
   Type,
 } from "./StFamilyEvent";
 import { useDarkMode } from "../../components/darkmode/DarkModeContext";
@@ -234,7 +235,7 @@ function FamilyEvent() {
           }}
         />
       )}
-
+      <Title>경조사 기록</Title>
       <FamilyEventWrap darkMode={darkMode}>
         <Modal
           isOpen={isModalOpen}
@@ -244,7 +245,7 @@ function FamilyEvent() {
               backgroundColor: "rgba(0, 0, 0, 0.5)",
             },
             content: {
-              width: "68%",
+              width: "50%",
               height: "800px",
               top: "50%",
               left: "50%",
@@ -479,7 +480,7 @@ function FamilyEvent() {
                   margin: "0.5rem",
                   background: "none",
                   cursor: "pointer",
-                  borderRadius: "50%",
+                  borderRadius: "20%",
                   backgroundColor:
                     currentPage === number ? "#51439d" : "transparent",
                   color: currentPage === number ? "white" : "black",

@@ -4,6 +4,17 @@ interface darkProps {
   darkMode: boolean;
 }
 
+export const Title = styled.h1`
+  width: 55%;
+  margin-bottom: 20px;
+  color: #5d5b66;
+  font-family: var(--font-title);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  padding-left: 2rem;
+`;
+
 export const FamilyEventWrap = styled.div<darkProps>`
   width: 55%;
   height: 750px;
@@ -11,8 +22,7 @@ export const FamilyEventWrap = styled.div<darkProps>`
   align-items: center;
   flex-direction: column;
   background: ${({ darkMode }) => (darkMode ? "#323336" : "white")};
-  border-radius: 40px;
-  margin-top: 80px;
+  border-radius: 5px;
 `;
 
 export const InputBox = styled.div`

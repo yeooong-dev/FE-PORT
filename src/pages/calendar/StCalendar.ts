@@ -9,7 +9,7 @@ export const CustomNavi = styled.div<darkProps>`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 70%;
+  width: 100%;
   font-size: 1.8rem;
   font-weight: bold;
   color: ${({ darkMode }) => (darkMode ? "#fff" : "#2e2e2e")};
@@ -35,10 +35,10 @@ export const CustomNavi = styled.div<darkProps>`
 `;
 
 export const StyledCalendar = styled(Calendar)<darkProps>`
-  width: 65%;
+  width: 60%;
   background: ${({ darkMode }) => (darkMode ? "#4e5057" : "#fcfcfc")};
-  margin-top: 30px;
-  border-radius: 20px;
+  margin-top: 40px;
+  border-radius: 40px;
   box-shadow: 10px 10px 7px 1px rgba(0, 0, 0, 0.15);
   -webkit-box-shadow: 10px 10px 7px 1px rgba(0, 0, 0, 0.15);
   -moz-box-shadow: 10px 10px 7px 1px rgba(0, 0, 0, 0.15);
@@ -47,16 +47,16 @@ export const StyledCalendar = styled(Calendar)<darkProps>`
     display: none;
   }
 
-  .react-calendar__navigation button:first-child,
-  .react-calendar__navigation button:last-child {
-    display: none;
-  }
+  // .react-calendar__navigation button:first-child,
+  // .react-calendar__navigation button:last-child {
+  //   display: none;
+  // }
 
   .react-calendar__month-view__weekdays__weekday {
     height: 80px;
     line-height: 80px;
     font-size: 1.3rem;
-    border-bottom: 1px solid #dedede;
+    border-bottom: 1px solid #e8e8e8;
     font-weight: bold;
     border-radius: 0;
     background: ${({ darkMode }) => (darkMode ? "#323336" : "#d5dae3")};
@@ -66,28 +66,22 @@ export const StyledCalendar = styled(Calendar)<darkProps>`
   .react-calendar__tile {
     position: relative;
     height: 120px;
-    background-color: #f6f6f6;
+    background: white;
     cursor: pointer;
     background: none;
     font-size: 1.1rem;
-    border-bottom: 1px solid #dedede;
+    border-bottom: 1px solid #e8e8e8;
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
-  }
-
-  .react-calendar__tile--now {
-    background-color: #51439d;
-    color: #51439d;
-    z-index: 0;
   }
 
   .react-calendar__month-view__weekdays {
     overflow: hidden;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
   }
 
   .react-calendar__month-view__days__day {
-    border-right: 1px solid #dedede;
+    border-right: 1px solid #e8e8e8;
   }
 
   .react-calendar__month-view__days__day:nth-child(7),
@@ -109,43 +103,58 @@ export const StyledCalendar = styled(Calendar)<darkProps>`
     border-bottom: none;
   }
 
+  .react-calendar__month-view__days__day:nth-last-child(1) {
+    border-bottom-right-radius: 40px;
+  }
+
   .react-calendar__tile {
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
     padding: 14px;
+    position: relative;
+  }
+
+  .react-calendar__tile.has-schedule::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    background-color: red;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99;
+  }
+
+  .react-calendar__tile--now {
+    background: none;
+    z-index: 0;
+  }
+
+  .react-calendar__tile--now::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 8px;
+    width: 48px;
+    height: 48px;
+    background-color: #bccaee;
+    border-radius: 40px;
+    z-index: -1;
+    opacity: 80%;
   }
 
   .react-calendar__year-view__months__month {
     height: auto;
   }
 
-  .react-calendar__tile--now {
-    background-color: transparent;
-    color: #51439d;
-    position: relative;
-    font-weight: bold;
-  }
-
-  .react-calendar__month-view__days__day:nth-last-child(1) {
-    border-bottom-right-radius: 20px;
-  }
-  .react-calendar__tile--now::before {
-    content: "";
-    position: absolute;
-    top: 8px;
-    right: 2px;
-    width: 50px;
-    height: 35px;
-    background-color: #bccaee;
-    border-radius: 20px;
-    z-index: -1;
-  }
-
   .react-calendar__month-view__days__day--neighboringMonth {
     background: ${({ darkMode }) => (darkMode ? "#323336" : "#f5f5f5")};
     color: ${({ darkMode }) => (darkMode ? "white" : "#cccccc")};
   }
+
   .react-calendar__tile:enabled:hover,
   .react-calendar__tile:enabled:focus {
     background-color: #e6e6e6;

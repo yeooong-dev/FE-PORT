@@ -11,6 +11,8 @@ import {
 } from "../../api/chat";
 import { imgGet } from "../../api/mypage";
 import { HiOutlinePencilAlt } from "react-icons/hi";
+import { io } from "socket.io-client";
+import { Socket } from "socket.io-client";
 
 interface User {
   id: number;
@@ -27,7 +29,6 @@ interface Message {
 }
 
 function Chat() {
-  const [users, setUsers] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -35,6 +36,67 @@ function Chat() {
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [interactedUsers, setInteractedUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  useEffect(() => {
+    const newSocket = io(process.env.REACT_APP_BE_SERVER || "");
+    setSocket(newSocket);
+
+    return () => {
+      newSocket.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    // 페이지 로드 시 서버에서 채팅 데이터 가져오기
+    const fetchChatData = async () => {
+      try {
+        if (selectedUser) {
+          const roomMessages = await getRoom(selectedUser.roomId);
+          setMessages(roomMessages.chats || []);
+        }
+      } catch (error) {
+        console.error("Error fetching chat data:", error);
+      }
+    };
+
+    fetchChatData();
+  }, [selectedUser]);
+
+  useEffect(() => {
+    if (selectedUser && socket) {
+      socket.emit("join room", selectedUser.roomId);
+
+      return () => {
+        socket.emit("leave room", selectedUser.roomId);
+      };
+    }
+  }, [selectedUser, socket]);
+
+  useEffect(() => {
+    return () => {
+      if (socket && selectedUser?.roomId) {
+        socket.emit("leave room", selectedUser.roomId);
+      }
+    };
+  }, [socket, selectedUser]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleMessage = (message: any) => {
+      if (!messages.find((msg) => msg.id === message.id)) {
+        setMessages((prevMessages) => [...prevMessages, message]);
+      }
+    };
+
+    socket.on("chat message", handleMessage);
+
+    return () => {
+      socket.off("chat message", handleMessage);
+    };
+  }, [socket, messages]);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
@@ -67,6 +129,7 @@ function Chat() {
         );
 
         setAllUsers(usersWithImages || []);
+        console.log("Updated Users State:", allUsers);
         setInteractedUsers(interacted || []);
       } catch (error) {
         console.error(error);
@@ -80,13 +143,18 @@ function Chat() {
 
   useEffect(() => {
     const loadInitialMessages = async () => {
-      if (interactedUsers.length > 0) {
-        const initialUser = interactedUsers[0];
-        setSelectedUser(initialUser);
-        const roomMessages = await getRoom(initialUser.roomId);
-        setMessages(roomMessages.chats || []);
+      try {
+        if (interactedUsers.length > 0 && interactedUsers[0].roomId) {
+          const initialUser = interactedUsers[0];
+          setSelectedUser(initialUser);
+          const roomMessages = await getRoom(initialUser.roomId);
+          setMessages(roomMessages.chats || []);
+        }
+      } catch (error) {
+        console.error("Error loading initial messages:", error);
       }
     };
+
     loadInitialMessages();
   }, [interactedUsers]);
 
@@ -95,32 +163,51 @@ function Chat() {
       try {
         const interacted = await getInteractedUsers();
         setInteractedUsers(interacted || []);
-
-        if (interacted && interacted[0]) {
+        if (interacted && interacted[0] && !selectedUser) {
+          setSelectedUser(interacted[0]);
           const roomMessages = await getRoom(interacted[0].roomId);
           setMessages(roomMessages.chats || []);
-          setSelectedUser(interacted[0]);
         }
       } catch (error) {
         console.error(error);
       }
     };
-
     fetchInitialData();
+  }, []);
+
+  useEffect(() => {
+    const newSocket = io(process.env.REACT_APP_BE_SERVER || "");
+    setSocket(newSocket);
+
+    newSocket.on("connect", () => {
+      console.log("Socket connected:", newSocket.connected); // true
+    });
+
+    newSocket.on("disconnect", () => {
+      console.log("Socket disconnected:", newSocket.connected); // false
+    });
+
+    return () => {
+      newSocket.close();
+    };
   }, []);
 
   const handleNewChat = async (userId: number) => {
     try {
       const roomName = `Room_${Date.now()}`;
       const room = await createRoom([userId], roomName);
+      if (room.error) {
+        alert(room.error);
+        return;
+      }
       const newUser = allUsers.find((u) => u.id === userId);
-
       if (newUser && room) {
-        const updatedUser = { ...newUser, roomId: room.id };
+        const updatedUser = { ...newUser, roomId: room.roomId };
         setInteractedUsers((prev) => [updatedUser, ...prev]);
         setSelectedUser(updatedUser);
+        const roomMessages = await getRoom(room.roomId);
+        setMessages(roomMessages.chats || []);
       }
-
       setModalIsOpen(false);
     } catch (error) {
       console.error("Error in handleNewChat", error);
@@ -138,24 +225,17 @@ function Chat() {
           inputValue
         );
 
-        // 기존 메시지 목록에 새 메시지 추가
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            id: newMessageResponse.id,
-            content: newMessageResponse.message,
-            user: selectedUser,
-          },
-        ]);
-
-        const updatedUser = {
-          ...selectedUser,
-          lastMessage: inputValue,
+        const newMessage = {
+          id: newMessageResponse.id,
+          content: newMessageResponse.message,
+          user: selectedUser,
         };
-        setInteractedUsers((prev) => [
-          updatedUser,
-          ...prev.filter((user) => user.id !== selectedUser.id),
-        ]);
+
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        if (socket) {
+          socket.emit("chat message", { roomId, msg: newMessage });
+        }
+
         setInputValue("");
       } catch (error) {
         console.error("Error in handleSendMessage", error);
@@ -310,10 +390,10 @@ function Chat() {
                     전송
                   </button>
                 </div>
-                {messages.map((message) =>
+                {messages.map((message, index) =>
                   message.user ? (
                     <div
-                      key={message.id}
+                      key={`${message.id}-${index}`}
                       style={{
                         display: "flex",
                         flexDirection:
