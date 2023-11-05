@@ -3,7 +3,6 @@ import instance from "./instance";
 export const getInteractedUsers = async () => {
   try {
     const response = await instance.get("/chat/interactedUsers");
-    console.log("API Response for getInteractedUsers:", response.data);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -14,7 +13,6 @@ export const getInteractedUsers = async () => {
 export const getUsers = async () => {
   try {
     const response = await instance.get("/chat/users");
-    console.log("API Response:", response.data);
     return response.data;
   } catch (error) {
     console.error(error);
@@ -38,6 +36,7 @@ export const createRoom = async (userIds: number[], name: string) => {
 };
 
 export const getRoom = async (roomId: number) => {
+  console.log('Requesting room with ID:', roomId); 
   try {
     const response = await instance.get(`/chat/room/${roomId}`);
 
@@ -47,14 +46,13 @@ export const getRoom = async (roomId: number) => {
 
     if (response.headers["content-type"]?.includes("application/json")) {
       const data = response.data;
-      if (data && data.chats) {
+      if (data && typeof data === "object" && "chats" in data) {
         return data;
       } else {
         throw new Error("Invalid response data");
       }
     } else {
-      const errorMessage = response.data;
-      throw new Error(errorMessage);
+      throw new Error("Response is not JSON");
     }
   } catch (error) {
     console.error(error);

@@ -38,6 +38,7 @@ function Chat() {
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
 
+  // 소켓 설정
   useEffect(() => {
     const newSocket = io(process.env.REACT_APP_BE_SERVER || "");
     setSocket(newSocket);
@@ -47,69 +48,43 @@ function Chat() {
     };
   }, []);
 
-  useEffect(() => {
-    // 페이지 로드 시 서버에서 채팅 데이터 가져오기
-    const fetchChatData = async () => {
-      try {
-        if (selectedUser) {
-          const roomMessages = await getRoom(selectedUser.roomId);
-          setMessages(roomMessages.chats || []);
-        }
-      } catch (error) {
-        console.error("Error fetching chat data:", error);
-      }
-    };
-
-    fetchChatData();
-  }, [selectedUser]);
-
-  useEffect(() => {
-    if (selectedUser && socket) {
-      socket.emit("join room", selectedUser.roomId);
-
-      return () => {
-        socket.emit("leave room", selectedUser.roomId);
-      };
-    }
-  }, [selectedUser, socket]);
-
-  useEffect(() => {
-    return () => {
-      if (socket && selectedUser?.roomId) {
-        socket.emit("leave room", selectedUser.roomId);
-      }
-    };
-  }, [socket, selectedUser]);
-
+  // 메시지 리스닝
   useEffect(() => {
     if (!socket) return;
-
-    const handleMessage = (message: any) => {
-      if (!messages.find((msg) => msg.id === message.id)) {
-        setMessages((prevMessages) => [...prevMessages, message]);
-      }
-    };
-
+    const handleMessage = (message: Message) => {};
     socket.on("chat message", handleMessage);
-
     return () => {
-      socket.off("chat message", handleMessage);
+      if (socket) socket.off("chat message", handleMessage);
     };
-  }, [socket, messages]);
+  }, [socket]);
 
+  // 유저 불러오기
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
+    if (selectedUser && typeof selectedUser.roomId === "number") {
+      const fetchMessages = async () => {
+        const roomMessages = await getRoom(selectedUser.roomId);
+        setMessages(roomMessages.chats || []);
+      };
+
+      fetchMessages();
+    }
+  }, [selectedUser]);
+
+  // 초기 데이터 페칭
+  useEffect(() => {
+    setLoading(true);
+    const fetchInitialData = async () => {
       try {
         const [fetchedUsers, interacted] = await Promise.all([
           getUsers(),
           getInteractedUsers(),
         ]);
 
+        // 이미지 가져오는 로직을 포함한 사용자 데이터 업데이트
         const usersWithImages = await Promise.all(
-          fetchedUsers.map(async (user: any) => {
+          fetchedUsers.map(async (user: User) => {
             try {
-              const response = await imgGet(user.id);
+              const response = await imgGet(String(user.id));
               let imageUrl = response.data.imageUrl;
               if (imageUrl) {
                 imageUrl =
@@ -127,10 +102,17 @@ function Chat() {
             }
           })
         );
-
         setAllUsers(usersWithImages || []);
-        console.log("Updated Users State:", allUsers);
         setInteractedUsers(interacted || []);
+        if (
+          interacted &&
+          interacted[0] &&
+          typeof interacted[0].roomId === "number"
+        ) {
+          setSelectedUser(interacted[0]);
+          const roomMessages = await getRoom(interacted[0].roomId);
+          setMessages(roomMessages.chats || []);
+        }
       } catch (error) {
         console.error(error);
       } finally {
@@ -138,75 +120,36 @@ function Chat() {
       }
     };
 
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const loadInitialMessages = async () => {
-      try {
-        if (interactedUsers.length > 0 && interactedUsers[0].roomId) {
-          const initialUser = interactedUsers[0];
-          setSelectedUser(initialUser);
-          const roomMessages = await getRoom(initialUser.roomId);
-          setMessages(roomMessages.chats || []);
-        }
-      } catch (error) {
-        console.error("Error loading initial messages:", error);
-      }
-    };
-
-    loadInitialMessages();
-  }, [interactedUsers]);
-
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const interacted = await getInteractedUsers();
-        setInteractedUsers(interacted || []);
-        if (interacted && interacted[0] && !selectedUser) {
-          setSelectedUser(interacted[0]);
-          const roomMessages = await getRoom(interacted[0].roomId);
-          setMessages(roomMessages.chats || []);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
     fetchInitialData();
   }, []);
 
-  useEffect(() => {
-    const newSocket = io(process.env.REACT_APP_BE_SERVER || "");
-    setSocket(newSocket);
-
-    newSocket.on("connect", () => {
-      console.log("Socket connected:", newSocket.connected); // true
-    });
-
-    newSocket.on("disconnect", () => {
-      console.log("Socket disconnected:", newSocket.connected); // false
-    });
-
-    return () => {
-      newSocket.close();
-    };
-  }, []);
+  // 채팅 유저 선택
+  const selectUser = async (user: User) => {
+    setSelectedUser(user);
+    if (user && typeof user.roomId === "number") {
+      const roomMessages = await getRoom(user.roomId);
+      setMessages(roomMessages.chats || []);
+    }
+  };
 
   const handleNewChat = async (userId: number) => {
     try {
       const roomName = `Room_${Date.now()}`;
       const room = await createRoom([userId], roomName);
-      if (room.error) {
-        alert(room.error);
-        return;
-      }
-      const newUser = allUsers.find((u) => u.id === userId);
-      if (newUser && room) {
-        const updatedUser = { ...newUser, roomId: room.roomId };
-        setInteractedUsers((prev) => [updatedUser, ...prev]);
-        setSelectedUser(updatedUser);
-        const roomMessages = await getRoom(room.roomId);
-        setMessages(roomMessages.chats || []);
+      if (room && typeof room.id === "number") {
+        const newUser = allUsers.find((u) => u.id === userId);
+        if (newUser) {
+          const updatedUser = { ...newUser, roomId: room.id };
+          // 이미 있는 사용자는 제외하고 새 배열을 생성
+          setInteractedUsers((prev) => {
+            const filteredPrev = prev.filter((u) => u.id !== newUser.id);
+            return [updatedUser, ...filteredPrev];
+          });
+          setSelectedUser(updatedUser);
+          console.log("Updated User:", updatedUser);
+          const roomMessages = await getRoom(room.id);
+          setMessages(roomMessages.chats || []);
+        }
       }
       setModalIsOpen(false);
     } catch (error) {
@@ -349,9 +292,9 @@ function Chat() {
                 ))}
               </div>
             </Modal>
-            {interactedUsers.map((user) => (
+            {interactedUsers.map((user, index) => (
               <div
-                key={user.id}
+                key={`${user.id}-${index}`}
                 onClick={() => setSelectedUser(user)}
                 className='list'
               >
