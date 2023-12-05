@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { ChatWrap, LeftWrap, RightWrap } from "./StChat";
 import {
+  checkIfRoomExists,
   createRoom,
   getInteractedUsers,
   getRoom,
   getUsers,
-  postMessage,
   removeUserFromRoom,
 } from "../../api/chat";
 import { imgGet } from "../../api/mypage";
@@ -26,6 +26,17 @@ interface Message {
   id: number;
   content: string;
   user: User;
+}
+
+interface SocketMessage {
+  id: number;
+  roomId: number;
+  content: string;
+  user: {
+    id: number;
+    name: string;
+    profile_image: string | null;
+  };
 }
 
 function Chat() {
@@ -48,31 +59,62 @@ function Chat() {
     };
   }, []);
 
-  // 메시지 리스닝
   useEffect(() => {
     if (!socket) return;
-    const handleMessage = (message: Message) => {};
-    socket.on("chat message", handleMessage);
-    return () => {
-      if (socket) socket.off("chat message", handleMessage);
+
+    const handleMessage = (data: SocketMessage) => {
+      if (selectedUser && data.roomId === selectedUser.roomId) {
+        const newMessage = {
+          id: data.id,
+          content: data.content,
+          user: {
+            ...data.user,
+            roomId: selectedUser.roomId,
+          },
+        };
+
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+      }
+
+      // 채팅방 목록 업데이트
+      const updateChatList = async () => {
+        const updatedUsers = await getInteractedUsers();
+        setInteractedUsers(updatedUsers);
+      };
+
+      updateChatList();
     };
-  }, [socket]);
+
+    socket.on("chat message", handleMessage);
+
+    return () => {
+      socket.off("chat message", handleMessage);
+    };
+  }, [socket, selectedUser]);
+
+  const joinRoom = (roomId: number) => {
+    if (socket) {
+      console.log(`Attempting to join room: ${roomId}`);
+      socket.emit("join room", roomId);
+    }
+  };
 
   // 유저 불러오기
   useEffect(() => {
-    if (selectedUser && typeof selectedUser.roomId === "number") {
-      const fetchMessages = async () => {
-        const roomMessages = await getRoom(selectedUser.roomId);
-        setMessages(roomMessages.chats || []);
-      };
-
-      fetchMessages();
+    if (!selectedUser || typeof selectedUser.roomId !== "number") {
+      return;
     }
+
+    const fetchMessages = async () => {
+      const roomMessages = await getRoom(selectedUser.roomId);
+      setMessages(roomMessages.chats || []);
+    };
+
+    fetchMessages();
   }, [selectedUser]);
 
   // 초기 데이터 페칭
   useEffect(() => {
-    setLoading(true);
     const fetchInitialData = async () => {
       try {
         const [fetchedUsers, interacted] = await Promise.all([
@@ -80,7 +122,6 @@ function Chat() {
           getInteractedUsers(),
         ]);
 
-        // 이미지 가져오는 로직을 포함한 사용자 데이터 업데이트
         const usersWithImages = await Promise.all(
           fetchedUsers.map(async (user: User) => {
             try {
@@ -102,8 +143,10 @@ function Chat() {
             }
           })
         );
+
         setAllUsers(usersWithImages || []);
         setInteractedUsers(interacted || []);
+
         if (
           interacted &&
           interacted[0] &&
@@ -114,7 +157,7 @@ function Chat() {
           setMessages(roomMessages.chats || []);
         }
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching initial data:", error);
       } finally {
         setLoading(false);
       }
@@ -123,79 +166,104 @@ function Chat() {
     fetchInitialData();
   }, []);
 
-  // 채팅 유저 선택
+  // 선택된 유저 업데이트
+  const updateInteractedUsers = async () => {
+    const updatedUsers = await getInteractedUsers();
+    setInteractedUsers(updatedUsers);
+  };
+
+  useEffect(() => {
+    if (selectedUser) {
+      updateInteractedUsers();
+    }
+  }, [selectedUser]);
+
   const selectUser = async (user: User) => {
     setSelectedUser(user);
-    if (user && typeof user.roomId === "number") {
+    joinRoom(user.roomId);
+    if (socket && user.roomId) {
+      socket.emit("join room", user.roomId);
       const roomMessages = await getRoom(user.roomId);
       setMessages(roomMessages.chats || []);
     }
   };
 
   const handleNewChat = async (userId: number) => {
-    try {
+    const existingRoom = await checkIfRoomExists([userId]);
+    let updatedUser: User | null = null;
+    const user = allUsers.find((u) => u.id === userId);
+
+    if (existingRoom) {
+      updatedUser = user ? { ...user, roomId: existingRoom.id } : null;
+    } else {
       const roomName = `Room_${Date.now()}`;
       const room = await createRoom([userId], roomName);
-      if (room && typeof room.id === "number") {
-        const newUser = allUsers.find((u) => u.id === userId);
-        if (newUser) {
-          const updatedUser = { ...newUser, roomId: room.id };
-          // 이미 있는 사용자는 제외하고 새 배열을 생성
-          setInteractedUsers((prev) => {
-            const filteredPrev = prev.filter((u) => u.id !== newUser.id);
-            return [updatedUser, ...filteredPrev];
-          });
-          setSelectedUser(updatedUser);
-          console.log("Updated User:", updatedUser);
-          const roomMessages = await getRoom(room.id);
-          setMessages(roomMessages.chats || []);
-        }
-      }
-      setModalIsOpen(false);
-    } catch (error) {
-      console.error("Error in handleNewChat", error);
+      updatedUser = user ? { ...user, roomId: room.id } : null;
     }
-  };
 
-  const handleSendMessage = async () => {
-    if (selectedUser && inputValue.trim()) {
-      try {
-        const roomId = selectedUser.roomId;
-        const userId = Number(selectedUser.id);
-        const newMessageResponse = await postMessage(
-          roomId,
-          userId,
-          inputValue
-        );
-
-        const newMessage = {
-          id: newMessageResponse.id,
-          content: newMessageResponse.message,
-          user: selectedUser,
-        };
-
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-        if (socket) {
-          socket.emit("chat message", { roomId, msg: newMessage });
-        }
-
-        setInputValue("");
-      } catch (error) {
-        console.error("Error in handleSendMessage", error);
+    if (updatedUser) {
+      setSelectedUser(updatedUser);
+      const roomMessages = await getRoom(updatedUser.roomId);
+      setMessages(roomMessages.chats || []);
+      if (socket) {
+        socket.emit("join room", updatedUser.roomId);
       }
     }
+    setModalIsOpen(false);
   };
+
+  // const handleSendMessage = async () => {
+  //   if (selectedUser && inputValue.trim() && socket) {
+  //     try {
+  //       const sentMessageResponse = await postMessage(
+  //         selectedUser.roomId,
+  //         inputValue
+  //       );
+
+  //       // 여기서 sentMessageResponse를 Message 타입으로 사용
+  //       const newMessage: Message = {
+  //         id: sentMessageResponse.id,
+  //         content: sentMessageResponse.content,
+  //         user: {
+  //           ...sentMessageResponse.user,
+  //           roomId: selectedUser.roomId, // 필요하다면 roomId 추가
+  //         },
+  //       };
+
+  //       setMessages((prevMessages) => [...prevMessages, newMessage]);
+  //       setInputValue("");
+
+  //       const updatedUsers = await getInteractedUsers();
+  //       setInteractedUsers(updatedUsers);
+
+  //       socket.emit("chat message in room", {
+  //         roomId: selectedUser.roomId,
+  //         message: inputValue,
+  //         userId: selectedUser.id,
+  //       });
+  //     } catch (error) {
+  //       console.error("메시지 전송 중 오류 발생", error);
+  //     }
+  //   }
+  // };
 
   const handleLeaveChatRoom = async (userId: number) => {
-    try {
-      if (selectedUser?.roomId) {
-        await removeUserFromRoom(selectedUser.roomId, userId);
-        setInteractedUsers((prev) => prev.filter((user) => user.id !== userId));
-      }
-    } catch (error) {
-      console.error("Error leaving chat room", error);
+    if (!selectedUser || selectedUser.id !== userId) {
+      return;
+    }
+
+    const confirmLeave = window.confirm("채팅방을 나가겠습니까?");
+    if (confirmLeave) {
+      await removeUserFromRoom(selectedUser.roomId, userId);
+      setInteractedUsers((prev) => prev.filter((user) => user.id !== userId));
+      setMessages([]);
+      setSelectedUser(null);
     }
   };
+
+  useEffect(() => {
+    console.log("Messages updated:", messages);
+  }, [messages]);
 
   return (
     <ChatWrap>
@@ -295,7 +363,7 @@ function Chat() {
             {interactedUsers.map((user, index) => (
               <div
                 key={`${user.id}-${index}`}
-                onClick={() => setSelectedUser(user)}
+                onClick={() => selectUser(user)}
                 className='list'
               >
                 <img
@@ -326,69 +394,79 @@ function Chat() {
                     placeholder='메시지를 입력하세요.'
                   />
                   <button
-                    onClick={() => {
-                      handleSendMessage();
-                    }}
+                  // onClick={() => {
+                  //   handleSendMessage();
+                  // }}
                   >
                     전송
                   </button>
                 </div>
-                {messages.map((message, index) =>
-                  message.user ? (
-                    <div
-                      key={`${message.id}-${index}`}
-                      style={{
-                        display: "flex",
-                        flexDirection:
-                          message.user.id === selectedUser?.id
-                            ? "row-reverse"
-                            : "row",
-                        alignItems: "center",
-                        marginBottom: "10px",
-                      }}
-                    >
-                      <img
-                        src={
-                          message.user.profile_image ||
-                          "/path-to-your-default-image"
-                        }
-                        alt={`${message.user.name}'s profile`}
-                        style={{
-                          borderRadius: "50%",
-                          width: "30px",
-                          height: "30px",
-                          objectFit: "cover",
-                          marginRight:
-                            message.user.id === selectedUser?.id ? "0" : "10px",
-                          marginLeft:
-                            message.user.id === selectedUser?.id ? "10px" : "0",
-                        }}
-                      />
+                {messages.map((message, index) => (
+                  <div
+                    key={`${message.id}-${index}`}
+                    style={{
+                      display: "flex",
+                      flexDirection:
+                        message.user.id === selectedUser.id
+                          ? "row-reverse"
+                          : "row",
+                      alignItems: "center",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    {/* 상대방 메시지일 경우 */}
+                    {message.user.id !== selectedUser.id && (
+                      <>
+                        <img
+                          src={
+                            message.user.profile_image ||
+                            "/path-to-your-default-image"
+                          }
+                          alt={`${message.user.name}'s profile`}
+                          style={{
+                            borderRadius: "50%",
+                            width: "30px",
+                            height: "30px",
+                            objectFit: "cover",
+                            marginRight: "10px",
+                          }}
+                        />
+                        <div
+                          style={{
+                            background: "#E0FFFF",
+                            padding: "10px",
+                            borderRadius: "10px",
+                            maxWidth: "70%",
+                          }}
+                        >
+                          <span style={{ fontWeight: "bold" }}>
+                            {message.user.name}
+                          </span>
+                          <p style={{ margin: "5px 0 0 0" }}>
+                            {message.content}
+                          </p>
+                        </div>
+                      </>
+                    )}
+                    {/* 현재 로그인한 사용자의 메시지일 경우 */}
+                    {message.user.id === selectedUser.id && (
                       <div
                         style={{
-                          background:
-                            message.user.id === selectedUser?.id
-                              ? "#ACE1AF"
-                              : "#E0FFFF",
+                          background: "#ACE1AF",
                           padding: "10px",
                           borderRadius: "10px",
                           maxWidth: "70%",
+                          alignSelf: "flex-end",
                         }}
                       >
-                        <span style={{ fontWeight: "bold" }}>
-                          {message.user.id !== selectedUser?.id
-                            ? message.user.name
-                            : ""}
-                        </span>
-
                         <p style={{ margin: "5px 0 0 0" }}>{message.content}</p>
                       </div>
-                    </div>
-                  ) : null
-                )}
+                    )}
+                  </div>
+                ))}
               </>
             ) : (
-              "채팅할 사용자를 선택해주세요!"
+              <h3>"채팅할 사용자를 선택해주세요!"</h3>
             )}
           </RightWrap>
         </>

@@ -14,6 +14,7 @@ import {
 import useInput from "../../hook/UseInput";
 import { register, usercheckEmail } from "../../api/auth";
 import { useState } from "react";
+import CustomAlert from "../alert/CustomAlert";
 
 function Register() {
   const [emailValue, setEmailValue] = useInput();
@@ -25,6 +26,10 @@ function Register() {
   const [nameMessage, setNameMessage] = useState<string | null>(null);
   const [pwMessage, setPwMessage] = useState<string | null>(null);
   const [pwConfirmMessage, setPwConfirmMessage] = useState<string | null>(null);
+
+  // 커스텀 알럿
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertType, setAlertType] = useState<"error" | "success">("error");
 
   // 이메일 중복 확인
   const [isEmailChecked, setIsEmailChecked] = useState<boolean>(false);
@@ -98,23 +103,23 @@ function Register() {
   const checkEmail = (): void => {
     usercheckEmail(emailValue)
       .then((res) => {
-        alert("사용 가능한 이메일입니다.");
-        // 중복 확인 완료됨
         setIsEmailChecked(true);
+        setAlertType("success");
+        setAlertMessage("사용 가능한 이메일입니다.");
       })
       .catch((err) => {
         console.log(err);
-        alert("중복된 이메일입니다.");
-        // 중복 확인 완료 안됨
         setIsEmailChecked(false);
-        return err;
+        setAlertType("error");
+        setAlertMessage("중복된 이메일입니다.");
       });
   };
 
   // 회원가입
   const onClickRegisterBtn = () => {
     if (!emailValue || !nameValue || !pwValue || !pwconfirmValue) {
-      alert("전체 입력 바랍니다.");
+      setAlertType("error");
+      setAlertMessage("전체 입력 바랍니다.");
       return;
     }
 
@@ -124,12 +129,14 @@ function Register() {
       pwMessage !== VALID_PASSWORD_MESSAGE ||
       pwConfirmMessage !== VALID_PW_CONFIRM_MESSAGE
     ) {
-      alert("모든 항목이 올바르게 입력되지 않았습니다.");
+      setAlertType("error");
+      setAlertMessage("모든 항목이 올바르게 입력되지 않았습니다.");
       return;
     }
 
     if (!isEmailChecked) {
-      alert("이메일 중복 확인 바랍니다.");
+      setAlertType("error");
+      setAlertMessage("이메일 중복 확인 바랍니다");
       return;
     }
 
@@ -140,108 +147,125 @@ function Register() {
       password: pwValue,
     })
       .then((response) => {
-        alert("회원가입이 완료되었습니다.");
-        navigate("/login");
+        setAlertType("success");
+        setAlertMessage("회원가입이 완료되었습니다.");
+
+        setTimeout(() => {
+          navigate("/login");
+        }, 1500);
       })
       .catch((error) => {
-        alert("회원가입에 실패하였습니다. 다시 시도해 주세요.");
+        setAlertType("error");
+        setAlertMessage("회원가입에 실패하였습니다. 다시 시도해 주세요.");
       });
   };
 
   return (
-    <AuthWrap>
-      <AuthContent>
-        <Link to='/'>
-          <Logo>PORT</Logo>
-        </Link>
-        <EmailBox>
-          <EmailInput
-            type='text'
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setEmailValue(e);
-              emailValidation(e);
+    <>
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          type={alertType}
+          onClose={() => {
+            setAlertMessage(null);
+            setAlertType("error");
+          }}
+        />
+      )}
+      <AuthWrap>
+        <AuthContent>
+          <Link to='/'>
+            <Logo>PORT</Logo>
+          </Link>
+          <EmailBox>
+            <EmailInput
+              type='text'
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setEmailValue(e);
+                emailValidation(e);
+              }}
+              value={emailValue || ""}
+              placeholder='이메일을 입력해주세요.'
+            />
+
+            <EmailCheck onClick={checkEmail}>중복 확인</EmailCheck>
+          </EmailBox>
+          <div
+            style={{
+              color: emailMessage === VALID_EMAIL_MESSAGE ? "green" : "red",
+              marginTop: "10px",
+              marginBottom: "20px",
             }}
-            value={emailValue || ""}
-            placeholder='이메일을 입력해주세요.'
+          >
+            {emailMessage}
+          </div>
+
+          <NameInput
+            type='text'
+            value={nameValue || ""}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setNameValue(e);
+              nameValidation(e);
+            }}
+            placeholder='성함을 입력해주세요.'
           />
+          <div
+            style={{
+              color: nameMessage === VALID_NAME_MESSAGE ? "green" : "red",
+              marginTop: "10px",
+              marginBottom: "20px",
+            }}
+          >
+            {nameMessage}
+          </div>
 
-          <EmailCheck onClick={checkEmail}>중복 확인</EmailCheck>
-        </EmailBox>
-        <div
-          style={{
-            color: emailMessage === VALID_EMAIL_MESSAGE ? "green" : "red",
-            marginTop: "10px",
-            marginBottom: "20px",
-          }}
-        >
-          {emailMessage}
-        </div>
+          <PwInput
+            type='password'
+            value={pwValue || ""}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              pwValidation(e);
+              setPwValue(e);
+            }}
+            placeholder='비밀번호를 입력해주세요.'
+          />
+          <div
+            style={{
+              color: pwMessage === VALID_PASSWORD_MESSAGE ? "green" : "red",
+              marginTop: "10px",
+              marginBottom: "20px",
+            }}
+          >
+            {pwMessage}
+          </div>
 
-        <NameInput
-          type='text'
-          value={nameValue || ""}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setNameValue(e);
-            nameValidation(e);
-          }}
-          placeholder='성함을 입력해주세요.'
-        />
-        <div
-          style={{
-            color: nameMessage === VALID_NAME_MESSAGE ? "green" : "red",
-            marginTop: "10px",
-            marginBottom: "20px",
-          }}
-        >
-          {nameMessage}
-        </div>
-
-        <PwInput
-          type='password'
-          value={pwValue || ""}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            pwValidation(e);
-            setPwValue(e);
-          }}
-          placeholder='비밀번호를 입력해주세요.'
-        />
-        <div
-          style={{
-            color: pwMessage === VALID_PASSWORD_MESSAGE ? "green" : "red",
-            marginTop: "10px",
-            marginBottom: "20px",
-          }}
-        >
-          {pwMessage}
-        </div>
-
-        <PwConfilmInput
-          type='password'
-          value={pwconfirmValue || ""}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setPwConfirmValue(e);
-            pwConfirmValidation(e);
-          }}
-          placeholder='비밀번호를 다시 입력해주세요.'
-        />
-        <div
-          style={{
-            color:
-              pwConfirmMessage === VALID_PW_CONFIRM_MESSAGE ? "green" : "red",
-            marginBottom: "20px",
-          }}
-        >
-          {pwConfirmMessage}
-        </div>
-        <RegisterBtn
-          onClick={() => {
-            onClickRegisterBtn();
-          }}
-        >
-          회원가입
-        </RegisterBtn>
-      </AuthContent>
-    </AuthWrap>
+          <PwConfilmInput
+            type='password'
+            value={pwconfirmValue || ""}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setPwConfirmValue(e);
+              pwConfirmValidation(e);
+            }}
+            placeholder='비밀번호를 다시 입력해주세요.'
+          />
+          <div
+            style={{
+              color:
+                pwConfirmMessage === VALID_PW_CONFIRM_MESSAGE ? "green" : "red",
+              marginBottom: "20px",
+            }}
+          >
+            {pwConfirmMessage}
+          </div>
+          <RegisterBtn
+            onClick={() => {
+              onClickRegisterBtn();
+            }}
+          >
+            회원가입
+          </RegisterBtn>
+        </AuthContent>
+      </AuthWrap>
+    </>
   );
 }
 

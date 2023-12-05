@@ -26,6 +26,9 @@ import { useEffect, useState } from "react";
 import { Logo } from "../wrapper/StWrapper";
 import { useUserContext } from "./userContext";
 import { useDarkMode } from "../darkmode/DarkModeContext";
+import CustomConfirm from "../alert/CustomConfirm";
+import UseUser from "../../hook/UseUser";
+import { imgGet } from "../../api/mypage";
 
 interface NaviBarProps {
   isSidebarOpen: boolean;
@@ -37,19 +40,45 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
   const { logout } = UseLogout();
   const [activeMenu, setActiveMenu] = useState("main");
   const [width, setWidth] = useState("180px");
-
+  const [showConfirm, setShowConfirm] = useState(false);
   const { state } = useUserContext();
   const location = useLocation();
   const { darkMode, toggleDarkMode } = useDarkMode();
-  const userProfileFromLocalStorage = JSON.parse(
-    localStorage.getItem("user") || "{}"
-  );
-  const imageUrl =
-    userProfileFromLocalStorage.profileImage || state.profileImage;
+  const [profileImageUrl, setProfileImageUrl] = useState("/person.png");
+  const { user } = UseUser();
+  const [displayName, setDisplayName] = useState("");
 
   useEffect(() => {
     setWidth(isSidebarOpen ? "180px" : "60px");
   }, [isSidebarOpen]);
+
+  useEffect(() => {
+    if (isLogin && user?.id) {
+      imgGet(user.id)
+        .then((response) => {
+          setProfileImageUrl(response.data.imageUrl);
+        })
+        .catch((error) => {
+          console.error("프로필 이미지 가져오기 실패:", error);
+          setProfileImageUrl("/person.png");
+        });
+    } else {
+      setProfileImageUrl("/person.png");
+    }
+  }, [isLogin, user?.id]);
+
+  useEffect(() => {
+    if (state.profileImage) {
+      setProfileImageUrl(state.profileImage);
+    } else {
+      setProfileImageUrl("/person.png");
+    }
+  }, [state.profileImage]);
+
+  useEffect(() => {
+    console.log("Current user name:", state.name);
+    setDisplayName(state.name ? `${state.name}님 환영합니다.` : "환영합니다.");
+  }, [state.name]);
 
   useEffect(() => {
     switch (location.pathname) {
@@ -77,6 +106,15 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
     }
   }, [location.pathname]);
 
+  const handleLogout = async () => {
+    await logout();
+    handleCancel();
+  };
+
+  const handleCancel = () => {
+    setShowConfirm(false);
+  };
+
   return (
     <Wrap isSidebarOpen={isSidebarOpen} darkMode={darkMode}>
       <div
@@ -98,18 +136,13 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
           <Link to='/main'>
             <Logo darkMode={darkMode}>PORT</Logo>
           </Link>
-          {state.profileImage ? (
-            <ProfileImg src={imageUrl} className='p_img' alt='프로필 이미지' />
-          ) : (
-            <ProfileImg
-              src='/person.png'
-              className='p_img'
-              alt='프로필 이미지'
-            />
-          )}
-          <Ment darkMode={darkMode}>
-            {state.name ? `${state.name}님 환영합니다.` : "환영합니다."}
-          </Ment>
+          <ProfileImg
+            src={profileImageUrl}
+            className='p_img'
+            alt='프로필 이미지'
+          />
+
+          <Ment darkMode={darkMode}>{displayName}</Ment>
         </>
       )}
 
@@ -188,9 +221,18 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
             </Dark>
 
             {isLogin ? (
-              <Log onClick={logout} darkMode={darkMode}>
-                로그아웃
-              </Log>
+              <>
+                <Log onClick={() => setShowConfirm(true)} darkMode={darkMode}>
+                  로그아웃
+                </Log>
+                {showConfirm && (
+                  <CustomConfirm
+                    message='로그아웃하시겠습니까?'
+                    onConfirm={handleLogout}
+                    onCancel={handleCancel}
+                  />
+                )}
+              </>
             ) : (
               <Link to='/login'>
                 <Log darkMode={darkMode}>로그인</Log>

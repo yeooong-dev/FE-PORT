@@ -27,12 +27,10 @@ const UseUser = () => {
   const updateProfileImage = async (imageUrl: string | null) => {
     if (!user || !token) return;
     try {
-      // 여기서 프로필 이미지를 업데이트하는 API 호출을 수행합니다.
       await instance.put("/path/to/your/api/endpoint", {
         profileImage: imageUrl,
         email,
       });
-      // API 호출이 성공하면 fetchUserInfo 함수를 호출하여 사용자 정보를 최신화합니다.
       await fetchUserInfo();
     } catch (error) {
       console.error("Failed to update profile image", error);

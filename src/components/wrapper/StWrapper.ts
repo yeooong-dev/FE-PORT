@@ -16,18 +16,22 @@ export const Wrap = styled.div<{ darkMode: boolean }>`
 
 export const Left = styled.div`
   width: 20%;
-  height: 100%;
+  height: 100vh;
   display: flex;
   align-items: center;
   flex-direction: column;
+
+  @media (max-width: 1200px) {
+    width: 30%;
+  }
 `;
 
 export const Right = styled.div<RightProps>`
   width: ${(props) => (props.isSidebarOpen ? "80%" : "300%")};
-  height: 100%;
+  height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   flex-direction: column;
   overflow-x: hidden;
   position: relative;
@@ -40,6 +44,7 @@ export const Contents = styled.div<{ darkMode: boolean }>`
   flex-direction: column;
   background-color: ${({ darkMode }) => (darkMode ? "#222327" : "#ebedf2")};
   text-align: center;
+  margin-top: 20px;
 `;
 
 export const Logo = styled.div<{ darkMode: boolean }>`

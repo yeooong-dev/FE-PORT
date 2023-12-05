@@ -241,6 +241,8 @@ function Calendar() {
   const tileClassName = ({ date }: { date: Date }) => {
     const dateString = date.toISOString().split("T")[0];
 
+    console.log(`tileClassName called for date: ${date}, view: ${view}`);
+
     for (let schedule of schedules) {
       if (isWithinRange(dateString, schedule.startDate, schedule.endDate)) {
         console.log("Matching date:", dateString);

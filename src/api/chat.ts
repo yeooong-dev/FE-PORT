@@ -1,5 +1,15 @@
 import instance from "./instance";
 
+interface Message {
+  id: number;
+  content: string;
+  user: {
+    id: number;
+    name: string;
+    profile_image: string | null;
+  };
+}
+
 export const getInteractedUsers = async () => {
   try {
     const response = await instance.get("/chat/interactedUsers");
@@ -21,8 +31,8 @@ export const getUsers = async () => {
 
 export const createRoom = async (userIds: number[], name: string) => {
   try {
+    console.log(`Creating room with userIds: ${userIds}`);
     const response = await instance.post("/chat/room", { userIds, name });
-    console.log("Server Response for Room Creation:", response.data);
 
     if (response.data && typeof response.data === "object") {
       return response.data;
@@ -35,25 +45,41 @@ export const createRoom = async (userIds: number[], name: string) => {
   }
 };
 
+export const checkIfRoomExists = async (userIds: number[]) => {
+  try {
+    const userIdsParam = userIds.join(",");
+
+    const response = await instance.get(
+      `/chat/room/exist?userIds=${userIdsParam}`
+    );
+    return response.data.exists ? response.data.room : null;
+  } catch (error) {
+    console.error("checkIfRoomExists API 호출 중 오류:", error);
+    throw error;
+  }
+};
+
 export const getRoom = async (roomId: number) => {
-  console.log('Requesting room with ID:', roomId); 
   try {
     const response = await instance.get(`/chat/room/${roomId}`);
+
+    if (response.status === 404) {
+      throw new Error("Room not found");
+    }
 
     if (response.status !== 200) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
-    if (response.headers["content-type"]?.includes("application/json")) {
-      const data = response.data;
-      if (data && typeof data === "object" && "chats" in data) {
-        return data;
-      } else {
-        throw new Error("Invalid response data");
-      }
-    } else {
-      throw new Error("Response is not JSON");
+    const data = response.data;
+    if (!data) {
+      throw new Error("Invalid response data");
     }
+
+    if (!("chats" in data)) {
+      console.warn("Received room data without chats", data);
+    }
+    return data;
   } catch (error) {
     console.error(error);
     throw error;
@@ -74,20 +100,19 @@ export const joinRoom = async (roomId: number, userId: number) => {
 
 export const postMessage = async (
   roomId: number,
-  userId: number,
   message: string
-) => {
-  try {
-    const response = await instance.post(`/chat/room/${roomId}/message`, {
-      userId,
-      message,
-      roomId,
-    });
-    if (!response.data) throw new Error("Invalid response data");
-    return response.data;
-  } catch (error) {
-    console.error(error);
-    throw error;
+): Promise<Message> => {
+  const response = await instance.post(`/chat/room/${roomId}/message`, {
+    message,
+  });
+  if (response.data) {
+    return {
+      id: response.data.id,
+      content: response.data.message,
+      user: response.data.user,
+    };
+  } else {
+    throw new Error("Invalid server response");
   }
 };
 

@@ -53,6 +53,7 @@ export const Ment = styled.p<MentProps>`
 `;
 
 export const NavBtn = styled.div`
+  width: 50%;
   margin-top: 30px;
   color: #2a3642;
   cursor: pointer;
@@ -77,6 +78,9 @@ export const Main = styled.button<MainProps>`
     background: #51449d;
     color: white;
     transition: 0.3s;
+  }
+
+  @media (max-width: 800px) {
   }
 `;
 

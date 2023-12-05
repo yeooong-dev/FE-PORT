@@ -13,6 +13,7 @@ import Chat from "../pages/chat/Chat";
 import Calendar from "../pages/calendar/Calendar";
 import UseIsLogin from "../hook/UseIsLogin";
 import Wrapper from "../components/wrapper/Wrapper";
+import SearchResultsPage from "../components/search/SearchResultsPage";
 
 interface ProtectedRouteProps {
   element: ReactElement;
@@ -42,6 +43,7 @@ function Router() {
         <Route path='/login' element={<Login />} />
 
         <Route path='/' element={<Wrapper />}>
+          <Route path='/search-results' element={<SearchResultsPage />} />
           <Route path='main' element={<Main />} />
           <Route
             path='mypage'

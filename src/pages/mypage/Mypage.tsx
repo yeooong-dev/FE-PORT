@@ -22,11 +22,13 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../../components/navigation/userContext";
 import { useDarkMode } from "../../components/darkmode/DarkModeContext";
+import CustomAlert from "../../components/alert/CustomAlert";
+import CustomConfirm from "../../components/alert/CustomConfirm";
 
 function Mypage() {
   Modal.setAppElement("#root");
   const { user, setUser } = useUser();
-  const { state, dispatch } = useUserContext();
+  const { state, dispatch, updateUserContext } = useUserContext();
   const [selectedTab, setSelectedTab] = useState<
     "nameEdit" | "pwEdit" | "deleteAccount" | null
   >("nameEdit");
@@ -40,6 +42,10 @@ function Mypage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
   const { darkMode } = useDarkMode();
+  // 커스텀 알럿
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertType, setAlertType] = useState<"error" | "success">("error");
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // 프로필 이미지 가져오기
   useEffect(() => {
@@ -173,36 +179,34 @@ function Mypage() {
         await imgAdd(user.id, profileImage);
         const response = await imgGet(user.id);
         setCurrentImage(response.data.imageUrl);
-        alert("프로필 이미지가 업로드되었습니다.");
-
-        const newImageUrl = response.data.imageUrl;
-        dispatch({
-          type: "SET_USER",
-          payload: { name: state.name, profileImage: newImageUrl },
+        setAlertType("success");
+        setAlertMessage("프로필 이미지가 업로드되었습니다.");
+        updateUserContext({
+          name: state.name,
+          profileImage: response.data.imageUrl,
         });
       } catch (error) {
         console.error(error);
-        alert("프로필 이미지 업로드에 실패했습니다.");
+        setAlertType("error");
+        setAlertMessage("프로필 이미지 업로드에 실패했습니다.");
       }
     } else {
       console.error("Profile image or user ID is not set");
     }
   };
 
-  // 프로필 삭제
   const handleImageDelete = async () => {
     if (user?.id) {
       try {
         await imgDelete(user.id);
         setCurrentImage(null);
-        alert("프로필 이미지가 삭제되었습니다.");
-        dispatch({
-          type: "SET_USER",
-          payload: { name: state.name, profileImage: "" },
-        });
+        setAlertType("success");
+        setAlertMessage("프로필 이미지가 삭제되었습니다.");
+        updateUserContext({ name: state.name, profileImage: "" });
       } catch (error) {
         console.error(error);
-        alert("이미지 삭제에 실패했습니다.");
+        setAlertType("error");
+        setAlertMessage("이미지 삭제에 실패했습니다.");
       }
     }
   };
@@ -210,12 +214,16 @@ function Mypage() {
   // 이름 변경
   const handleNameChange = async () => {
     if (!user?.id) {
-      alert("유저 정보를 불러오는데 실패했습니다. 다시 시도해주세요.");
+      setAlertType("error");
+      setAlertMessage(
+        "유저 정보를 불러오는데 실패했습니다. 다시 시도해주세요."
+      );
       return;
     }
     try {
       await updateName(user.id, name, email, password);
-      alert("이름이 성공적으로 변경되었습니다.");
+      setAlertType("success");
+      setAlertMessage("이름이 성공적으로 변경되었습니다.");
       setUser((prev) => {
         if (prev === null) return null;
         return { ...prev, name };
@@ -229,7 +237,8 @@ function Mypage() {
         payload: { name: name, profileImage: state.profileImage },
       });
     } catch (error) {
-      alert("모든 필드를 올바르게 입력해주세요.");
+      setAlertType("error");
+      setAlertMessage("모든 필드를 올바르게 입력해주세요.");
     }
   };
 
@@ -237,6 +246,7 @@ function Mypage() {
   const handlePasswordChange = async () => {
     if (user === null || user === undefined) {
       alert("유저 정보를 불러오는데 실패했습니다. 다시 시도해주세요.");
+
       return;
     }
 
@@ -247,7 +257,8 @@ function Mypage() {
       newPassword !== confirmPassword ||
       !email
     ) {
-      alert("모든 필드를 올바르게 입력해주세요.");
+      setAlertType("error");
+      setAlertMessage("모든 필드를 올바르게 입력해주세요.");
       return;
     }
 
@@ -258,41 +269,68 @@ function Mypage() {
         newPassword,
         confirmPassword
       );
-      alert("비밀번호가 성공적으로 변경되었습니다.");
+      setAlertType("success");
+      setAlertMessage("비밀번호가 성공적으로 변경되었습니다.");
       setEmail("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (error) {
-      alert("비밀번호 변경에 실패하였습니다. 정보를 다시 확인해주세요.");
+      setAlertType("error");
+      setAlertMessage(
+        "비밀번호 변경에 실패하였습니다. 정보를 다시 확인해주세요."
+      );
     }
   };
 
-  // 계정 삭제 핸들러
-  const handleAccountDelete = async () => {
+  const handleAccountDelete = () => {
     if (user === null || user === undefined) {
-      alert("유저 정보를 불러오는데 실패했습니다. 다시 시도해주세요.");
+      setAlertType("error");
+      setAlertMessage(
+        "유저 정보를 불러오는데 실패했습니다. 다시 시도해주세요."
+      );
       return;
     }
 
     if (!password) {
-      alert("비밀번호를 입력해주세요.");
+      setAlertType("error");
+      setAlertMessage("비밀번호를 입력해주세요.");
       return;
     }
 
-    if (window.confirm("정말로 계정을 삭제하시겠습니까?")) {
-      try {
-        const response = await deleteAccount(user.id, password);
-        alert("계정이 성공적으로 삭제되었습니다.");
-        setUser(null);
-        navigate("/login");
-      } catch (error) {
-        alert("비밀번호를 다시 확인해주세요.");
-      }
+    setShowConfirm(true);
+  };
+
+  const confirmAccountDelete = async () => {
+    if (!user) {
+      setAlertType("error");
+      setAlertMessage("유저 정보가 없습니다.");
+      return;
+    }
+
+    try {
+      const response = await deleteAccount(user.id, password);
+      setAlertType("success");
+      setAlertMessage("계정이 성공적으로 삭제되었습니다.");
+      setUser(null);
+      navigate("/login");
+    } catch (error) {
+      setAlertType("error");
+      setAlertMessage("비밀번호를 다시 확인해주세요.");
     }
   };
 
   return (
     <Wrap>
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          type={alertType}
+          onClose={() => {
+            setAlertMessage(null);
+            setAlertType("error");
+          }}
+        />
+      )}
       <Profile darkMode={darkMode}>
         {currentImage ? (
           <img src={currentImage} className='p_img' alt='프로필 이미지' />
@@ -449,6 +487,13 @@ function Mypage() {
           >
             회원 탈퇴
           </Tab>
+          {showConfirm && (
+            <CustomConfirm
+              message='정말로 계정을 삭제하시겠습니까?'
+              onConfirm={confirmAccountDelete}
+              onCancel={() => setShowConfirm(false)}
+            />
+          )}
         </TabTop>
 
         <Info>{renderContent()}</Info>
