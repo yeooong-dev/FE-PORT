@@ -21,7 +21,7 @@ export const Info1 = styled.div`
     justify-content: space-between;
     width: 100%;
     height: 800px;
-    background: #51449d;
+    background: #3c57b3;
     clip-path: ellipse(100% 100% at 50% 0%);
     -webkit-box-shadow: 3px 3px 8px 5px #4a4851;
     box-shadow: 3px 3px 8px 5px #37363b;
@@ -127,7 +127,7 @@ export const Left = styled.div`
         font-size: 1.5rem;
         font-weight: 900;
         opacity: 80%;
-        color: #fffc49;
+        color: #ffe100;
         text-align: right;
         line-height: 2rem;
         cursor: pointer;
@@ -154,12 +154,12 @@ export const Right = styled.div`
         left: 0;
         color: #d5d5d5;
         font-size: 1.5rem;
-        background: #51449d;
+        background: #3c57b3;
         display: flex;
         align-items: center;
         justify-content: center;
         -webkit-box-shadow: 3px 3px 3px 5px #443985;
-        box-shadow: 3px 3px 3px 5px #443985;
+        box-shadow: 3px 3px 3px 5px #344194;
         line-height: 2.5rem;
     }
 
@@ -174,12 +174,12 @@ export const Right = styled.div`
         left: -120px;
         color: #d5d5d5;
         font-size: 1.5rem;
-        background: #51449d;
+        background: #3c57b3;
         display: flex;
         align-items: center;
         justify-content: center;
         -webkit-box-shadow: 3px 3px 3px 5px #443985;
-        box-shadow: 3px 3px 3px 5px #443985;
+        box-shadow: 3px 3px 3px 5px #344194;
         line-height: 2.5rem;
     }
 
@@ -194,12 +194,12 @@ export const Right = styled.div`
         left: 120px;
         color: #d5d5d5;
         font-size: 1.5rem;
-        background: #51449d;
+        background: #3c57b3;
         display: flex;
         align-items: center;
         justify-content: center;
         -webkit-box-shadow: 3px 3px 3px 5px #443985;
-        box-shadow: 3px 3px 3px 5px #443985;
+        box-shadow: 3px 3px 3px 5px #344194;
         line-height: 2.5rem;
     }
 `;

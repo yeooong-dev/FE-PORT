@@ -101,6 +101,12 @@ function Register() {
 
   // 이메일 중복 확인
   const checkEmail = (): void => {
+    if (emailMessage !== VALID_EMAIL_MESSAGE) {
+      setAlertType("error");
+      setAlertMessage("올바른 이메일 형식으로 작성 후 중복 확인 바랍니다.");
+      return;
+    }
+
     usercheckEmail(emailValue)
       .then((res) => {
         setIsEmailChecked(true);
@@ -145,6 +151,7 @@ function Register() {
       email: emailValue,
       name: nameValue,
       password: pwValue,
+      passwordConfirm: pwconfirmValue,
     })
       .then((response) => {
         setAlertType("success");
@@ -152,7 +159,7 @@ function Register() {
 
         setTimeout(() => {
           navigate("/login");
-        }, 1500);
+        }, 1000);
       })
       .catch((error) => {
         setAlertType("error");

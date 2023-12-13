@@ -4,21 +4,27 @@ interface RightProps {
   isSidebarOpen: boolean;
 }
 
-export const Wrap = styled.div<{ darkMode: boolean }>`
+export const Wrap = styled.div<{
+  darkMode: boolean;
+  searchInputVisible: boolean;
+}>`
   width: 100%;
+  overflow-x: hidden;
   height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  background-color: ${({ darkMode }) => (darkMode ? "#222327" : "#ebedf2")};
+  background-color: ${({ darkMode }) => (darkMode ? "#323336" : "#f4f5fb")};
   color: ${({ darkMode }) => (darkMode ? "#fff" : "#000")};
 `;
 
 export const Left = styled.div`
-  width: 20%;
+  width: 280px;
+  min-width: 280px;
   height: 100vh;
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-direction: column;
 
   @media (max-width: 1200px) {
@@ -27,29 +33,43 @@ export const Left = styled.div`
 `;
 
 export const Right = styled.div<RightProps>`
-  width: ${(props) => (props.isSidebarOpen ? "80%" : "300%")};
-  height: 100vh;
+  width: 100%;
+  margin-left: ${(props) => (props.isSidebarOpen ? "0" : "-200px")};
+  height: 96vh;
   display: flex;
-  align-items: center;
-  justify-content: flex-start;
   flex-direction: column;
-  overflow-x: hidden;
-  position: relative;
+
+  @media (max-width: 550px) {
+    margin-left: ${(props) => (props.isSidebarOpen ? "-100px" : "-230px")};
+    transform: translateX(
+      ${(props) => (props.isSidebarOpen ? "100px" : "-20px")}
+    );
+    transition: transform 0.5s ease;
+  }
 `;
 
 export const Contents = styled.div<{ darkMode: boolean }>`
-  width: 100%;
+  width: 98%;
+  height: 90%;
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-direction: column;
-  background-color: ${({ darkMode }) => (darkMode ? "#222327" : "#ebedf2")};
+  background-color: ${({ darkMode }) => (darkMode ? "#222327" : "white")};
   text-align: center;
-  margin-top: 20px;
+  border-radius: 50px;
+  box-shadow: 6px 6px 10px 5px rgba(0, 0, 0, 0.07);
+  -webkit-box-shadow: 6px 6px 10px 5px rgba(0, 0, 0, 0.07);
+  -moz-box-shadow: 6px 6px 10px 5px rgba(0, 0, 0, 0.07);
 `;
 
 export const Logo = styled.div<{ darkMode: boolean }>`
   font-size: 2.3rem;
-  color: ${({ darkMode }) => (darkMode ? "#fff" : "#51449d")};
+  color: ${({ darkMode }) => (darkMode ? "#fff" : "#3c57b3")};
   font-family: var(--font-logo);
   cursor: pointer;
+
+  @media (max-width: 550px) {
+    font-size: 1.8rem;
+  }
 `;

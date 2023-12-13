@@ -103,7 +103,10 @@ function Login() {
             placeholder='비밀번호 입력'
           />
           <LoginBtn onClick={onClickLoginBtn}>로그인</LoginBtn>
-          <Link to='/register' style={{ color: "black", fontSize: "1.1rem" }}>
+          <Link
+            to='/register'
+            style={{ color: "#2e2e2e", fontSize: "1.1rem", fontWeight: "bold" }}
+          >
             회원가입
           </Link>
         </AuthContent>

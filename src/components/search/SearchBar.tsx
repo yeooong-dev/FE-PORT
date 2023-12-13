@@ -1,12 +1,27 @@
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useSearchResults } from "./SearchResultsContext";
-import { Search, SearchBtn, SearchInput, SearchWrap } from "./StSearchBar";
+import {
+  Action,
+  Dark,
+  Search,
+  SearchBtn,
+  SearchInput,
+  SearchRight,
+  SearchWrap,
+} from "./StSearchBar";
 import { BiSearchAlt } from "react-icons/bi";
 import instance from "../../api/instance";
 import { useDarkMode } from "../darkmode/DarkModeContext";
 import { useNavigate } from "react-router-dom";
+import { BsSunFill, BsFillMoonFill } from "react-icons/bs";
+import { HiOutlineMenuAlt2, HiOutlineMenuAlt3 } from "react-icons/hi";
 
-function SearchBar() {
+interface SearchBarProps {
+  setIsSidebarOpen: (isOpen: boolean) => void;
+  isSidebarOpen: boolean;
+}
+
+function SearchBar({ setIsSidebarOpen, isSidebarOpen }: SearchBarProps) {
   const { setSearchResults, setLastSearchTerm } = useSearchResults();
   const [searchTerm, setSearchTerm] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
@@ -14,7 +29,7 @@ function SearchBar() {
   const [isSearchAttempted, setIsSearchAttempted] = useState(false);
 
   const navigate = useNavigate();
-  const { darkMode } = useDarkMode();
+  const { darkMode, toggleDarkMode } = useDarkMode();
 
   const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -47,35 +62,85 @@ function SearchBar() {
   };
 
   const toggleSearchInput = () => {
-    setSearchInputVisible(!searchInputVisible);
     if (!searchInputVisible) {
       setTimeout(() => {
-        document.getElementById("search-input")?.focus();
-      }, 300);
+        setSearchInputVisible(true);
+      }, 0);
+    } else {
+      setSearchInputVisible(false);
+    }
+  };
+
+  const toggleSidebar = () => {
+    if (window.innerWidth <= 550) {
+      setIsSidebarOpen(!isSidebarOpen);
+      setSearchInputVisible(false);
+    } else {
+      setIsSidebarOpen(!isSidebarOpen);
     }
   };
 
   return (
-    <SearchWrap onSubmit={handleSubmit}>
-      <SearchBtn onClick={toggleSearchInput} darkMode={darkMode}>
-        <BiSearchAlt size='32' className='icon' />
-      </SearchBtn>
-      {searchInputVisible && (
-        <>
-          <SearchInput
-            id='search-input'
-            value={searchTerm}
-            onChange={handleSearchChange}
-            placeholder={
-              isSearchAttempted && !searchTerm ? "검색어를 입력해주세요." : ""
-            }
+    <SearchWrap
+      onSubmit={handleSubmit}
+      darkMode={darkMode}
+      visible={searchInputVisible}
+      isSidebarOpen={isSidebarOpen}
+    >
+      <div className='open_btn' onClick={toggleSidebar}>
+        {isSidebarOpen ? (
+          <HiOutlineMenuAlt3 size='32' />
+        ) : (
+          <HiOutlineMenuAlt2 size='32' />
+        )}
+      </div>
+
+      <Dark
+        onClick={toggleDarkMode}
+        darkMode={darkMode}
+        visible={searchInputVisible}
+        isSidebarOpen={isSidebarOpen}
+      >
+        {darkMode ? (
+          <BsFillMoonFill size='20' color='#ebb05e' />
+        ) : (
+          <BsSunFill size='25' color='#ebb05e' />
+        )}
+      </Dark>
+
+      <SearchRight>
+        <SearchBtn
+          onClick={toggleSearchInput}
+          darkMode={darkMode}
+          visible={searchInputVisible}
+          isSidebarOpen={isSidebarOpen}
+        >
+          <BiSearchAlt size='32' className='icon' />
+        </SearchBtn>
+
+        {searchInputVisible && (
+          <Action
+            darkMode={darkMode}
             visible={searchInputVisible}
-          />
-          <Search onClick={handleSearchSubmit} darkMode={darkMode}>
-            검색
-          </Search>
-        </>
-      )}
+            isSidebarOpen={isSidebarOpen}
+          >
+            <SearchInput
+              id='search-input'
+              value={searchTerm}
+              onChange={handleSearchChange}
+              isSidebarOpen={isSidebarOpen}
+              placeholder={
+                isSearchAttempted && !searchTerm ? "검색어를 입력해주세요." : ""
+              }
+              visible={searchInputVisible}
+              darkMode={darkMode}
+            />
+            <Search onClick={handleSearchSubmit} darkMode={darkMode}>
+              검색
+            </Search>
+          </Action>
+        )}
+      </SearchRight>
     </SearchWrap>
   );
 }

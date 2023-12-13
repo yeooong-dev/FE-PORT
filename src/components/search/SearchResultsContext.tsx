@@ -23,13 +23,14 @@ interface FamilyEvent {
   target: string;
   type: string;
   amount: string;
+  createdAt: string;
 }
 
 interface CalendarEvent {
   event_id: number;
   title: string;
-  start_date: string;
-  end_date: string;
+  startDate: string;
+  endDate: string;
 }
 
 interface SearchResultsContextType {

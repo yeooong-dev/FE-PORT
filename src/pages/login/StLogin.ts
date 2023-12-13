@@ -27,7 +27,15 @@ export const LoginBtn = styled.button`
   margin-top: 10px;
   margin-bottom: 30px;
   cursor: pointer;
-  background: #51439d;
+  background: #3c57b3;
   color: white;
   font-size: 1.1rem;
+
+  &:hover {
+    background: none;
+    color: #3c57b3;
+    font-weight: bold;
+    border: 2px solid #bcc5e0;
+    transition: 0.2s;
+  }
 `;

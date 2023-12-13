@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Title, TodoTop, TodoWrap, Todos } from "./StTodo";
 import Modal from "react-modal";
 import { IoTrashOutline } from "react-icons/io5";
 import { BsPencil, BsCheckLg } from "react-icons/bs";
@@ -12,6 +11,7 @@ import {
 } from "../../api/todo";
 import { useDarkMode } from "../../components/darkmode/DarkModeContext";
 import CustomAlert from "../../components/alert/CustomAlert";
+import styled from "styled-components";
 Modal.setAppElement("#root");
 
 interface TodoItem {
@@ -20,7 +20,6 @@ interface TodoItem {
   time: string;
   todo_id: number;
 }
-
 function Todo() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -126,7 +125,6 @@ function Todo() {
         }
         setTodos(response);
 
-        // 서버로부터 가져온 completed 상태를 사용하여 checkedTodoIds 초기화
         const initialCheckedTodoIds = response
           .filter((todo) => todo.completed)
           .map((todo) => todo.todo_id);
@@ -149,7 +147,6 @@ function Todo() {
           onClose={() => setAlertMessage(null)}
         />
       )}
-      <Title>오늘의 할 일</Title>
       <TodoWrap darkMode={darkMode}>
         <TodoTop darkMode={darkMode}>
           <div>
@@ -165,17 +162,20 @@ function Todo() {
         <Modal
           isOpen={isModalOpen}
           onRequestClose={closeModal}
+          className='modal'
           style={{
             overlay: {
               backgroundColor: "rgba(0, 0, 0, 0.5)",
+              zIndex: "999",
             },
             content: {
-              width: "900px",
-              height: "230px",
+              width: "80%",
+              maxWidth: "500px",
+              minHeight: "500px",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              backgroundColor: "#ebebeb",
+              backgroundColor: "white",
               border: "none",
               borderRadius: "5px",
               display: "flex",
@@ -185,6 +185,18 @@ function Todo() {
             },
           }}
         >
+          <h1
+            style={{
+              position: "absolute",
+              top: "30px",
+              left: "50%",
+              transform: "translate(-50%, 0)",
+              fontSize: "1.2rem",
+              color: "#858087",
+            }}
+          >
+            할일 추가
+          </h1>
           <button
             style={{
               position: "absolute",
@@ -207,81 +219,93 @@ function Todo() {
           <input
             autoFocus
             style={{
-              width: "550px",
+              width: "50%",
+              minWidth: "100px",
               height: "70px",
-              backgroundColor: "white",
+              backgroundColor: "#f0f0f0",
               paddingLeft: "1rem",
-              fontSize: "1.2rem",
+              fontSize: "1rem",
             }}
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={(e) => {
+              const newValue = e.target.value;
+              if (newValue.length <= 30) {
+                setInputValue(newValue);
+              }
+            }}
             onKeyPress={(e) => {
               if (e.key === "Enter") handleAddTodo();
             }}
+            placeholder='30글자 이내로 작성바랍니다.'
           />
+
           <button
             className='AddBtn'
             style={{
-              width: "200px",
+              minWidth: "80px",
               height: "70px",
               fontSize: "1.2rem",
               cursor: "pointer",
-              backgroundColor: "#6b60a6",
+              backgroundColor: "#3c57b3",
               color: "white",
             }}
             onClick={handleAddTodo}
           >
-            {editTodoId !== null ? "수정하기" : "추가하기"}
+            {editTodoId !== null ? "수정" : "저장"}
           </button>
         </Modal>
 
         <Todos darkMode={darkMode}>
-          {todos.map((todo) => (
-            <div
-              className={`between ${
-                checkedTodoIds.includes(todo.todo_id) ? "checked" : ""
-              }`}
-              key={todo.todo_id}
-            >
-              <div className='left'>
-                <div
-                  className='check'
-                  onClick={() => handleToggleCheck(todo.todo_id)}
-                >
-                  {checkedTodoIds.includes(todo.todo_id) ? (
-                    <BsCheckLg size='35' color='#51439d' />
-                  ) : null}
+          {todos.length === 0 ? (
+            <b>오늘의 할일을 추가해주세요!</b>
+          ) : (
+            todos.map((todo) => (
+              <div
+                className={`between ${
+                  checkedTodoIds.includes(todo.todo_id) ? "checked" : ""
+                }`}
+                key={todo.todo_id}
+              >
+                <div className='left'>
+                  <div
+                    className='check'
+                    onClick={() => handleToggleCheck(todo.todo_id)}
+                  >
+                    {checkedTodoIds.includes(todo.todo_id) ? (
+                      <BsCheckLg size='35' color='#3c57b3' />
+                    ) : null}
+                  </div>
+                  <span
+                    className={`text ${
+                      checkedTodoIds.includes(todo.todo_id) ? "checked" : ""
+                    }`}
+                  >
+                    {todo.text}
+                  </span>
                 </div>
-                <span
-                  className={`text ${
-                    checkedTodoIds.includes(todo.todo_id) ? "checked" : ""
-                  }`}
-                >
-                  {todo.text}
-                </span>
-              </div>
 
-              <div className='right'>
-                <span
-                  className={`time ${
-                    checkedTodoIds.includes(todo.todo_id) ? "checked" : ""
-                  }`}
-                >
-                  {todo.time}
-                </span>
-                <BsPencil
-                  size='23'
-                  className='pen'
-                  onClick={() => openEditModal(todo.todo_id, todo.text)}
-                />
-                <IoTrashOutline
-                  className='trash'
-                  size='25'
-                  onClick={() => handleDeleteTodo(todo.todo_id)}
-                />
+                <div className='right'>
+                  <span
+                    className={`time ${
+                      checkedTodoIds.includes(todo.todo_id) ? "checked" : ""
+                    }`}
+                  >
+                    {todo.time}
+                  </span>
+                  <BsPencil
+                    size='23'
+                    className='pen'
+                    onClick={() => openEditModal(todo.todo_id, todo.text)}
+                  />
+                  <IoTrashOutline
+                    className='trash'
+                    size='25'
+                    onClick={() => handleDeleteTodo(todo.todo_id)}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </Todos>
       </TodoWrap>
     </>
@@ -289,3 +313,280 @@ function Todo() {
 }
 
 export default Todo;
+
+interface darkProps {
+  darkMode: boolean;
+}
+
+const TodoWrap = styled.div<darkProps>`
+  width: 80%;
+  max-width: 1300px;
+  height: 90%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background: ${({ darkMode }) => (darkMode ? "#222327" : "white")};
+  border-radius: 5px;
+
+  .modal {
+  }
+`;
+
+const TodoTop = styled.div<darkProps>`
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  div {
+    text-align: left;
+
+    .date {
+      font-size: 1.6rem;
+      font-weight: 900;
+      margin-bottom: 20px;
+      color: ${({ darkMode }) => (darkMode ? "white" : "#777777")};
+    }
+    .num {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: ${({ darkMode }) => (darkMode ? "white" : "#3c57b3")};
+    }
+  }
+
+  button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: #3c57b3;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+
+    &:hover {
+      background: none;
+      border: 5px solid #3c57b3;
+      transition: 0.5s;
+      color: #3c57b3;
+    }
+  }
+
+  @media (max-width: 550px) {
+    width: 90%;
+
+    div {
+      .date {
+        font-size: 1.3rem;
+      }
+    }
+
+    button {
+      width: 50px;
+      height: 50px;
+      min-width: 50px;
+      min-height: 50px;
+
+      &:hover {
+        background: #3c57b3;
+        border: none;
+        color: white;
+      }
+    }
+  }
+`;
+
+const Todos = styled.div<darkProps>`
+  width: 80%;
+  max-width: 1300px;
+  height: 620px;
+  max-height: 620px;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  margin-top: 80px;
+  overflow-y: auto;
+
+  b {
+    font-size: 1.4rem;
+    margin-top: 100px;
+    color: ${({ darkMode }) => (darkMode ? "white" : "#777777")};
+  }
+
+  .between {
+    width: 100%;
+    height: auto;
+    min-height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 40px;
+    position: relative;
+
+    &:before {
+      content: "";
+      position: absolute;
+      left: 0px;
+      right: 0;
+      bottom: -5px;
+      border-bottom: ${({ darkMode }) =>
+        darkMode ? "1.5px solid #616161" : "1.5px solid #d6d6d6"};
+      transition: bottom 0.3s ease;
+      width: 100%;
+    }
+
+    &.checked:before {
+      bottom: 50%;
+      position: absolute;
+      left: 40px;
+      right: 70px;
+      border-bottom: ${({ darkMode }) =>
+        darkMode ? "1.5px solid #616161" : "1.5px solid #e8e8e8"};
+      color: #d6d6d6;
+      width: 86%;
+    }
+
+    .left {
+      display: flex;
+      align-items: center;
+
+      .check {
+        background: none;
+        width: 30px;
+        height: 30px;
+        max-width: 30px;
+        min-width: 30px;
+        border: 2px solid #3c57b3;
+        border-radius: 50%;
+        cursor: pointer;
+        margin-right: 20px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .text {
+        width: 100%;
+        font-size: 1.2rem;
+        color: ${({ darkMode }) => (darkMode ? "white" : "#555555")};
+        font-weight: bold;
+        text-align: left;
+        line-height: 25px;
+        word-break: break-all;
+      }
+
+      .text.checked {
+        color: ${({ darkMode }) => (darkMode ? "#616161" : "#d6d6d6")};
+      }
+    }
+
+    .right {
+      display: flex;
+      align-items: center;
+
+      .time {
+        font-size: 1.2rem;
+        color: #555555;
+      }
+
+      .time.checked {
+        color: #d6d6d6;
+      }
+
+      .pen {
+        width: 50px;
+        cursor: pointer;
+        padding-left: 20px;
+        z-index: 3;
+        background: ${({ darkMode }) => (darkMode ? "#222327" : "white")};
+      }
+
+      .pen:hover {
+        color: #3c57b3;
+        transition: 0.3s;
+      }
+
+      .trash {
+        width: 60px;
+        background: ${({ darkMode }) => (darkMode ? "#222327" : "white")};
+        margin-left: 0px;
+        cursor: pointer;
+        z-index: 3;
+      }
+
+      .trash:hover {
+        color: #3c57b3;
+        transition: 0.3s;
+      }
+    }
+  }
+  .between.checked .left .check {
+    border: none;
+    display: flex;
+    align-items: center;
+    color: #d6d6d6;
+  }
+
+  @media (max-width: 550px) {
+    width: 100%;
+    height: 650px;
+    max-height: 650px;
+
+    .between {
+      height: 45px;
+      min-height: 45px;
+      margin-bottom: 30px;
+
+      &:before {
+        bottom: -5px;
+      }
+
+      .left {
+        .text {
+          width: 100%;
+          font-size: 15px;
+          font-weight: bold;
+          line-height: 25px;
+        }
+
+        .check {
+          width: 20px;
+          height: 20px;
+          min-width: 20px;
+          margin-right: 10px;
+        }
+      }
+
+      .right {
+        .time {
+          font-size: 1.2rem;
+          color: #555555;
+        }
+  
+        .time.checked {
+          color: #d6d6d6;
+        }
+  
+        .pen {
+          width: 25px;
+          padding-left: 8px;
+          z-index: 3;
+        
+        }
+  
+        .pen:hover {
+          color: ${({ darkMode }) => (darkMode ? "white" : "#222327")};
+        }
+  
+        .trash {
+          width: 25px;
+          padding-left: 15px;
+      
+        }
+  
+        .trash:hover {
+          color: ${({ darkMode }) => (darkMode ? "white" : "#222327")};
+        }
+      }
+    }
+    }
+  }
+`;

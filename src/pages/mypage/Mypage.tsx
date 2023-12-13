@@ -224,18 +224,15 @@ function Mypage() {
       await updateName(user.id, name, email, password);
       setAlertType("success");
       setAlertMessage("이름이 성공적으로 변경되었습니다.");
-      setUser((prev) => {
-        if (prev === null) return null;
-        return { ...prev, name };
-      });
-      setName("");
-      setEmail("");
-      setPassword("");
-
+      setUser((prev) => (prev ? { ...prev, name: name } : null));
       dispatch({
         type: "SET_USER",
         payload: { name: name, profileImage: state.profileImage },
       });
+      updateUserContext({ name: name, profileImage: state.profileImage });
+      setName("");
+      setEmail("");
+      setPassword("");
     } catch (error) {
       setAlertType("error");
       setAlertMessage("모든 필드를 올바르게 입력해주세요.");

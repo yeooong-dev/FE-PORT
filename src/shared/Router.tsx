@@ -10,7 +10,7 @@ import FamilyEvent from "../pages/familyEvent/FamilyEvent";
 import Vacation from "../pages/vacation/Vacation";
 import Dm from "../pages/dm/Dm";
 import Chat from "../pages/chat/Chat";
-import Calendar from "../pages/calendar/Calendar";
+import Calendar from "../pages/calendar/CalendarView";
 import UseIsLogin from "../hook/UseIsLogin";
 import Wrapper from "../components/wrapper/Wrapper";
 import SearchResultsPage from "../components/search/SearchResultsPage";

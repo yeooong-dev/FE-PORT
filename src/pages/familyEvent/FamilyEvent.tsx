@@ -25,7 +25,6 @@ import CustomConfirm from "../../components/alert/CustomConfirm";
 
 interface Event {
   id: number;
-  user_id: number;
   target: string;
   date: string;
   type: string;
@@ -34,7 +33,6 @@ interface Event {
 
 function FamilyEvent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userId, setUserId] = useState(1);
   const [target, setTarget] = useState("");
   const [date, setDate] = useState("");
   const [type, setType] = useState("");
@@ -89,7 +87,6 @@ function FamilyEvent() {
 
     try {
       const newEvent = await addFamilyEvent({
-        user_id: userId,
         target,
         date,
         type,

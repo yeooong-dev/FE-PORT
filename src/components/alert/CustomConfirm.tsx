@@ -60,7 +60,7 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
               onCancel();
             }}
             style={{
-              background: "#91a4d9",
+              background: "#3c57b3",
               color: "white",
               width: "150px",
               height: "50px",

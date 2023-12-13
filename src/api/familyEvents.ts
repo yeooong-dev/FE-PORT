@@ -1,7 +1,6 @@
 import instance from "./instance";
 
 interface FamilyEventAddPayload {
-  user_id: number;
   target: string;
   date: string;
   type: string;

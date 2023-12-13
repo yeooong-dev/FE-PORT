@@ -2,7 +2,7 @@ import { styled } from "styled-components";
 
 export const Logo = styled.div`
   font-size: 2.3rem;
-  color: #51449d;
+  color: #3c57b3;
   font-family: var(--font-logo);
   cursor: pointer;
 `;
@@ -86,8 +86,17 @@ export const RegisterBtn = styled.button`
   width: 420px;
   height: 55px;
   margin-top: 10px;
+  margin-bottom: 30px;
   cursor: pointer;
-  background: #51439d;
+  background: #3c57b3;
   color: white;
   font-size: 1.1rem;
+
+  &:hover {
+    background: none;
+    color: #3c57b3;
+    font-weight: bold;
+    border: 2px solid #bcc5e0;
+    transition: 0.2s;
+  }
 `;

@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useSearchResults } from "./SearchResultsContext";
 import { ResultWrap } from "./StSearchBar";
+import { useDarkMode } from "../../components/darkmode/DarkModeContext";
 
 function highlightSearchTerm(
   text: string | undefined,
@@ -14,7 +15,7 @@ function highlightSearchTerm(
   const parts = text.split(regex);
   return parts.map((part, index) =>
     regex.test(part) ? (
-      <span key={index} style={{ backgroundColor: "yellow" }}>
+      <span key={index} className='highlight'>
         {part}
       </span>
     ) : (
@@ -26,6 +27,7 @@ function highlightSearchTerm(
 function SearchResultsPage() {
   const { searchResults, lastSearchTerm } = useSearchResults();
   const navigate = useNavigate();
+  const { darkMode } = useDarkMode();
 
   const hasResults =
     searchResults &&
@@ -34,19 +36,21 @@ function SearchResultsPage() {
       searchResults.calendar.length > 0);
 
   return (
-    <ResultWrap>
+    <ResultWrap darkMode={darkMode}>
       {hasResults ? (
         <>
           {searchResults?.todos.map((todo) => (
             <div key={`todo-${todo.todo_id}`} onClick={() => navigate(`/todo`)}>
-              <p>오늘의 할 일</p>
-              <span>
+              <b>오늘의 할 일</b>
+              <span className='title'>
                 {todo.text
                   ? highlightSearchTerm(todo.text, lastSearchTerm)
                   : null}
               </span>
-              <span>{todo.completed ? "완료" : "미완료"}</span>
-              <span>
+              <span className='clear'>
+                {todo.completed ? "완료" : "미완료"}
+              </span>
+              <span className='date'>
                 {new Date(todo.created_at).toLocaleString()
                   ? highlightSearchTerm(
                       new Date(todo.created_at).toLocaleString(),
@@ -66,19 +70,15 @@ function SearchResultsPage() {
               }
               onClick={() => navigate(`/event`)}
             >
-              <p>경조사 기록</p>
-              <span>
+              <b>경조사 기록</b>
+              <span className='title'>
+                경조사 대상 :
                 {event.target
                   ? highlightSearchTerm(event.target, lastSearchTerm)
                   : null}
               </span>
-              <span>
-                {event.type
-                  ? highlightSearchTerm(event.type, lastSearchTerm)
-                  : null}
-              </span>
-
-              <span>
+              <span className='title'>
+                경조사 날짜 :{" "}
                 {new Date(event.date).toLocaleString()
                   ? highlightSearchTerm(
                       new Date(event.date).toLocaleString(),
@@ -86,8 +86,13 @@ function SearchResultsPage() {
                     )
                   : null}
               </span>
-
-              <p>금액: {event.amount}</p>
+              <span className='title'>
+                경조사 유형 :
+                {event.type
+                  ? highlightSearchTerm(event.type, lastSearchTerm)
+                  : null}
+              </span>
+              <span className='title last'>경조사 금액 : {event.amount}</span>
             </div>
           ))}
 
@@ -96,35 +101,32 @@ function SearchResultsPage() {
               key={`calendarEvent-${event.event_id || index}`}
               onClick={() => navigate(`/calendar`)}
             >
-              <p>나의 캘린더</p>
-              <span>
+              <b>나의 캘린더</b>
+              <span className='title'>
                 {event.title
                   ? highlightSearchTerm(event.title, lastSearchTerm)
                   : null}
               </span>
-              <p>
-                시작 날짜 :{" "}
-                {new Date(event.start_date).toLocaleString()
+              <span className='date'>
+                {new Date(event.startDate).toLocaleString()
                   ? highlightSearchTerm(
-                      new Date(event.start_date).toLocaleString(),
+                      new Date(event.startDate).toLocaleString(),
+                      lastSearchTerm
+                    )
+                  : null}{" "}
+                ~ <br />
+                {new Date(event.endDate).toLocaleString()
+                  ? highlightSearchTerm(
+                      new Date(event.endDate).toLocaleString(),
                       lastSearchTerm
                     )
                   : null}
-              </p>
-              <p>
-                시작 날짜 :{" "}
-                {new Date(event.end_date).toLocaleString()
-                  ? highlightSearchTerm(
-                      new Date(event.end_date).toLocaleString(),
-                      lastSearchTerm
-                    )
-                  : null}
-              </p>
+              </span>
             </div>
           ))}
         </>
       ) : (
-        <p>"{lastSearchTerm}" 에 대한 검색 결과가 없습니다.</p>
+        <p className='none'>"{lastSearchTerm}" 에 대한 검색 결과가 없습니다.</p>
       )}
     </ResultWrap>
   );

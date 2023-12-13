@@ -67,7 +67,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
       const user = JSON.parse(storedUser);
       dispatch({ type: "SET_USER", payload: user });
     }
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("user", JSON.stringify(state));

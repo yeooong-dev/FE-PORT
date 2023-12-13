@@ -6,15 +6,18 @@ export const register = async ({
   email,
   name,
   password,
+  passwordConfirm,
 }: {
   email: string;
   name: string;
   password: string;
+  passwordConfirm: string;
 }) => {
   const response = await instance.post(`/auth/register`, {
     email,
     name,
     password,
+    passwordConfirm,
   });
   return response;
 };

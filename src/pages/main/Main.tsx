@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import Calendar from "../calendar/Calendar";
+import Calendar from "../calendar/CalendarView";
 import {
   CheckDiv,
   Wrap,
@@ -69,7 +69,7 @@ function Main() {
   }, []);
 
   const handleToggleCheck = async (id: number) => {
-    const todoToUpdate = todos.find((todo) => todo.todo_id === id);
+    const todoToUpdate = todos.find((todo) => todo.id === id);
     if (todoToUpdate) {
       const updatedTodo = {
         ...todoToUpdate,
@@ -80,7 +80,7 @@ function Main() {
         await todoToggleCheck(id);
 
         setTodos((prevTodos) =>
-          prevTodos.map((todo) => (todo.todo_id === id ? updatedTodo : todo))
+          prevTodos.map((todo) => (todo.id === id ? updatedTodo : todo))
         );
       } catch (error) {
         console.error("Error updating check status:", error);
@@ -146,7 +146,7 @@ function Main() {
           <Link to='/calendar'>
             <h1>나의 일정 &nbsp; {">"}</h1>
           </Link>
-          <Calendar />
+          {/* <Calendar /> */}
         </WrapCalendar>
 
         <WrapSocket darkMode={darkMode}>
