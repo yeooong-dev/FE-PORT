@@ -42,7 +42,7 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
   const { state, updateUserContext } = useUserContext();
   const location = useLocation();
   const [profileImageUrl, setProfileImageUrl] = useState("/person.png");
-  const { user, setUser } = useUser();
+  const { user } = useUser();
   const [displayName, setDisplayName] = useState("");
   const { darkMode } = useDarkMode();
 
@@ -73,16 +73,16 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
         })
         .catch((error) => {
           console.error("프로필 이미지 가져오기 실패:", error);
-          setProfileImageUrl("/person.png");
+          setProfileImageUrl("/profile.png");
         });
     } else {
-      setProfileImageUrl("/person.png");
+      setProfileImageUrl("/profile.png");
     }
   }, [isLogin, user?.id, updateUserContext]);
 
   useEffect(() => {
     setDisplayName(state.name);
-    setProfileImageUrl(state.profileImage || "/person.png");
+    setProfileImageUrl(state.profileImage || "/profile.png");
   }, [state]);
 
   useEffect(() => {

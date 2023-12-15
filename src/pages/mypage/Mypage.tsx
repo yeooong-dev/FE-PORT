@@ -156,8 +156,8 @@ function Mypage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder='비밀번호 입력'
                   autoComplete='current-password'
+                  className='lastInput'
                 />
-                <br />
                 <button type='submit'>회원 탈퇴하기</button>
               </form>
             </NameEdit>
@@ -190,11 +190,12 @@ function Mypage() {
         const response = await imgGet(user.id);
         setCurrentImage(response.data.imageUrl);
         updateUserContext({
-          name: name,
-          profileImage: user.profileImage || "/default-profile.png",
+          ...state,
+          profileImage: response.data.imageUrl,
         });
         setAlertType("success");
         setAlertMessage("프로필 이미지가 업로드되었습니다.");
+        window.location.reload();
       } catch (error) {
         console.error(error);
         setAlertType("error");
@@ -210,8 +211,13 @@ function Mypage() {
       try {
         await imgDelete(user.id);
         setCurrentImage(null);
+        updateUserContext({
+          ...state,
+          profileImage: "/default-profile.png",
+        });
         setAlertType("success");
         setAlertMessage("프로필 이미지가 삭제되었습니다.");
+        window.location.reload();
       } catch (error) {
         console.error(error);
         setAlertType("error");

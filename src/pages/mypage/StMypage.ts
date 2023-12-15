@@ -81,6 +81,7 @@ export const Profile = styled.div<darkProps>`
 
     .name {
       font-size: 1.2rem;
+      margin-bottom: 35px;
     }
   }
 `;
@@ -172,6 +173,10 @@ export const NameEdit = styled.div`
     font-size: 1rem;
   }
 
+  .lastInput {
+    min-width: 400px;
+  }
+
   button {
     width: 80%;
     max-width: 420px;
@@ -187,11 +192,21 @@ export const NameEdit = styled.div`
     transition: 0.3s;
   }
 
+  @media (max-width: 1000px) {
+    .lastInput {
+      min-width: 200px;
+    }
+  }
+
   @media (max-width: 550px) {
     input {
       width: 70%;
       height: 40px;
       font-size: 14px;
+    }
+
+    .lastInput {
+      min-width: 150px;
     }
 
     button {
