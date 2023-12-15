@@ -58,6 +58,7 @@ function CalendarView(props: any) {
   const calendarRef = useRef<HTMLDivElement>(null);
   const [hoveredSchedule, setHoveredSchedule] = useState<Schedule | null>(null);
   const [monthModalOpen, setMonthModalOpen] = useState(false);
+  const [tileSize, setTileSize] = useState(0);
 
   useEffect(() => {
     const fetchSchedules = async () => {
@@ -299,517 +300,699 @@ function CalendarView(props: any) {
     updateFilteredSchedules(localDate);
   }, [currentMonth]);
 
+  const updateTileSize = () => {
+    if (calendarRef.current) {
+      const calendarWidth = calendarRef.current.offsetWidth;
+      const size = Math.floor(calendarWidth / 7);
+      setTileSize(size);
+    }
+  };
+
+  useEffect(() => {
+    updateTileSize();
+    window.addEventListener("resize", updateTileSize);
+
+    return () => {
+      window.removeEventListener("resize", updateTileSize);
+    };
+  }, []);
+
   return (
     <Box>
-      <CalendarWrap>
-        {alertMessage && (
-          <CustomAlert
-            message={alertMessage}
-            onClose={() => setAlertMessage(null)}
-          />
-        )}
-        <CustomNavi darkMode={darkMode}>
-          <button
-            onClick={() => {
-              setCurrentMonth(
-                (prevMonth) =>
-                  new Date(prevMonth.getFullYear(), prevMonth.getMonth() - 1, 1)
-              );
-            }}
-          >
-            &lt;
-          </button>
-          <span onClick={openYearAndMonthSelection}>
-            {currentMonth.getFullYear()}
-            {"."}
-            {currentMonth.toLocaleString("ko", { month: "long" })}
-          </span>
-          <button
-            onClick={() => {
-              setCurrentMonth(
-                (prevMonth) =>
-                  new Date(prevMonth.getFullYear(), prevMonth.getMonth() + 1, 1)
-              );
-            }}
-          >
-            &gt;
-          </button>
-        </CustomNavi>
-
-        {yearModalOpen && (
-          <Modal
-            isOpen={yearModalOpen}
-            onRequestClose={() => setYearModalOpen(false)}
-            closeTimeoutMS={200}
-            style={{
-              overlay: {
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-              },
-              content: {
-                width: "35%",
-                height: "50vh",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                backgroundColor: darkMode ? "#333" : "#f6f6f6",
-                border: "none",
-                borderRadius: "20px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              },
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                flexDirection: "row",
-                maxWidth: "100%",
-                height: "90%",
-                alignItems: "center",
-                justifyContent: "center",
+      <div className='scroll'>
+        <CalendarWrap darkMode={darkMode}>
+          {alertMessage && (
+            <CustomAlert
+              message={alertMessage}
+              onClose={() => setAlertMessage(null)}
+            />
+          )}
+          <CustomNavi darkMode={darkMode}>
+            <button
+              onClick={() => {
+                setCurrentMonth(
+                  (prevMonth) =>
+                    new Date(
+                      prevMonth.getFullYear(),
+                      prevMonth.getMonth() - 1,
+                      1
+                    )
+                );
               }}
             >
-              {Array.from(
-                { length: 12 },
-                (_, i) => currentMonth.getFullYear() - 5 + i
-              ).map((year) => (
-                <button
-                  key={year}
-                  onClick={() => {
-                    selectYear(year);
-                    setMonthModalOpen(true);
-                    setYearModalOpen(false);
-                  }}
-                  style={{
-                    display: "flex",
-                    fontSize: "2rem",
-                    whiteSpace: "nowrap",
-                    width: "30%",
-                    background: "none",
-                    cursor: "pointer",
-                    color: darkMode ? "white" : "#67686b",
-                    transition: "color 0.3s ease",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {year}
-                </button>
-              ))}
-            </div>
-          </Modal>
-        )}
-
-        {monthModalOpen && (
-          <Modal
-            isOpen={monthModalOpen}
-            onRequestClose={() => setMonthModalOpen(false)}
-            style={{
-              overlay: {
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-              },
-              content: {
-                width: "35%",
-                height: "50vh",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                backgroundColor: darkMode ? "#333" : "#f6f6f6",
-                border: "none",
-                borderRadius: "20px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-              },
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                flexDirection: "row",
-                maxWidth: "100%",
-                height: "90%",
-                alignItems: "center",
-                justifyContent: "center",
+              &lt;
+            </button>
+            <span onClick={openYearAndMonthSelection}>
+              {currentMonth.getFullYear()}
+              {"."}
+              {currentMonth.toLocaleString("ko", { month: "long" })}
+            </span>
+            <button
+              onClick={() => {
+                setCurrentMonth(
+                  (prevMonth) =>
+                    new Date(
+                      prevMonth.getFullYear(),
+                      prevMonth.getMonth() + 1,
+                      1
+                    )
+                );
               }}
             >
-              {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-                <button
-                  key={month}
-                  onClick={() => selectMonthAndCloseModal(month - 1)}
-                  style={{
-                    display: "flex",
-                    fontSize: "2rem",
-                    whiteSpace: "nowrap",
-                    width: "30%",
-                    background: "none",
-                    cursor: "pointer",
-                    color: darkMode ? "white" : "#67686b",
-                    transition: "color 0.3s ease",
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  {month}월
-                </button>
-              ))}
-            </div>
-          </Modal>
-        )}
+              &gt;
+            </button>
+          </CustomNavi>
 
-        <StyledCalendar darkMode={darkMode} ref={calendarRef}>
-          <Calendar
-            key={currentMonth.toISOString()}
-            tileClassName={({ date, view }) => {
-              if (view === "month") {
-                const formattedDate = moment(date).format("YYYY-MM-DD");
-                const isMarked = schedules.some(
-                  (schedule) =>
-                    formattedDate >= schedule.startDate &&
-                    formattedDate <= schedule.endDate
-                );
-                return isMarked ? "dot" : "";
-              }
-              return "";
-            }}
-            tileContent={({ date, view }) => {
-              if (view === "month") {
-                const formattedDate = moment(date).format("YYYY-MM-DD");
-                const isMarked = schedules.some(
-                  (schedule) =>
-                    formattedDate >= schedule.startDate &&
-                    formattedDate <= schedule.endDate
-                );
-                if (isMarked) {
-                  const scheduleTitle = schedules.find(
-                    (schedule) =>
-                      formattedDate >= schedule.startDate &&
-                      formattedDate <= schedule.endDate
-                  )?.title;
-
-                  return (
-                    <div className='dot'>
-                      <div className='tooltip'>{scheduleTitle}</div>
-                    </div>
-                  );
-                }
-              }
-              return null;
-            }}
-            onClickDay={(value: Date) => handleDateClick(value)}
-            value={currentMonth}
-            onChange={(
-              value: any,
-              event: React.MouseEvent<HTMLButtonElement>
-            ) => {
-              if (value instanceof Date) {
-                setCurrentMonth(value);
-              } else if (Array.isArray(value) && value[0] instanceof Date) {
-                setCurrentMonth(value[0]);
-              }
-            }}
-            view={view}
-          />
-          {hoveredSchedule && (
+          {yearModalOpen && (
             <Modal
-              isOpen={!!hoveredSchedule}
-              onRequestClose={() => setHoveredSchedule(null)}
+              isOpen={yearModalOpen}
+              onRequestClose={() => setYearModalOpen(false)}
+              closeTimeoutMS={200}
               style={{
+                overlay: {
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  zIndex: "999",
+                },
                 content: {
+                  width: "70%",
+                  maxWidth: "500px",
+                  height: "40vh",
                   top: "50%",
                   left: "50%",
-                  right: "auto",
-                  bottom: "auto",
-                  marginRight: "-50%",
                   transform: "translate(-50%, -50%)",
-                  width: "200px",
-                  height: "auto",
-                  padding: "10px",
+                  backgroundColor: darkMode ? "#333" : "#f6f6f6",
+                  border: "none",
+                  borderRadius: "20px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
                 },
               }}
             >
-              <div style={{ textAlign: "center" }}>{hoveredSchedule.title}</div>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  flexDirection: "row",
+                  maxWidth: "100%",
+                  height: "90%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {Array.from(
+                  { length: 12 },
+                  (_, i) => currentMonth.getFullYear() - 5 + i
+                ).map((year) => (
+                  <button
+                    key={year}
+                    onClick={() => {
+                      selectYear(year);
+                      setMonthModalOpen(true);
+                      setYearModalOpen(false);
+                    }}
+                    style={{
+                      display: "flex",
+                      fontSize: "1.5rem",
+                      whiteSpace: "nowrap",
+                      width: "30%",
+                      background: "none",
+                      cursor: "pointer",
+                      color: darkMode ? "white" : "#67686b",
+                      transition: "color 0.3s ease",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {year}
+                  </button>
+                ))}
+              </div>
             </Modal>
           )}
-        </StyledCalendar>
-      </CalendarWrap>
-      <CalendarList darkMode={darkMode}>
-        <button onClick={handleAddClick}>일정 추가하기</button>
-        {schedules.map((schedule) => (
-          <div key={schedule.id} className='schedule-item'>
+
+          {monthModalOpen && (
+            <Modal
+              isOpen={monthModalOpen}
+              onRequestClose={() => setMonthModalOpen(false)}
+              style={{
+                overlay: {
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  zIndex: "999",
+                },
+                content: {
+                  width: "70%",
+                  maxWidth: "500px",
+                  height: "40vh",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  backgroundColor: darkMode ? "#333" : "#f6f6f6",
+                  border: "none",
+                  borderRadius: "20px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                },
+              }}
+            >
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  flexDirection: "row",
+                  maxWidth: "100%",
+                  height: "90%",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                  <button
+                    key={month}
+                    onClick={() => selectMonthAndCloseModal(month - 1)}
+                    style={{
+                      display: "flex",
+                      fontSize: "1.5rem",
+                      whiteSpace: "nowrap",
+                      width: "30%",
+                      background: "none",
+                      cursor: "pointer",
+                      color: darkMode ? "white" : "#67686b",
+                      transition: "color 0.3s ease",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    {month}월
+                  </button>
+                ))}
+              </div>
+            </Modal>
+          )}
+
+          <StyledCalendar
+            darkMode={darkMode}
+            tileSize={tileSize}
+            ref={calendarRef}
+          >
+            <Calendar
+              key={currentMonth.toISOString()}
+              tileClassName={({ date, view }) => {
+                if (view === "month") {
+                  const formattedDate = moment(date).format("YYYY-MM-DD");
+                  const isMarked = schedules.some(
+                    (schedule) =>
+                      formattedDate >= schedule.startDate &&
+                      formattedDate <= schedule.endDate
+                  );
+                  return isMarked ? "dot" : "";
+                }
+                return "";
+              }}
+              tileContent={({ date, view }) => {
+                if (view === "month") {
+                  const formattedDate = moment(date).format("YYYY-MM-DD");
+                  const isMarked = schedules.some(
+                    (schedule) =>
+                      formattedDate >= schedule.startDate &&
+                      formattedDate <= schedule.endDate
+                  );
+                  const scheduleStartingToday = schedules.find(
+                    (schedule) => formattedDate === schedule.startDate
+                  );
+                  if (isMarked) {
+                    return (
+                      <div className='dot'>
+                        {scheduleStartingToday && (
+                          <>
+                            <div className='tooltip'>
+                              {scheduleStartingToday.title}
+                            </div>
+                            <div className='start'></div>
+                          </>
+                        )}
+                      </div>
+                    );
+                  }
+                }
+                return null;
+              }}
+              onClickDay={(value: Date) => handleDateClick(value)}
+              value={currentMonth}
+              onChange={(
+                value: any,
+                event: React.MouseEvent<HTMLButtonElement>
+              ) => {
+                if (value instanceof Date) {
+                  setCurrentMonth(value);
+                } else if (Array.isArray(value) && value[0] instanceof Date) {
+                  setCurrentMonth(value[0]);
+                }
+              }}
+              view={view}
+            />
+            {hoveredSchedule && (
+              <Modal
+                isOpen={!!hoveredSchedule}
+                onRequestClose={() => setHoveredSchedule(null)}
+                style={{
+                  content: {
+                    top: "50%",
+                    left: "50%",
+                    right: "auto",
+                    bottom: "auto",
+                    marginRight: "-50%",
+                    transform: "translate(-50%, -50%)",
+                    width: "200px",
+                    height: "auto",
+                    padding: "10px",
+                  },
+                }}
+              >
+                <div style={{ textAlign: "center" }}>
+                  {hoveredSchedule.title}
+                </div>
+              </Modal>
+            )}
+          </StyledCalendar>
+        </CalendarWrap>
+        <CalendarList darkMode={darkMode}>
+          <button onClick={handleAddClick}>일정 추가하기</button>
+          {schedules.length === 0 ? (
             <p
               style={{
-                fontSize: "1.3rem",
-                color: darkMode ? "white" : "#91a5d9",
-                fontWeight: "bold",
-                marginBottom: "15px",
+                textAlign: "center",
+                color: darkMode ? "#fff" : "#333",
+                marginTop: "20px",
               }}
             >
-              {schedule.title}
+              일정을 추가해주세요.
             </p>
-            <div
-              style={{
-                marginBottom: "5px",
-                paddingBottom: "20px",
-                borderBottom: "1.5px solid #ccd1de",
-              }}
-            >
-              <span
-                style={{
-                  fontSize: "1.2rem",
-                  color: "gray",
-                  marginRight: "30px",
-                }}
-              >
-                {schedule.startDate} - {schedule.endDate}
-              </span>
-              <button
-                onClick={() => handleEditClick(schedule)}
-                style={{
-                  background: edit === schedule.id ? "#c4c6cc" : "none",
-                  marginRight: "10px",
-                  cursor: "pointer",
-                  width: "90px",
-                  height: "40px",
-                  border: "2px solid #c4c6cc",
-                  color: darkMode ? "white" : "black",
-                  fontSize: "1.1rem",
-                  borderRadius: "5px",
-                }}
-              >
-                수정
-              </button>
-              {showConfirm && (
-                <CustomConfirm
-                  message='기록을 삭제하시겠습니까?'
-                  onConfirm={handleDeleteConfirmation}
-                  onCancel={() => setShowConfirm(false)}
-                />
-              )}
-              <button
-                onClick={() => handleDeleteClick(schedule)}
-                style={{
-                  background: "none",
-                  cursor: "pointer",
-                  width: "90px",
-                  height: "40px",
-                  border: "2px solid #d66851",
-                  fontSize: "1.1rem",
-                  borderRadius: "5px",
-                  color: "#d66851",
-                }}
-              >
-                삭제
-              </button>
-            </div>
-          </div>
-        ))}
-        {isModalOpen && (
-          <Modal
-            isOpen={isModalOpen}
-            onRequestClose={() => setIsModalOpen(false)}
-            contentLabel='Schedule Modal'
-            style={{
-              overlay: {
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-              },
-              content: {
-                width: "60%",
-                height: "600px",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                backgroundColor: darkMode ? "#333" : "#f6f6f6",
-                border: "none",
-                borderRadius: "20px",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                position: "relative",
-              },
-            }}
-          >
-            <button
-              style={{
-                position: "absolute",
-                top: "20px",
-                right: "20px",
-                backgroundColor: "#858087",
-                border: "none",
-                width: "40px",
-                height: "40px",
-                borderRadius: "50%",
-                fontSize: "1.3rem",
-                cursor: "pointer",
-                color: "white",
-              }}
-              onClick={closeModal}
-            >
-              X
-            </button>
-            <div
-              style={{
-                width: "80%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
-              }}
-            >
-              <h3 style={{ marginBottom: "20px", color: "gray" }}>
-                일정 추가하기
-              </h3>
-              <div>
-                <input
-                  type='date'
-                  value={formData.startDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, startDate: e.target.value })
-                  }
+          ) : (
+            schedules.map((schedule) => (
+              <div key={schedule.id} className='schedule-item'>
+                <p
                   style={{
-                    width: "280px",
-                    height: "30px",
-                    padding: "1rem",
-                    fontSize: "1.2rem",
-                    cursor: "pointer",
-                    marginRight: "10px",
-                    marginBottom: "10px",
+                    fontSize: "1.3rem",
+                    color: darkMode ? "white" : "#2e2e2e",
+                    fontWeight: "bold",
+                    marginBottom: "15px",
+                    textAlign: "left",
                   }}
-                />
-                <input
-                  type='date'
-                  value={formData.endDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, endDate: e.target.value })
-                  }
+                >
+                  {schedule.title}
+                </p>
+                <div
                   style={{
-                    width: "280px",
-                    height: "30px",
-                    padding: "1rem",
-                    fontSize: "1.2rem",
-                    cursor: "pointer",
-                    marginRight: "10px",
+                    paddingBottom: "10px",
+                    borderBottom: darkMode
+                      ? "1.5px solid #595959"
+                      : "1.5px solid #e3e3e3",
+                    textAlign: "left",
                   }}
-                />
+                >
+                  <span
+                    style={{
+                      width: "100%",
+                      fontSize: "1.2rem",
+                      color: "#b8b8b8",
+                      fontWeight: "bold",
+                      textAlign: "left",
+                    }}
+                  >
+                    {schedule.startDate} - {schedule.endDate}
+                  </span>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <button
+                      onClick={() => handleEditClick(schedule)}
+                      style={{
+                        background: "none",
+                        marginRight: "10px",
+                        cursor: "pointer",
+                        width: "120px",
+                        height: "40px",
+                        border: "1.5px solid #c4c6cc",
+                        color: darkMode ? "white" : "black",
+                        fontSize: "1rem",
+                        borderRadius: "5px",
+                        fontWeight: "bold",
+                        marginTop: "20px",
+                      }}
+                    >
+                      수정
+                    </button>
+                    {showConfirm && (
+                      <CustomConfirm
+                        message='기록을 삭제하시겠습니까?'
+                        onConfirm={handleDeleteConfirmation}
+                        onCancel={() => setShowConfirm(false)}
+                      />
+                    )}
+                    <button
+                      onClick={() => handleDeleteClick(schedule)}
+                      style={{
+                        background: "none",
+                        cursor: "pointer",
+                        width: "120px",
+                        height: "40px",
+                        border: "2px solid #d66851",
+                        fontSize: "1rem",
+                        borderRadius: "5px",
+                        color: "#d66851",
+                        fontWeight: "bold",
+                        marginTop: "20px",
+                      }}
+                    >
+                      삭제
+                    </button>
+                  </div>
+                </div>
               </div>
-
-              <div>
-                <input
-                  type='time'
-                  value={formData.startTime}
-                  onChange={(e) =>
-                    setFormData({ ...formData, startTime: e.target.value })
-                  }
-                  style={{
-                    width: "280px",
-                    height: "30px",
-                    padding: "1rem",
-                    fontSize: "1.2rem",
-                    cursor: "pointer",
-                    marginRight: "10px",
-                    marginBottom: "10px",
-                  }}
-                />
-                <input
-                  type='time'
-                  value={formData.endTime}
-                  onChange={(e) =>
-                    setFormData({ ...formData, endTime: e.target.value })
-                  }
-                  style={{
-                    width: "280px",
-                    height: "30px",
-                    padding: "1rem",
-                    fontSize: "1.2rem",
-                    cursor: "pointer",
-                    marginRight: "10px",
-                  }}
-                />
-              </div>
-
-              <input
-                type='text'
-                value={formData.title}
-                onChange={(e) =>
-                  setFormData({ ...formData, title: e.target.value })
-                }
-                placeholder='일정을 추가해주세요.'
-                style={{
-                  width: "603px",
-                  height: "30px",
-                  padding: "1rem",
-                  fontSize: "1.1rem",
-                  cursor: "pointer",
-                  marginRight: "10px",
-                  marginBottom: "10px",
-                }}
-              />
+            ))
+          )}
+          {isModalOpen && (
+            <Modal
+              isOpen={isModalOpen}
+              onRequestClose={() => setIsModalOpen(false)}
+              contentLabel='Schedule Modal'
+              style={{
+                overlay: {
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  zIndex: "999",
+                },
+                content: {
+                  width: "80%",
+                  maxWidth: "450px",
+                  height: "550px",
+                  maxHeight: "480px",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  backgroundColor: darkMode ? "#333" : "#f6f6f6",
+                  border: "none",
+                  borderRadius: "20px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  position: "relative",
+                },
+              }}
+            >
               <button
-                onClick={handleSubmit}
                 style={{
-                  width: "635px",
-                  height: "60px",
-                  padding: "1rem",
+                  position: "absolute",
+                  top: "20px",
+                  right: "20px",
+                  backgroundColor: "#858087",
+                  border: "none",
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
                   fontSize: "1.3rem",
                   cursor: "pointer",
-                  marginRight: "10px",
-                  fontWeight: "bold",
-                  marginBottom: "50px",
-                  backgroundColor: darkMode ? "#51439d" : "#91a5d9",
                   color: "white",
                 }}
+                onClick={closeModal}
               >
-                {edit !== null ? "수정" : "추가"}
+                X
               </button>
-            </div>
-          </Modal>
-        )}
-      </CalendarList>
+              <div
+                style={{
+                  width: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexDirection: "column",
+                }}
+              >
+                <h3 style={{ marginBottom: "20px", color: "gray" }}>
+                  {edit !== null ? "일정 수정하기" : "일정 추가하기"}
+                </h3>
+
+                <div
+                  style={{
+                    width: "100%",
+                    height: "50px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <span style={{ color: "gray", marginRight: "5px" }}>
+                    시작 날짜
+                  </span>
+                  <input
+                    type='date'
+                    value={formData.startDate}
+                    onChange={(e) =>
+                      setFormData({ ...formData, startDate: e.target.value })
+                    }
+                    style={{
+                      width: "60%",
+                      height: "15px",
+                      padding: "1rem",
+                      fontSize: "1rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    width: "100%",
+                    height: "50px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <span style={{ color: "gray", marginRight: "5px" }}>
+                    종료 날짜
+                  </span>{" "}
+                  <input
+                    type='date'
+                    value={formData.endDate}
+                    onChange={(e) =>
+                      setFormData({ ...formData, endDate: e.target.value })
+                    }
+                    style={{
+                      width: "60%",
+                      height: "15px",
+                      padding: "1rem",
+                      fontSize: "1rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    width: "100%",
+                    height: "50px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <span style={{ color: "gray", marginRight: "5px" }}>
+                    시작 시간
+                  </span>{" "}
+                  <input
+                    type='time'
+                    value={formData.startTime}
+                    onChange={(e) =>
+                      setFormData({ ...formData, startTime: e.target.value })
+                    }
+                    style={{
+                      width: "60%",
+                      height: "15px",
+                      padding: "1rem",
+                      fontSize: "1rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    width: "100%",
+                    height: "50px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: "10px",
+                  }}
+                >
+                  <span style={{ color: "gray", marginRight: "5px" }}>
+                    종료 시간
+                  </span>{" "}
+                  <input
+                    type='time'
+                    value={formData.endTime}
+                    onChange={(e) =>
+                      setFormData({ ...formData, endTime: e.target.value })
+                    }
+                    style={{
+                      width: "60%",
+                      height: "15px",
+                      padding: "1rem",
+                      fontSize: "1rem",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  />
+                </div>
+
+                <input
+                  type='text'
+                  value={formData.title}
+                  onChange={(e) =>
+                    setFormData({ ...formData, title: e.target.value })
+                  }
+                  placeholder='일정을 추가해주세요.'
+                  style={{
+                    width: "83%",
+                    maxWidth: "335px",
+                    height: "15px",
+                    padding: "1rem",
+                    fontSize: "1.1rem",
+                    cursor: "pointer",
+                    marginBottom: "20px",
+                  }}
+                />
+
+                <button
+                  onClick={handleSubmit}
+                  style={{
+                    width: "95%",
+                    maxWidth: "370px",
+                    height: "50px",
+                    fontSize: "1.1rem",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    marginBottom: "50px",
+                    backgroundColor: darkMode ? "#3c57b3" : "#3c57b3",
+                    color: "white",
+                  }}
+                >
+                  {edit !== null ? "수정" : "추가"}
+                </button>
+              </div>
+            </Modal>
+          )}
+        </CalendarList>
+      </div>
     </Box>
   );
 }
 export default CalendarView;
+
+interface StyledCalendarProps extends darkProps {
+  tileSize: number;
+  darkMode: boolean;
+}
 
 interface darkProps {
   darkMode: boolean;
 }
 
 const Box = styled.div`
-  width: 80%;
-  height: 100%;
-  max-width: 1300px;
+  width: 100%;
+  height: 90vh;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  overflow-y: scroll;
+  box-sizing: border-box;
+
+  .scroll {
+    width: 80%;
+    height: 80vh;
+    max-width: 1300px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 1200px) {
+    .scroll {
+      padding-bottom: 50px;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+  }
+
+  @media (max-width: 550px) {
+    justify-content: center;
+  }
+
+  @media (max-width: 420px) {
+    .scroll {
+    }
+  }
 `;
 
-const CalendarWrap = styled.div`
+const CalendarWrap = styled.div<darkProps>`
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  width: 90%;
+  width: 100%;
   max-width: 900px;
-  height: 90%;
-  margin-top: -20px;
-  margin-right: 30px;
+  height: 800px;
+  border-radius: 20px;
+  box-sizing: border-box;
+  margin: 30px;
+
+  @media (max-width: 1200px) {
+    border: none;
+    height: 80vh;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 800px) {
+    margin-top: 10px;
+  }
+
+  @media (max-width: 550px) {
+    padding: 0px;
+    width: 100%;
+    border: none;
+  }
 `;
 
 const CustomNavi = styled.div<darkProps>`
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   width: 100%;
-  height: 80px;
-  font-size: 1.8rem;
+  height: 50px;
   font-weight: bold;
   color: ${({ darkMode }) => (darkMode ? "#fff" : "#2e2e2e")};
+  padding: 20px;
 
   span {
     cursor: pointer;
@@ -821,44 +1004,72 @@ const CustomNavi = styled.div<darkProps>`
     width: 40px;
     height: 40px;
     font-size: 1.5rem;
-    background: #d5dae3;
-    border-radius: 50%;
-    margin: 0px 60px;
-    padding: 0 0 10px 0;
-    color: white;
+    background: none;
+    margin: -3px 20px;
+    color: #a3a3a3;
     cursor: pointer;
     font-family: var(--font-title);
   }
+
+  @media (max-width: 550px) {
+    height: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+
+    span {
+      font-size: 1rem;
+      width: 100%;
+    }
+
+    button {
+      margin: -10px 20px;
+    }
+  }
 `;
 
-const StyledCalendar = styled.div<darkProps>`
+const StyledCalendar = styled.div<StyledCalendarProps>`
   width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
   border-radius: 40px;
 
   .react-calendar {
     width: 100%;
-    background: ${({ darkMode }) => (darkMode ? "#4e5057" : "#fcfcfc")};
-    border: 1px solid #ededed;
+    background: ${({ darkMode }) => (darkMode ? "#2e2e2e" : "#fcfcfc")};
+    border: ${({ darkMode }) =>
+      darkMode ? "1px solid #333333" : "1px solid #ededed"};
   }
 
   .react-calendar__tile.dot::after {
     content: "";
     position: absolute;
-    top: 55px;
-    left: 100px;
-    width: 10px;
-    height: 10px;
+    bottom: 0px;
+    left: 0;
+    width: 100%;
+    height: 30px;
     background-color: #91a5d9;
-    border-radius: 50%;
+    opacity: 20%;
   }
 
   .tooltip {
     position: absolute;
-    left: 30px;
-    top: 65%;
-    transform: translateY(-50%);
-    color: #91a5d9;
+    left: 0;
+    bottom: 7px;
+    color: ${({ darkMode }) => (darkMode ? "#fff" : "#3c57b3")};
+    font-weight: bold;
+    font-size: 14px;
     width: 100%;
+    z-index: 0;
+  }
+
+  .start {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 5px;
+    height: 30px;
+    background: #3c57b3;
   }
 
   .tooltip.visible {
@@ -870,24 +1081,27 @@ const StyledCalendar = styled.div<darkProps>`
   }
 
   .react-calendar__month-view__weekdays__weekday {
-    height: 50px;
+    height: 45px;
     line-height: 30px;
     font-size: 1.1rem;
-    border-bottom: 1px solid #e8e8e8;
+    border-bottom: ${({ darkMode }) =>
+      darkMode ? "0.8px solid #333333" : "0.8px solid #e3e3e3"};
     font-weight: bold;
     border-radius: 0;
-    background: ${({ darkMode }) => (darkMode ? "#323336" : "#d5dae3")};
+    background: ${({ darkMode }) => (darkMode ? "#aaadb5" : "#e9eaf2")};
     color: ${({ darkMode }) => (darkMode ? "white" : "#474747")};
   }
 
   .react-calendar__tile {
     position: relative;
-    height: 120px;
-    background: white;
+    width: 120px;
+    height: ${(props) => props.tileSize}px;
+    min-height: ${(props) => props.tileSize}px;
     cursor: pointer;
     background: none;
     font-size: 1.1rem;
-    border-bottom: 1px solid #e8e8e8;
+    font-weight: bold;
+    border-bottom: 1px solid #e3e3e3;
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
   }
 
@@ -898,7 +1112,8 @@ const StyledCalendar = styled.div<darkProps>`
   }
 
   .react-calendar__month-view__days__day {
-    border-right: 1px solid #e8e8e8;
+    border: ${({ darkMode }) =>
+      darkMode ? "0.8px solid #333333" : "0.8px solid #e3e3e3"};
   }
 
   .react-calendar__month-view__days__day:nth-child(7),
@@ -936,15 +1151,15 @@ const StyledCalendar = styled.div<darkProps>`
   .react-calendar__tile--now::before {
     content: "";
     position: absolute;
-    top: 0;
-    right: 0;
-    width: 45px;
-    height: 45px;
-    background-color: #bccaee;
+    top: 3px;
+    right: 3px;
+    width: 40px;
+    height: 40px;
+    background-color: #3c57b3;
     border-radius: 40px;
     border: 2px solid #b3c1e3;
     z-index: -1;
-    opacity: 80%;
+    opacity: 50%;
   }
 
   .react-calendar__year-view__months__month {
@@ -952,13 +1167,13 @@ const StyledCalendar = styled.div<darkProps>`
   }
 
   .react-calendar__month-view__days__day--neighboringMonth {
-    background: ${({ darkMode }) => (darkMode ? "#323336" : "#f5f5f5")};
+    background: ${({ darkMode }) => (darkMode ? "#3d3d3d" : "#f5f5f5")};
     color: ${({ darkMode }) => (darkMode ? "white" : "#cccccc")};
   }
 
   .react-calendar__tile:enabled:hover,
   .react-calendar__tile:enabled:focus {
-    background-color: #e6e6e6;
+    background: ${({ darkMode }) => (darkMode ? "#616161" : "#f5f5f5")};
     color: black;
   }
 
@@ -984,20 +1199,59 @@ const StyledCalendar = styled.div<darkProps>`
   .year-button:hover {
     background-color: #d5dae3;
   }
+
+  @media (max-width: 550px) {
+    .react-calendar__month-view__weekdays__weekday {
+      font-size: 1rem;
+    }
+
+    .react-calendar__tile {
+      padding: 10px;
+      font-size: 14px;
+    }
+
+    .react-calendar__tile--now::before {
+      top: 8px;
+      right: 7px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .react-calendar__tile.dot::after {
+      bottom: 0px;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      background-color: #91a5d9;
+      opacity: 20%;
+    }
+
+    .tooltip {
+      display: none;
+    }
+
+    .start {
+      height: 10px;
+    }
+  }
 `;
 
 const CalendarList = styled.div<darkProps>`
   width: 40%;
   max-width: 350px;
-  height: 100%;
-  background: ${({ darkMode }) => (darkMode ? "#333" : "#f5f5f5")};
+  min-width: 250px;
+  height: 800px;
+  max-height: 620px;
+  min-height: 740px;
   padding: 20px;
   border-radius: 25px;
-  overflow-y: auto;
-  max-height: 760px;
+  overflow-y: scroll;
+  border: ${({ darkMode }) =>
+    darkMode ? "1px solid #595959" : "1px solid #e3e3e3"};
+  overflow-x: hidden;
+  box-sizing: border-box;
 
   .schedule-item {
-    background: ${({ darkMode }) => (darkMode ? "#4e5057" : "#f9f9f9")};
     color: ${({ darkMode }) => (darkMode ? "#fff" : "#333")};
     padding: 10px;
     margin-bottom: 10px;
@@ -1006,12 +1260,39 @@ const CalendarList = styled.div<darkProps>`
 
   button {
     width: 100%;
+    max-width: 300px;
     height: 50px;
-    background: #91a5d9;
+    background: #3c57b3;
     color: white;
     border-radius: 10px;
     font-size: 1.2rem;
     font-weight: bold;
     margin-bottom: 20px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    opacity: 40%;
+    transition: 0.3s;
+  }
+
+  @media (max-width: 1200px) {
+    width: 100%;
+    max-width: 800px;
+    min-height: 650px;
+  }
+
+  @media (max-width: 550px) {
+    min-width: 220px;
+    box-sizing: border-box;
+    min-height: 620px;
+
+    button {
+      font-size: 1rem;
+    }
+
+    button:hover {
+      opacity: 100%;
+    }
   }
 `;

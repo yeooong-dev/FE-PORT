@@ -12,11 +12,12 @@ interface WrapProps {
 
 interface MentProps {
   darkMode: boolean;
+  isSidebarOpen: boolean;
 }
 
 export const Wrap = styled.div<WrapProps>`
-  width: ${({ isSidebarOpen }) => (isSidebarOpen ? "100%" : "80px")};
-  transition: width 0.3s ease, margin-right 0.3s ease;
+  width: ${({ isSidebarOpen }) => (isSidebarOpen ? "100%" : "50px")};
+  transition: width 0.5s ease, margin-right 0.5s ease;
   height: 100%;
   display: flex;
   justify-content: center;
@@ -347,6 +348,7 @@ export const Mypage = styled.button<MainProps>`
 `;
 
 export const Log = styled.li<MentProps>`
+  width: ${({ isSidebarOpen }) => (isSidebarOpen ? "100%" : "55px")};
   cursor: pointer;
   font-size: 1rem;
   color: ${({ darkMode }) => (darkMode ? "#8f8f8f" : "#858585")};

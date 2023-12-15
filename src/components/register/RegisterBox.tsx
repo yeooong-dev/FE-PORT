@@ -258,6 +258,7 @@ function Register() {
             style={{
               color:
                 pwConfirmMessage === VALID_PW_CONFIRM_MESSAGE ? "green" : "red",
+              marginTop: "10px",
               marginBottom: "20px",
             }}
           >

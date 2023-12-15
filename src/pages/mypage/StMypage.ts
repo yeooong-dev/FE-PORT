@@ -11,6 +11,16 @@ interface darkProps {
 
 export const Wrap = styled.div`
   width: 60%;
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  @media (max-width: 550px) {
+    width: 80%;
+    height: 80vh;
+  }
 `;
 
 export const Profile = styled.div<darkProps>`
@@ -18,14 +28,12 @@ export const Profile = styled.div<darkProps>`
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    background: #ccd2e0;
-    margin-top: 30px;
-    margin-bottom: 20px;
   }
 
-  div {
-    margin-top: -60px;
+  .icon {
+    margin-top: -35px;
   }
+
   .edit {
     cursor: pointer;
     margin-top: -25px;
@@ -48,20 +56,52 @@ export const Profile = styled.div<darkProps>`
   .name {
     font-size: 2rem;
     font-weight: 600;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
     letter-spacing: 5px;
-    color: ${({ darkMode }) => (darkMode ? "white" : "#51439d")};
+    color: ${({ darkMode }) => (darkMode ? "white" : "#3c57b3")};
+  }
+
+  @media (max-width: 550px) {
+    .p_img {
+      width: 80px;
+      height: 80px;
+    }
+
+    .edit {
+      width: 25px;
+      margin-top: -10px;
+      margin-left: 70px;
+    }
+
+    .hi {
+      font-size: 1rem;
+      margin-top: 5px;
+      margin-bottom: 0px;
+    }
+
+    .name {
+      font-size: 1.2rem;
+    }
   }
 `;
 
 export const TabContainer = styled.div<darkProps>`
   width: 100%;
+  max-width: 900px;
+  height: 480px;
   display: flex;
+  align-items: center;
   justify-content: center;
   flex-direction: column;
-  height: 490px;
+  margin-bottom: 20px;
   background: ${({ darkMode }) => (darkMode ? "#333" : "#f6f6f6")};
   color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+
+  @media (max-width: 550px) {
+    height: 300px;
+  }
 `;
 
 export const TabTop = styled.div<darkProps>`
@@ -89,36 +129,30 @@ export const Tab = styled.div<TabProps & darkProps>`
         ? "#fff"
         : "#ccc"
       : props.selected
-      ? "#51439d"
+      ? "#3c57b3"
       : "#ababab"};
   cursor: pointer;
   font-size: 1.25rem;
-  border-top: 1px solid #cfcfcf;
 
-  &:nth-child(1) {
-    border-right: 1px solid #cfcfcf;
-    border-left: 1px solid #cfcfcf;
-  }
-
-  &:nth-child(2) {
-    border-right: 1px solid #cfcfcf;
-  }
-
-  &:nth-child(3) {
-    border-right: 1px solid #cfcfcf;
+  @media (max-width: 550px) {
+    font-size: 12px;
+    height: 40px;
   }
 `;
 
-export const Info = styled.div`
+export const Info = styled.div<darkProps>`
   width: 100%;
   height: 430px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
-  background: #f6f6f6;
+  background: ${({ darkMode }) => (darkMode ? "#222327" : "white")};
   font-size: 1.2rem;
-  opacity: 80%;
+
+  @media (max-width: 550px) {
+    height: 300px;
+  }
 `;
 
 export const NameEdit = styled.div`
@@ -130,7 +164,8 @@ export const NameEdit = styled.div`
   align-items: center;
 
   input {
-    width: 380px;
+    width: 80%;
+    max-width: 400px;
     height: 55px;
     margin-bottom: 20px;
     padding-left: 1rem;
@@ -138,12 +173,34 @@ export const NameEdit = styled.div`
   }
 
   button {
-    width: 395px;
+    width: 80%;
+    max-width: 420px;
     height: 55px;
     font-size: 1.1rem;
-    background: #51439d;
+    background: #3c57b3;
     color: white;
     cursor: pointer;
-    border-radius: 10px;
+  }
+
+  button:hover {
+    opacity: 50%;
+    transition: 0.3s;
+  }
+
+  @media (max-width: 550px) {
+    input {
+      width: 70%;
+      height: 40px;
+      font-size: 14px;
+    }
+
+    button {
+      height: 40px;
+      font-size: 14px;
+    }
+
+    button:hover {
+      opacity: 100%;
+    }
   }
 `;

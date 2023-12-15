@@ -31,17 +31,19 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
           left: "50%",
           transform: "translate(-50%, -50%)",
           backgroundColor: "#fff",
-          padding: "6rem 5rem",
+          padding: "5rem 5rem",
           borderRadius: "5px",
-          fontSize: "1.5rem",
+          fontSize: "1.3rem",
           zIndex: 100,
-          width: "300px",
+          width: "20%",
+          minWidth: "100px",
+          maxWidth: "220px",
         }}
       >
         <div
           style={{
             color: "black",
-            marginBottom: "50px",
+            marginBottom: "30px",
             fontWeight: "bold",
             textAlign: "center",
           }}
@@ -51,7 +53,7 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
+            justifyContent: "center",
           }}
         >
           <button
@@ -62,7 +64,9 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
             style={{
               background: "#3c57b3",
               color: "white",
-              width: "150px",
+              width: "20%",
+              minWidth: "100px",
+              maxWidth: "220px",
               height: "50px",
               borderRadius: "5px",
               fontSize: "1.2rem",
@@ -77,7 +81,9 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
             style={{
               background: "#d1d1d1",
               color: "white",
-              width: "150px",
+              width: "20%",
+              minWidth: "100px",
+              maxWidth: "220px",
               height: "50px",
               borderRadius: "5px",
               fontSize: "1.2rem",

@@ -15,20 +15,19 @@ import {
   imgAdd,
   imgGet,
   imgDelete,
-  updateName,
   updatePassword,
   deleteAccount,
+  updateName,
 } from "../../api/mypage";
 import { useNavigate } from "react-router-dom";
-import { useUserContext } from "../../components/navigation/userContext";
 import { useDarkMode } from "../../components/darkmode/DarkModeContext";
 import CustomAlert from "../../components/alert/CustomAlert";
 import CustomConfirm from "../../components/alert/CustomConfirm";
+import { useUserContext } from "../../components/navigation/userContext";
 
 function Mypage() {
   Modal.setAppElement("#root");
   const { user, setUser } = useUser();
-  const { state, dispatch, updateUserContext } = useUserContext();
   const [selectedTab, setSelectedTab] = useState<
     "nameEdit" | "pwEdit" | "deleteAccount" | null
   >("nameEdit");
@@ -40,6 +39,7 @@ function Mypage() {
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const { state, updateUserContext } = useUserContext();
   const navigate = useNavigate();
   const { darkMode } = useDarkMode();
   // 커스텀 알럿
@@ -85,27 +85,32 @@ function Mypage() {
         return (
           <TabContainer darkMode={darkMode}>
             <NameEdit>
-              <input
-                type='text'
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder='변경할 이름 입력'
-              />
+              <form onSubmit={handleNameChange}>
+                <input
+                  type='text'
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder='변경할 이름 입력'
+                  autoComplete='username'
+                />
 
-              <input
-                type='text'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder='이메일 입력'
-              />
+                <input
+                  type='text'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder='이메일 입력'
+                  autoComplete='email'
+                />
 
-              <input
-                type='password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder='비밀번호 입력'
-              />
-              <button onClick={handleNameChange}>이름 변경</button>
+                <input
+                  type='password'
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder='비밀번호 입력'
+                  autoComplete='current-password'
+                />
+                <button type='submit'>이름 변경</button>
+              </form>
             </NameEdit>
           </TabContainer>
         );
@@ -113,28 +118,30 @@ function Mypage() {
         return (
           <TabContainer darkMode={darkMode}>
             <NameEdit>
-              <input
-                type='text'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder='이메일 입력'
-              />
-
-              <input
-                type='password'
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                placeholder='변경할 비밀번호 입력'
-              />
-
-              <input
-                type='password'
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder='비밀번호 확인'
-              />
-
-              <button onClick={handlePasswordChange}>비밀번호 변경</button>
+              <form onSubmit={handlePasswordChange}>
+                <input
+                  type='text'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder='이메일 입력'
+                  autoComplete='email'
+                />
+                <input
+                  type='password'
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder='변경할 비밀번호 입력'
+                  autoComplete='new-password'
+                />
+                <input
+                  type='password'
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder='비밀번호 확인'
+                  autoComplete='new-password-cofirm'
+                />
+                <button type='submit'>비밀번호 변경</button>
+              </form>
             </NameEdit>
           </TabContainer>
         );
@@ -142,14 +149,17 @@ function Mypage() {
         return (
           <TabContainer darkMode={darkMode}>
             <NameEdit>
-              <input
-                type='password'
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder='비밀번호 입력'
-              />
-              <br />
-              <button onClick={handleAccountDelete}>회원 탈퇴하기</button>
+              <form onSubmit={handleAccountDelete}>
+                <input
+                  type='password'
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder='비밀번호 입력'
+                  autoComplete='current-password'
+                />
+                <br />
+                <button type='submit'>회원 탈퇴하기</button>
+              </form>
             </NameEdit>
           </TabContainer>
         );
@@ -179,12 +189,12 @@ function Mypage() {
         await imgAdd(user.id, profileImage);
         const response = await imgGet(user.id);
         setCurrentImage(response.data.imageUrl);
+        updateUserContext({
+          name: name,
+          profileImage: user.profileImage || "/default-profile.png",
+        });
         setAlertType("success");
         setAlertMessage("프로필 이미지가 업로드되었습니다.");
-        updateUserContext({
-          name: state.name,
-          profileImage: response.data.imageUrl,
-        });
       } catch (error) {
         console.error(error);
         setAlertType("error");
@@ -202,7 +212,6 @@ function Mypage() {
         setCurrentImage(null);
         setAlertType("success");
         setAlertMessage("프로필 이미지가 삭제되었습니다.");
-        updateUserContext({ name: state.name, profileImage: "" });
       } catch (error) {
         console.error(error);
         setAlertType("error");
@@ -212,35 +221,37 @@ function Mypage() {
   };
 
   // 이름 변경
-  const handleNameChange = async () => {
-    if (!user?.id) {
+  const handleNameChange = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!user?.id || !name || !password || !email) {
       setAlertType("error");
-      setAlertMessage(
-        "유저 정보를 불러오는데 실패했습니다. 다시 시도해주세요."
-      );
+      setAlertMessage("모든 필드를 올바르게 입력해주세요.");
       return;
     }
     try {
       await updateName(user.id, name, email, password);
+      const updatedUser = { ...user, name: name };
+      setUser(updatedUser);
+      updateUserContext({
+        ...state,
+        name: name,
+      });
       setAlertType("success");
       setAlertMessage("이름이 성공적으로 변경되었습니다.");
-      setUser((prev) => (prev ? { ...prev, name: name } : null));
-      dispatch({
-        type: "SET_USER",
-        payload: { name: name, profileImage: state.profileImage },
-      });
-      updateUserContext({ name: name, profileImage: state.profileImage });
       setName("");
       setEmail("");
       setPassword("");
     } catch (error) {
       setAlertType("error");
-      setAlertMessage("모든 필드를 올바르게 입력해주세요.");
+      setAlertMessage("이름 변경에 실패했습니다.");
     }
   };
 
   // 비밀번호 변경 핸들러
-  const handlePasswordChange = async () => {
+  const handlePasswordChange = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (user === null || user === undefined) {
       alert("유저 정보를 불러오는데 실패했습니다. 다시 시도해주세요.");
 
@@ -279,7 +290,10 @@ function Mypage() {
     }
   };
 
-  const handleAccountDelete = () => {
+  // 계정 삭제
+  const handleAccountDelete = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (user === null || user === undefined) {
       setAlertType("error");
       setAlertMessage(
@@ -335,8 +349,8 @@ function Mypage() {
           <img src='/person.png' className='p_img' alt='프로필 이미지' />
         )}
 
-        <div onClick={openModal}>
-          <RiEditCircleFill className='edit' size='45' color='#51439d' />
+        <div onClick={openModal} className='icon'>
+          <RiEditCircleFill className='edit' size='45' color='#3c57b3' />
         </div>
         <p className='hi'>안녕하세요!</p>
         <p className='name'>{user && user.name ? `${user.name}님` : null}</p>
@@ -348,10 +362,12 @@ function Mypage() {
         style={{
           overlay: {
             backgroundColor: "rgba(0, 0, 0, 0.5)",
+            zIndex: "999",
           },
           content: {
-            width: "700px",
-            height: "600px",
+            width: "80%",
+            maxWidth: "500px",
+            height: "500px",
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
@@ -397,14 +413,15 @@ function Mypage() {
           src={currentImage ? currentImage : "/person.png"}
           alt='현재 프로필 이미지'
           style={{
-            width: "230px",
-            height: "230px",
+            width: "180px",
+            height: "180px",
             borderRadius: "50%",
             marginBottom: "40px",
           }}
         />
         <div
           style={{
+            width: "60%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -415,7 +432,7 @@ function Mypage() {
             htmlFor='fileInput'
             style={{
               display: "inline-block",
-              width: "160px",
+              width: "100%",
               height: "40px",
               lineHeight: "40px",
               backgroundColor: "#ebebeb",
@@ -434,7 +451,7 @@ function Mypage() {
           <button
             onClick={handleImageUpload}
             style={{
-              width: "160px",
+              width: "100%",
               height: "40px",
               fontSize: "1rem",
               cursor: "pointer",
@@ -493,7 +510,7 @@ function Mypage() {
           )}
         </TabTop>
 
-        <Info>{renderContent()}</Info>
+        <Info darkMode={darkMode}>{renderContent()}</Info>
       </TabContainer>
     </Wrap>
   );

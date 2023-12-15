@@ -23,7 +23,7 @@ import { useEffect, useState } from "react";
 import { Logo } from "../wrapper/StWrapper";
 import { useUserContext } from "./userContext";
 import CustomConfirm from "../alert/CustomConfirm";
-import UseUser from "../../hook/UseUser";
+import useUser from "../../hook/UseUser";
 import { imgGet } from "../../api/mypage";
 import { useDarkMode } from "../darkmode/DarkModeContext";
 import { ImExit } from "react-icons/im";
@@ -39,10 +39,10 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
   const [activeMenu, setActiveMenu] = useState("main");
   const [width, setWidth] = useState("180px");
   const [showConfirm, setShowConfirm] = useState(false);
-  const { state } = useUserContext();
+  const { state, updateUserContext } = useUserContext();
   const location = useLocation();
   const [profileImageUrl, setProfileImageUrl] = useState("/person.png");
-  const { user } = UseUser();
+  const { user, setUser } = useUser();
   const [displayName, setDisplayName] = useState("");
   const { darkMode } = useDarkMode();
 
@@ -66,6 +66,10 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
       imgGet(user.id)
         .then((response) => {
           setProfileImageUrl(response.data.imageUrl);
+          updateUserContext({
+            name: user.name,
+            profileImage: response.data.imageUrl,
+          });
         })
         .catch((error) => {
           console.error("프로필 이미지 가져오기 실패:", error);
@@ -74,19 +78,12 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
     } else {
       setProfileImageUrl("/person.png");
     }
-  }, [isLogin, user?.id]);
+  }, [isLogin, user?.id, updateUserContext]);
 
   useEffect(() => {
-    if (state.profileImage) {
-      setProfileImageUrl(state.profileImage);
-    } else {
-      setProfileImageUrl("/person.png");
-    }
-  }, [state.profileImage]);
-
-  useEffect(() => {
-    setDisplayName(user && user.name ? `${user.name}` : "");
-  }, [user]);
+    setDisplayName(state.name);
+    setProfileImageUrl(state.profileImage || "/person.png");
+  }, [state]);
 
   useEffect(() => {
     switch (location.pathname) {
@@ -157,7 +154,9 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
             alt='프로필 이미지'
           />
 
-          <Ment darkMode={darkMode}>{displayName}</Ment>
+          <Ment darkMode={darkMode} isSidebarOpen={isSidebarOpen}>
+            {displayName}
+          </Ment>
         </>
       )}
 
@@ -236,7 +235,11 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
 
         {isLogin ? (
           <>
-            <Log onClick={() => setShowConfirm(true)} darkMode={darkMode}>
+            <Log
+              onClick={() => setShowConfirm(true)}
+              darkMode={darkMode}
+              isSidebarOpen={isSidebarOpen}
+            >
               <ImExit size='20' />
               {isSidebarOpen && <span>&nbsp;로그아웃</span>}
             </Log>
@@ -250,7 +253,7 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
           </>
         ) : (
           <Link to='/login'>
-            <Log darkMode={darkMode}>
+            <Log darkMode={darkMode} isSidebarOpen={isSidebarOpen}>
               {isSidebarOpen ? <span>&nbsp;로그인</span> : <ImExit size='20' />}
             </Log>
           </Link>

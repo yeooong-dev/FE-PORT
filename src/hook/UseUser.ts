@@ -5,7 +5,7 @@ import instance from "../api/instance";
 interface User {
   name: string;
   id: string;
-  profileImage?: string | null;
+  profileImage: string | null;
 }
 
 const UseUser = () => {
@@ -18,22 +18,13 @@ const UseUser = () => {
     if (!token || !email) return;
     try {
       const response = await instance.get<User>(`/auth/user?email=${email}`);
-      setUser(response.data);
+      setUser({
+        id: response.data.id,
+        name: response.data.name,
+        profileImage: response.data.profileImage,
+      });
     } catch (error) {
       console.error("Failed to fetch user info", error);
-    }
-  };
-
-  const updateProfileImage = async (imageUrl: string | null) => {
-    if (!user || !token) return;
-    try {
-      await instance.put("/path/to/your/api/endpoint", {
-        profileImage: imageUrl,
-        email,
-      });
-      await fetchUserInfo();
-    } catch (error) {
-      console.error("Failed to update profile image", error);
     }
   };
 
@@ -41,7 +32,7 @@ const UseUser = () => {
     fetchUserInfo();
   }, [token, email]);
 
-  return { user, setUser, updateProfileImage };
+  return { user, setUser };
 };
 
 export default UseUser;

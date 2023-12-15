@@ -33,14 +33,17 @@ export const Left = styled.div`
 `;
 
 export const Right = styled.div<RightProps>`
-  width: 100%;
-  margin-left: ${(props) => (props.isSidebarOpen ? "0" : "-200px")};
+  width: ${(props) => (props.isSidebarOpen ? "90%" : "100%")};
+  margin-left: ${(props) => (props.isSidebarOpen ? "0" : "-180px")};
+  transition: transform 0.5s ease;
   height: 96vh;
   display: flex;
+  justify-content: center;
   flex-direction: column;
 
   @media (max-width: 550px) {
-    margin-left: ${(props) => (props.isSidebarOpen ? "-100px" : "-230px")};
+    width: ${(props) => (props.isSidebarOpen ? "100%" : "90%")};
+    margin-left: ${(props) => (props.isSidebarOpen ? "-100px" : "-242px")};
     transform: translateX(
       ${(props) => (props.isSidebarOpen ? "100px" : "-20px")}
     );
@@ -61,6 +64,10 @@ export const Contents = styled.div<{ darkMode: boolean }>`
   box-shadow: 6px 6px 10px 5px rgba(0, 0, 0, 0.07);
   -webkit-box-shadow: 6px 6px 10px 5px rgba(0, 0, 0, 0.07);
   -moz-box-shadow: 6px 6px 10px 5px rgba(0, 0, 0, 0.07);
+
+  @media (max-width: 550px) {
+    width: 100%;
+  }
 `;
 
 export const Logo = styled.div<{ darkMode: boolean }>`
@@ -70,6 +77,6 @@ export const Logo = styled.div<{ darkMode: boolean }>`
   cursor: pointer;
 
   @media (max-width: 550px) {
-    font-size: 1.8rem;
+    font-size: 1.7rem;
   }
 `;

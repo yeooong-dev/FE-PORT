@@ -42,6 +42,7 @@ function Login() {
             profileImage: res.data.user.profile_image,
           };
           setCookie("authorization", "Bearer " + authId);
+          setCookie("userEmail", res.data.user.email);
           localStorage.setItem("user", JSON.stringify(userData));
 
           dispatch({

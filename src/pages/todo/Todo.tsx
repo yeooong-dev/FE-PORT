@@ -224,7 +224,7 @@ function Todo() {
               height: "70px",
               backgroundColor: "#f0f0f0",
               paddingLeft: "1rem",
-              fontSize: "1rem",
+              fontSize: "0.9rem",
             }}
             value={inputValue}
             onChange={(e) => {
@@ -327,9 +327,6 @@ const TodoWrap = styled.div<darkProps>`
   flex-direction: column;
   background: ${({ darkMode }) => (darkMode ? "#222327" : "white")};
   border-radius: 5px;
-
-  .modal {
-  }
 `;
 
 const TodoTop = styled.div<darkProps>`
@@ -398,8 +395,8 @@ const TodoTop = styled.div<darkProps>`
 const Todos = styled.div<darkProps>`
   width: 80%;
   max-width: 1300px;
-  height: 620px;
-  max-height: 620px;
+  height: 580px;
+  max-height: 580px;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -529,6 +526,10 @@ const Todos = styled.div<darkProps>`
     width: 100%;
     height: 650px;
     max-height: 650px;
+
+    b{
+      font-size:16px;
+    }
 
     .between {
       height: 45px;

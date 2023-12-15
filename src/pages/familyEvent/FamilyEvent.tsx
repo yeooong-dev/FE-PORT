@@ -41,7 +41,7 @@ function FamilyEvent() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editEventId, setEditEventId] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const eventsPerPage = 7;
+  const eventsPerPage = 5;
   const { darkMode } = useDarkMode();
   const [alertType, setAlertType] = useState<"error" | "success" | undefined>();
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -232,7 +232,6 @@ function FamilyEvent() {
           }}
         />
       )}
-      <Title>경조사 기록</Title>
       <FamilyEventWrap darkMode={darkMode}>
         <Modal
           isOpen={isModalOpen}
@@ -240,10 +239,14 @@ function FamilyEvent() {
           style={{
             overlay: {
               backgroundColor: "rgba(0, 0, 0, 0.5)",
+              zIndex: "999",
             },
             content: {
-              width: "50%",
-              height: "800px",
+              width: "80%",
+              maxWidth: "600px",
+              minWidth: "250px",
+              maxHeight: "600px",
+              height: "90%",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
@@ -253,10 +256,8 @@ function FamilyEvent() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: "flex-start",
               position: "relative",
-              overflowY: "auto",
-              padding: "2.5rem",
             },
           }}
         >
@@ -280,7 +281,8 @@ function FamilyEvent() {
           </button>
           <p
             style={{
-              fontSize: "1.8rem",
+              fontSize: "1.3rem",
+              marginTop: "20px",
               marginBottom: "20px",
               textAlign: "center",
               fontWeight: "bold",
@@ -292,7 +294,7 @@ function FamilyEvent() {
           <div
             style={{
               width: "90%",
-              height: "80px",
+              height: "70px",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
@@ -301,7 +303,7 @@ function FamilyEvent() {
             <div
               style={{
                 width: "100%",
-                height: "50px",
+                height: "43px",
                 display: "flex",
                 alignItems: "center",
                 background: "#e6e6e6",
@@ -354,22 +356,25 @@ function FamilyEvent() {
             <div
               key={event.id}
               style={{
-                width: "90%",
-                height: "80px",
+                width: "100%",
+                height: "70px",
                 display: "flex",
                 alignItems: "center",
-                justifyContent: "space-between",
+                justifyContent: "center",
                 color: darkMode ? "white" : "#2e2e2e",
               }}
             >
               <div
                 key={event.id}
                 style={{
-                  width: "100%",
-                  height: "70px",
-                  borderBottom: "1.5px solid #d9d9d9",
+                  width: "90%",
+                  height: "65px",
+                  borderBottom: darkMode
+                    ? "1.5px solid #595959"
+                    : "1.5px solid #d9d9d9",
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "center",
                   marginTop: "-20px",
                 }}
               >
@@ -377,16 +382,16 @@ function FamilyEvent() {
                   style={{
                     width: "20%",
                     textAlign: "center",
-                    fontSize: "1.2rem",
+                    fontSize: "0.9rem",
                   }}
                 >
                   {event.target}
                 </span>
                 <span
                   style={{
-                    width: "20%",
+                    width: "22%",
                     textAlign: "center",
-                    fontSize: "1.2rem",
+                    fontSize: "0.9rem",
                   }}
                 >
                   {event.date.split("T")[0]}{" "}
@@ -394,9 +399,9 @@ function FamilyEvent() {
 
                 <span
                   style={{
-                    width: "20%",
+                    width: "22%",
                     textAlign: "center",
-                    fontSize: "1.2rem",
+                    fontSize: "0.9rem",
                   }}
                 >
                   {event.type}
@@ -404,9 +409,9 @@ function FamilyEvent() {
 
                 <span
                   style={{
-                    width: "20%",
+                    width: "22%",
                     textAlign: "center",
-                    fontSize: "1.2rem",
+                    fontSize: "0.9rem",
                   }}
                 >
                   {event.amount}원
@@ -418,7 +423,7 @@ function FamilyEvent() {
                     textAlign: "center",
                     display: "flex",
                     justifyContent: "center",
-                    gap: "10px",
+                    marginTop: "5px",
                   }}
                 >
                   <button
@@ -433,11 +438,11 @@ function FamilyEvent() {
                       fontSize: "1.2rem",
                       cursor: "pointer",
                       background: "none",
-                      marginRight: "10px",
-                      color: darkMode ? "white" : "#51439d",
+                      marginRight: "20px",
+                      color: darkMode ? "white" : "#3c57b3",
                     }}
                   >
-                    <BsPencil size='25' />
+                    <BsPencil size='20' />
                   </button>
                   {showSingleDeleteConfirm && (
                     <CustomConfirm
@@ -456,10 +461,10 @@ function FamilyEvent() {
                       fontSize: "1.2rem",
                       cursor: "pointer",
                       background: "none",
-                      color: darkMode ? "white" : "#51439d",
+                      color: darkMode ? "white" : "#3c57b3",
                     }}
                   >
-                    <IoTrashOutline size='25' />
+                    <IoTrashOutline size='20' />
                   </button>
                 </div>
               </div>
@@ -479,7 +484,7 @@ function FamilyEvent() {
                   cursor: "pointer",
                   borderRadius: "20%",
                   backgroundColor:
-                    currentPage === number ? "#51439d" : "transparent",
+                    currentPage === number ? "#3c57b3" : "transparent",
                   color: currentPage === number ? "white" : "black",
                 }}
               >
@@ -505,6 +510,7 @@ function FamilyEvent() {
               }}
               style={{
                 marginTop: "20px",
+                marginBottom: "20px",
                 background: "none",
                 fontSize: "1.2rem",
                 border: "1.5px solid #e34f39",
@@ -524,10 +530,14 @@ function FamilyEvent() {
           style={{
             overlay: {
               backgroundColor: "rgba(0, 0, 0, 0.5)",
+              zIndex: "999",
             },
             content: {
               width: "80%",
-              height: "800px",
+              maxWidth: "600px",
+              minWidth: "250px",
+              maxHeight: "600px",
+              height: "90%",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
@@ -537,7 +547,7 @@ function FamilyEvent() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "center",
+              justifyContent: "flex-start",
               position: "relative",
             },
           }}
@@ -570,7 +580,8 @@ function FamilyEvent() {
               placeholder='경조사 대상'
               style={{
                 paddingLeft: "2rem",
-                fontSize: "1.2rem",
+                fontSize: "1rem",
+                marginTop: "80px",
               }}
             />
             <Date
@@ -582,7 +593,7 @@ function FamilyEvent() {
               placeholder='경조사 날짜'
               style={{
                 paddingLeft: "2rem",
-                fontSize: "1.2rem",
+                fontSize: "1rem",
               }}
             />
             <Type
@@ -594,7 +605,7 @@ function FamilyEvent() {
               placeholder='경조사 유형'
               style={{
                 paddingLeft: "2rem",
-                fontSize: "1.2rem",
+                fontSize: "1rem",
               }}
             />
             <Amount
@@ -606,17 +617,17 @@ function FamilyEvent() {
               placeholder='경조사 금액'
               style={{
                 paddingLeft: "2rem",
-                fontSize: "1.2rem",
+                fontSize: "1rem",
                 marginBottom: "50px",
               }}
             />
             <button
               onClick={handleUpdateEventConfirm}
               style={{
-                width: "500px",
+                width: "90%",
                 height: "65px",
                 fontSize: "1.2rem",
-                background: "#51439d",
+                background: "#3c57b3",
                 color: "white",
                 cursor: "pointer",
               }}
@@ -626,6 +637,7 @@ function FamilyEvent() {
           </InputBox>
         </Modal>
         <InputBox>
+          <Title darkMode={darkMode}>경조사 기록하기</Title>
           <Target
             type='text'
             value={target}

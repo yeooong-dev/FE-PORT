@@ -45,8 +45,12 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [state, dispatch] = useReducer(userReducer, initialState);
 
   useEffect(() => {
-    localStorage.setItem("user", JSON.stringify(state));
-  }, [state]);
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      dispatch({ type: "SET_USER", payload: user });
+    }
+  }, []);
 
   const updateUserContext = useCallback(
     (user: UserState) => {

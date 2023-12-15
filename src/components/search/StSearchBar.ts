@@ -74,6 +74,10 @@ export const Dark = styled.li<SearchInputProps>`
     height: 30px;
     left: 50px;
   }
+
+  @media (max-width: 320px) {
+    left: 46px;
+  }
 `;
 
 export const SearchRight = styled.div`
@@ -120,6 +124,10 @@ export const SearchInput = styled.input<SearchInputProps>`
 
   @media (max-width: 550px) {
     width: 100px;
+  }
+
+  @media (max-width: 320px) {
+    width: 80px;
   }
 `;
 
