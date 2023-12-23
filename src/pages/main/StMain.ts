@@ -21,14 +21,15 @@ export const WrapLeft = styled.div`
 `;
 
 export const WrapTodo = styled.div<darkProps>`
-  width: 600px;
+  width: 100%;
+  max-width: 650px;
   height: 100%;
   padding: 0rem 6rem;
-  margin-top: 30px;
-  margin-bottom: 50px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 
   h1 {
-    font-size: 1.6rem;
+    font-size: 1.2rem;
     text-align: left;
     font-family: var(--font-title);
     margin-bottom: 20px;
@@ -37,13 +38,14 @@ export const WrapTodo = styled.div<darkProps>`
 
   .todolist {
     width: 100%;
-    height: 300px;
-    background: ${({ darkMode }) => (darkMode ? "#323336" : "#d7dae0")};
+    height: 320px;
+    max-height: 320px;
+    background: ${({ darkMode }) => (darkMode ? "#323336" : "#f5f5f5")};
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
     border-radius: 20px;
-    padding: 2rem 4rem;
+    padding: 2rem;
     overflow-y: auto;
-    max-height: 280px;
+    padding-bottom: 0;
 
     span {
       font-size: 1.2rem;
@@ -60,9 +62,11 @@ export const WrapTodo = styled.div<darkProps>`
 
 export const CheckDiv = styled.div`
   background: none;
-  width: 30px;
-  height: 30px;
-  border: 2px solid #51439d;
+  width: 25px;
+  height: 25px;
+  min-width: 25px;
+  min-height: 25px;
+  border: 2px solid #3c57b3;
   border-radius: 20%;
   cursor: pointer;
   margin-right: 20px;
@@ -71,19 +75,20 @@ export const CheckDiv = styled.div`
 
   &.checked {
     border: none;
-    color: #d6d6d6;
+    color: #cccccc;
   }
 `;
 
 export const WrapEvent = styled.div<darkProps>`
-  width: 600px;
+  width: 100%;
+  max-width: 600px;
   height: 100%;
   margin-bottom: 0;
   padding: 0rem 6rem;
 
   h1 {
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
-    font-size: 1.6rem;
+    font-size: 1.2rem;
     text-align: left;
     font-family: var(--font-title);
     margin-bottom: 20px;
@@ -92,7 +97,7 @@ export const WrapEvent = styled.div<darkProps>`
   .event {
     width: 100%;
     height: 300px;
-    background: ${({ darkMode }) => (darkMode ? "#323336" : "#d7dae0")};
+    background: ${({ darkMode }) => (darkMode ? "#323336" : "#f5f5f5")};
     border-radius: 20px;
     padding: 2rem 4rem;
     overflow-y: auto;
@@ -101,7 +106,7 @@ export const WrapEvent = styled.div<darkProps>`
     .eventHeaders {
       font-size: 1.2rem;
       font-weight: bold;
-      color: ${({ darkMode }) => (darkMode ? "white" : "#51439d")};
+      color: ${({ darkMode }) => (darkMode ? "white" : "#3c57b3")};
       margin-bottom: 0px;
     }
 
@@ -141,7 +146,7 @@ export const WrapRight = styled.div`
 
 export const WrapCalendar = styled.div<darkProps>`
   width: 100%;
-  height: 0;
+  height: 100%;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -149,7 +154,7 @@ export const WrapCalendar = styled.div<darkProps>`
 
   h1 {
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
-    font-size: 1.6rem;
+    font-size: 1.2rem;
     text-align: left;
     font-family: var(--font-title);
     margin-bottom: 40px;
@@ -173,7 +178,7 @@ export const WrapSocket = styled.div<darkProps>`
 
   h1 {
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
-    font-size: 1.6rem;
+    font-size: 1.2rem;
     text-align: left;
     font-family: var(--font-title);
     margin-bottom: 40px;

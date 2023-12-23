@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-import Calendar from "../calendar/CalendarView";
 import {
   CheckDiv,
   Wrap,
@@ -15,6 +14,7 @@ import { todoGet, todoToggleCheck } from "../../api/todo";
 import { getAllFamilyEvents } from "../../api/familyEvents";
 import { BsCheckLg } from "react-icons/bs";
 import { useDarkMode } from "../../components/darkmode/DarkModeContext";
+import CalendarView from "../calendar/CalendarView";
 
 export interface TodoItem {
   id: number;
@@ -35,6 +35,7 @@ export interface FamilyEventItem {
 function Main() {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [events, setEvents] = useState<FamilyEventItem[]>([]);
+  const [showCalendarList, setShowCalendarList] = useState(false);
   const { darkMode } = useDarkMode();
 
   const fetchTodos = async () => {
@@ -103,7 +104,7 @@ function Main() {
                   onClick={() => handleToggleCheck(todo.todo_id)}
                 >
                   {todo.completed ? (
-                    <BsCheckLg size='35' color='#51439d' />
+                    <BsCheckLg size='35' color='#3c57b3' />
                   ) : null}
                 </CheckDiv>
                 <span
@@ -146,7 +147,7 @@ function Main() {
           <Link to='/calendar'>
             <h1>나의 일정 &nbsp; {">"}</h1>
           </Link>
-          {/* <Calendar /> */}
+          {showCalendarList && <CalendarView />}
         </WrapCalendar>
 
         <WrapSocket darkMode={darkMode}>

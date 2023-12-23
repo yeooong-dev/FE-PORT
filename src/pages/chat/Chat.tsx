@@ -1,6 +1,14 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Modal from "react-modal";
-import { ChatWrap, LeftWrap, RightWrap } from "./StChat";
+import {
+  BtnBox,
+  ChatWrap,
+  LeftWrap,
+  List,
+  ListWrap,
+  RightWrap,
+  ToggleButton,
+} from "./StChat";
 import {
   checkIfRoomExists,
   createRoom,
@@ -8,11 +16,14 @@ import {
   getRoom,
   getUsers,
   removeUserFromRoom,
+  sendChatMessage,
 } from "../../api/chat";
 import { imgGet } from "../../api/mypage";
 import { HiOutlinePencilAlt } from "react-icons/hi";
+import { BiSolidFoodMenu } from "react-icons/bi";
 import { io } from "socket.io-client";
 import { Socket } from "socket.io-client";
+import UseUser from "../../hook/UseUser";
 
 interface User {
   id: number;
@@ -20,23 +31,43 @@ interface User {
   profile_image: string | null;
   roomId: number;
   lastMessage?: string;
+  user?: {
+    id: number;
+    name: string;
+    profile_image: string | null;
+  };
 }
 
 interface Message {
   id: number;
-  content: string;
-  user: User;
-}
-
-interface SocketMessage {
-  id: number;
-  roomId: number;
-  content: string;
+  message: string;
   user: {
     id: number;
     name: string;
     profile_image: string | null;
   };
+}
+
+interface SocketMessage {
+  id: number;
+  roomId: number;
+  message: string;
+  user: {
+    id: number;
+    name: string;
+    profile_image: string | null;
+  };
+}
+
+interface InteractedUser {
+  user?: {
+    id: number;
+    name: string;
+    profile_image: string | null;
+  };
+  lastMessage: string;
+  roomId: number;
+  profile_image: string | null;
 }
 
 function Chat() {
@@ -48,6 +79,8 @@ function Chat() {
   const [interactedUsers, setInteractedUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const { user } = UseUser();
+  const [showLeftWrap, setShowLeftWrap] = useState(true);
 
   // 소켓 설정
   useEffect(() => {
@@ -59,38 +92,65 @@ function Chat() {
     };
   }, []);
 
+  // 채팅 목록 업데이트 함수
+  const updateChatList = useCallback(async () => {
+    try {
+      const updatedUsers = await getInteractedUsers();
+      const updatedUsersWithImages: User[] = updatedUsers.map(
+        (user: InteractedUser) => {
+          return {
+            id: user.user?.id,
+            name: user.user?.name,
+            profile_image: user.user?.profile_image,
+            roomId: user.roomId,
+            lastMessage: user.lastMessage,
+          };
+        }
+      );
+      setInteractedUsers(updatedUsersWithImages);
+    } catch (error) {
+      console.error("채팅 목록 업데이트 중 오류 발생:", error);
+    }
+  }, []);
+
+  const handleMessage = useCallback((data: SocketMessage) => {
+    console.log("새 메시지 수신:", data);
+    setMessages((prevMessages) => [...prevMessages, data]);
+
+    setInteractedUsers((prevUsers) => {
+      const existingUserIndex = prevUsers.findIndex(
+        (u) => u.id === data.user.id
+      );
+      if (existingUserIndex >= 0) {
+        return prevUsers.map((user, index) =>
+          index === existingUserIndex
+            ? { ...user, lastMessage: data.message }
+            : user
+        );
+      } else {
+        return [
+          ...prevUsers,
+          {
+            id: data.user.id,
+            name: data.user.name,
+            profile_image: data.user.profile_image,
+            roomId: data.roomId,
+            lastMessage: data.message,
+          },
+        ];
+      }
+    });
+  }, []);
+
   useEffect(() => {
     if (!socket) return;
-
-    const handleMessage = (data: SocketMessage) => {
-      if (selectedUser && data.roomId === selectedUser.roomId) {
-        const newMessage = {
-          id: data.id,
-          content: data.content,
-          user: {
-            ...data.user,
-            roomId: selectedUser.roomId,
-          },
-        };
-
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
-      }
-
-      // 채팅방 목록 업데이트
-      const updateChatList = async () => {
-        const updatedUsers = await getInteractedUsers();
-        setInteractedUsers(updatedUsers);
-      };
-
-      updateChatList();
-    };
 
     socket.on("chat message", handleMessage);
 
     return () => {
       socket.off("chat message", handleMessage);
     };
-  }, [socket, selectedUser]);
+  }, [socket, handleMessage]);
 
   const joinRoom = (roomId: number) => {
     if (socket) {
@@ -127,35 +187,24 @@ function Chat() {
             try {
               const response = await imgGet(String(user.id));
               let imageUrl = response.data.imageUrl;
-              if (imageUrl) {
-                imageUrl =
-                  "https://yeong-port.s3.ap-northeast-2.amazonaws.com/" +
-                  imageUrl
-                    .split(
-                      "https://yeong-port.s3.ap-northeast-2.amazonaws.com/"
-                    )
-                    .join("");
+
+              if (!imageUrl) {
+                imageUrl = "/path-to-default-profile-image.png";
               }
+
               return { ...user, profile_image: imageUrl };
             } catch (error) {
-              console.error(error);
-              return user;
+              console.error("프로필 이미지 가져오기 실패:", error);
+              return {
+                ...user,
+                profile_image: "/path-to-default-profile-image.png",
+              };
             }
           })
         );
 
         setAllUsers(usersWithImages || []);
         setInteractedUsers(interacted || []);
-
-        if (
-          interacted &&
-          interacted[0] &&
-          typeof interacted[0].roomId === "number"
-        ) {
-          setSelectedUser(interacted[0]);
-          const roomMessages = await getRoom(interacted[0].roomId);
-          setMessages(roomMessages.chats || []);
-        }
       } catch (error) {
         console.error("Error fetching initial data:", error);
       } finally {
@@ -179,91 +228,139 @@ function Chat() {
   }, [selectedUser]);
 
   const selectUser = async (user: User) => {
-    setSelectedUser(user);
+    const foundUser = interactedUsers.find((u) => u.id === user.id);
+    if (foundUser) {
+      setSelectedUser(foundUser);
+    } else {
+      setSelectedUser(user);
+    }
     joinRoom(user.roomId);
+
     if (socket && user.roomId) {
       socket.emit("join room", user.roomId);
       const roomMessages = await getRoom(user.roomId);
       setMessages(roomMessages.chats || []);
     }
+    await updateChatList();
   };
 
-  const handleNewChat = async (userId: number) => {
-    const existingRoom = await checkIfRoomExists([userId]);
-    let updatedUser: User | null = null;
-    const user = allUsers.find((u) => u.id === userId);
-
-    if (existingRoom) {
-      updatedUser = user ? { ...user, roomId: existingRoom.id } : null;
-    } else {
-      const roomName = `Room_${Date.now()}`;
-      const room = await createRoom([userId], roomName);
-      updatedUser = user ? { ...user, roomId: room.id } : null;
-    }
-
-    if (updatedUser) {
-      setSelectedUser(updatedUser);
-      const roomMessages = await getRoom(updatedUser.roomId);
-      setMessages(roomMessages.chats || []);
-      if (socket) {
-        socket.emit("join room", updatedUser.roomId);
-      }
-    }
-    setModalIsOpen(false);
-  };
-
-  // const handleSendMessage = async () => {
-  //   if (selectedUser && inputValue.trim() && socket) {
-  //     try {
-  //       const sentMessageResponse = await postMessage(
-  //         selectedUser.roomId,
-  //         inputValue
-  //       );
-
-  //       // 여기서 sentMessageResponse를 Message 타입으로 사용
-  //       const newMessage: Message = {
-  //         id: sentMessageResponse.id,
-  //         content: sentMessageResponse.content,
-  //         user: {
-  //           ...sentMessageResponse.user,
-  //           roomId: selectedUser.roomId, // 필요하다면 roomId 추가
-  //         },
-  //       };
-
-  //       setMessages((prevMessages) => [...prevMessages, newMessage]);
-  //       setInputValue("");
-
-  //       const updatedUsers = await getInteractedUsers();
-  //       setInteractedUsers(updatedUsers);
-
-  //       socket.emit("chat message in room", {
-  //         roomId: selectedUser.roomId,
-  //         message: inputValue,
-  //         userId: selectedUser.id,
-  //       });
-  //     } catch (error) {
-  //       console.error("메시지 전송 중 오류 발생", error);
-  //     }
-  //   }
-  // };
-
-  const handleLeaveChatRoom = async (userId: number) => {
-    if (!selectedUser || selectedUser.id !== userId) {
+  const handleNewChat = async (targetUserId: number) => {
+    if (!user || !user.id) {
+      console.error("User ID is not available.");
       return;
     }
 
-    const confirmLeave = window.confirm("채팅방을 나가겠습니까?");
-    if (confirmLeave) {
-      await removeUserFromRoom(selectedUser.roomId, userId);
-      setInteractedUsers((prev) => prev.filter((user) => user.id !== userId));
-      setMessages([]);
-      setSelectedUser(null);
+    const currentUserId = parseInt(user.id);
+    if (isNaN(currentUserId)) {
+      console.error("Invalid user ID.");
+      return;
+    }
+
+    const userIds = [currentUserId, targetUserId];
+
+    try {
+      const roomExistence = await checkIfRoomExists(userIds);
+
+      let roomId;
+      if (roomExistence && roomExistence.exists) {
+        roomId = roomExistence.room.id;
+        console.log(`Room already exists with ID: ${roomId}`);
+      } else {
+        console.log(
+          `Creating new room for IDs: ${currentUserId}, ${targetUserId}`
+        );
+        const roomName = `Room_${Date.now()}`;
+        const newRoom = await createRoom(
+          [currentUserId, targetUserId],
+          roomName
+        );
+        roomId = newRoom.id;
+        console.log(`New room created with ID: ${roomId}`);
+      }
+
+      if (!roomId) {
+        console.error("Failed to obtain a valid room ID.");
+        return;
+      }
+
+      const fetchedRoom = await getRoom(roomId);
+      if (!fetchedRoom) {
+        console.error("Failed to fetch room details.");
+        return;
+      }
+
+      const targetUser = allUsers.find((u) => u.id === targetUserId);
+      if (!targetUser) {
+        console.error("Target user not found.");
+        return;
+      }
+
+      const updatedUser = {
+        ...targetUser,
+        roomId,
+        lastMessage: fetchedRoom.lastMessage || "",
+      };
+
+      setSelectedUser(updatedUser);
+      setMessages(fetchedRoom.chats || []);
+      joinRoom(roomId);
+      setModalIsOpen(false);
+    } catch (error) {
+      console.error("Error in handleNewChat:", error);
     }
   };
 
-  useEffect(() => {
-    console.log("Messages updated:", messages);
-  }, [messages]);
+  const handleSendMessage = async () => {
+    if (selectedUser && inputValue.trim() && socket && user) {
+      try {
+        const sentMessageResponse = await sendChatMessage(
+          selectedUser.roomId,
+          inputValue
+        );
+        if (sentMessageResponse) {
+          setInputValue("");
+          await updateChatList();
+        }
+      } catch (error) {
+        console.error("Failed to send message", error);
+      }
+    }
+  };
+
+  // 채팅방 나가기 로직
+  const handleLeaveChatRoom = async (roomId: number) => {
+    if (selectedUser && user) {
+      const confirmLeave = window.confirm("채팅방을 나가겠습니까?");
+      if (confirmLeave) {
+        try {
+          const userId = Number(user.id);
+          if (isNaN(userId)) {
+            console.error("Invalid user ID.");
+            return;
+          }
+
+          await removeUserFromRoom(roomId, userId);
+          updateChatList();
+          setMessages([]);
+          setSelectedUser(null);
+        } catch (error) {
+          console.error("Error leaving chat room:", error);
+        }
+      }
+    }
+  };
+
+  // useEffect(() => {
+  //   console.log("메세지:", messages);
+  // }, [messages]);
+
+  // useEffect(() => {
+  //   console.log("모달 이미지:", allUsers);
+  // }, [allUsers]);
+
+  // useEffect(() => {
+  //   console.log("이미지:", interactedUsers);
+  // }, [interactedUsers]);
 
   return (
     <ChatWrap>
@@ -271,200 +368,205 @@ function Chat() {
         <div>Loading...</div>
       ) : (
         <>
-          <LeftWrap>
-            <button onClick={() => setModalIsOpen(true)} className='addBtn'>
-              <HiOutlinePencilAlt size='33' color='#51439d' />
-            </button>
-            <Modal
-              isOpen={modalIsOpen}
-              onRequestClose={() => setModalIsOpen(false)}
-              contentLabel='User List Modal'
-              style={{
-                overlay: {
-                  backgroundColor: "rgba(0, 0, 0, 0.5)",
-                },
-                content: {
-                  width: "40%",
-                  height: "800px",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                  backgroundColor: "#f6f6f6",
-                  border: "none",
-                  borderRadius: "20px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  position: "relative",
-                },
-              }}
-            >
-              <div
+          <LeftWrap show={showLeftWrap}>
+            <BtnBox>
+              <ToggleButton onClick={() => setShowLeftWrap((prev) => !prev)}>
+                {showLeftWrap ? (
+                  <BiSolidFoodMenu size='30' color='#3c57b3' />
+                ) : (
+                  <BiSolidFoodMenu size='30' color='#3c57b3' />
+                )}
+              </ToggleButton>
+              <button onClick={() => setModalIsOpen(true)} className='addBtn'>
+                <HiOutlinePencilAlt size='33' color='#3c57b3' />
+              </button>
+            </BtnBox>
+            <ListWrap show={showLeftWrap}>
+              <Modal
+                isOpen={modalIsOpen}
+                onRequestClose={() => setModalIsOpen(false)}
+                contentLabel='User List Modal'
                 style={{
-                  width: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  flexDirection: "column",
-                  justifyContent: "center",
+                  overlay: {
+                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    zIndex: "999",
+                  },
+                  content: {
+                    width: "80%",
+                    maxWidth: "260px",
+                    height: "550px",
+                    overflowY: "scroll",
+                    padding: "30px",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    backgroundColor: "#f6f6f6",
+                    border: "none",
+                    borderRadius: "20px",
+                    display: "flex",
+                    flexDirection: "column",
+                    position: "relative",
+                  },
                 }}
               >
-                <h5
+                <div
                   style={{
-                    fontSize: "1.5rem",
-                    marginBottom: "60px",
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    justifyContent: "center",
                   }}
                 >
-                  PORT 사용자들
-                </h5>
-                {allUsers.map((user) => (
-                  <div
-                    key={user.id}
+                  <h5
                     style={{
+                      fontSize: "1.2rem",
+                      margin: "20px 0px",
                       width: "100%",
-                      height: "80px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      fontSize: "1.3rem",
-                      fontWeight: "bold",
-                      borderBottom: "1.5px solid #e8e8e8",
-                      padding: "15px",
+                      textAlign: "center",
                     }}
                   >
-                    <img
-                      src={user.profile_image || "/path-to-your-default-image"}
-                      alt={`${user.name}'s profile`}
+                    PORT 사용자들
+                  </h5>
+                  {allUsers.map((user) => (
+                    <div
+                      key={user.id}
                       style={{
-                        width: "80px",
-                        marginRight: "30px",
-                      }}
-                    />
-                    {user.name}
-                    <button
-                      onClick={() => handleNewChat(user.id)}
-                      style={{
-                        marginLeft: "100px",
-                        width: "150px",
+                        width: "100%",
                         height: "50px",
-                        borderRadius: "10px",
-                        background: "#51439d",
-                        color: "white",
-                        fontSize: "1.1rem",
-                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontWeight: "bold",
+                        borderBottom: "1.5px solid #e8e8e8",
+                        padding: "20px",
                       }}
                     >
-                      채팅하기
-                    </button>
+                      <img
+                        src={
+                          user.profile_image || "/path-to-your-default-image"
+                        }
+                        alt={`${user.name}'s profile`}
+                        style={{
+                          width: "60px",
+                        }}
+                      />
+                      <span style={{ margin: "30px", width: "280px" }}>
+                        {user.name}
+                      </span>
+                      <button
+                        onClick={() => handleNewChat(user.id)}
+                        style={{
+                          width: "80px",
+                          minWidth: "80px",
+                          height: "40px",
+                          borderRadius: "5px",
+                          background: "#3c57b3",
+                          color: "white",
+                          fontSize: "15px",
+                          cursor: "pointer",
+                        }}
+                      >
+                        채팅하기
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </Modal>
+              {interactedUsers.map((interactedUser, index) => {
+                const isUserSelected =
+                  !!selectedUser && selectedUser.id === interactedUser.id;
+                return (
+                  <List
+                    key={`${interactedUser.id}-${index}`}
+                    isSelected={isUserSelected}
+                    onClick={() => selectUser(interactedUser)}
+                  >
+                    <img
+                      src={
+                        interactedUser.user?.profile_image
+                          ? `https://yeong-port.s3.ap-northeast-2.amazonaws.com/${interactedUser.user.profile_image}`
+                          : "https://yeong-port.s3.ap-northeast-2.amazonaws.com/person.png"
+                      }
+                      alt={`${interactedUser.user?.name || "User"}'s profile`}
+                      style={{
+                        borderRadius: "50%",
+                      }}
+                    />
+                    <div className='flex'>
+                      <p>{interactedUser.user?.name}</p>
+                      <p>{interactedUser.lastMessage}</p>
+                    </div>
+                    {isUserSelected && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleLeaveChatRoom(interactedUser.roomId);
+                        }}
+                        className='exit'
+                      >
+                        삭제
+                      </button>
+                    )}
+                  </List>
+                );
+              })}
+            </ListWrap>
+          </LeftWrap>
+          <RightWrap show={showLeftWrap}>
+            {selectedUser ? (
+              <div className='chatBox'>
+                <h3>{selectedUser.name}</h3>
+                {messages.map((message, index) => (
+                  <div
+                    key={`${message.id}-${index}`}
+                    style={{
+                      width: "90%",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent:
+                        user && message.user.id !== Number(user.id)
+                          ? "start"
+                          : "end",
+                    }}
+                  >
+                    {user && message.user.id !== Number(user.id) && (
+                      <div className='you'>
+                        <div className='info'>
+                          <span>{message.user.name}</span>
+                          <img
+                            src={
+                              message.user?.profile_image
+                                ? `https://yeong-port.s3.ap-northeast-2.amazonaws.com/${message.user.profile_image}`
+                                : "https://yeong-port.s3.ap-northeast-2.amazonaws.com/person.png"
+                            }
+                            alt={`${message.user.name}'s profile`}
+                          />
+                        </div>
+
+                        <div className='you_msg'>
+                          <p>{message.message}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {user && message.user.id === Number(user.id) && (
+                      <div className='me'>
+                        <p>{message.message}</p>
+                      </div>
+                    )}
                   </div>
                 ))}
-              </div>
-            </Modal>
-            {interactedUsers.map((user, index) => (
-              <div
-                key={`${user.id}-${index}`}
-                onClick={() => selectUser(user)}
-                className='list'
-              >
-                <img
-                  src={user.profile_image || "/path-to-your-default-image"}
-                  alt={`${user.name}'s profile`}
-                  style={{ width: "80px", height: "80px", borderRadius: "50%" }}
-                />
-                <div className='flex'>
-                  <p>{user.name}</p>
-                  <p>{user.lastMessage}</p>
-                </div>
-                <button onClick={() => handleLeaveChatRoom(user.id)}>
-                  채팅 나가기
-                </button>
-              </div>
-            ))}
-          </LeftWrap>
-          <RightWrap>
-            {selectedUser ? (
-              <>
-                <h3>{selectedUser.name}</h3>
-
-                <div>
+                <div className='inputBox'>
                   <input
                     type='text'
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder='메시지를 입력하세요.'
                   />
-                  <button
-                  // onClick={() => {
-                  //   handleSendMessage();
-                  // }}
-                  >
-                    전송
-                  </button>
+                  <button onClick={() => handleSendMessage()}>전송</button>
                 </div>
-                {messages.map((message, index) => (
-                  <div
-                    key={`${message.id}-${index}`}
-                    style={{
-                      display: "flex",
-                      flexDirection:
-                        message.user.id === selectedUser.id
-                          ? "row-reverse"
-                          : "row",
-                      alignItems: "center",
-                      marginBottom: "10px",
-                    }}
-                  >
-                    {/* 상대방 메시지일 경우 */}
-                    {message.user.id !== selectedUser.id && (
-                      <>
-                        <img
-                          src={
-                            message.user.profile_image ||
-                            "/path-to-your-default-image"
-                          }
-                          alt={`${message.user.name}'s profile`}
-                          style={{
-                            borderRadius: "50%",
-                            width: "30px",
-                            height: "30px",
-                            objectFit: "cover",
-                            marginRight: "10px",
-                          }}
-                        />
-                        <div
-                          style={{
-                            background: "#E0FFFF",
-                            padding: "10px",
-                            borderRadius: "10px",
-                            maxWidth: "70%",
-                          }}
-                        >
-                          <span style={{ fontWeight: "bold" }}>
-                            {message.user.name}
-                          </span>
-                          <p style={{ margin: "5px 0 0 0" }}>
-                            {message.content}
-                          </p>
-                        </div>
-                      </>
-                    )}
-                    {/* 현재 로그인한 사용자의 메시지일 경우 */}
-                    {message.user.id === selectedUser.id && (
-                      <div
-                        style={{
-                          background: "#ACE1AF",
-                          padding: "10px",
-                          borderRadius: "10px",
-                          maxWidth: "70%",
-                          alignSelf: "flex-end",
-                        }}
-                      >
-                        <p style={{ margin: "5px 0 0 0" }}>{message.content}</p>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </>
+              </div>
             ) : (
               <h3>"채팅할 사용자를 선택해주세요!"</h3>
             )}

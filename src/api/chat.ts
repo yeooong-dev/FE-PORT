@@ -31,7 +31,6 @@ export const getUsers = async () => {
 
 export const createRoom = async (userIds: number[], name: string) => {
   try {
-    console.log(`Creating room with userIds: ${userIds}`);
     const response = await instance.post("/chat/room", { userIds, name });
 
     if (response.data && typeof response.data === "object") {
@@ -46,12 +45,12 @@ export const createRoom = async (userIds: number[], name: string) => {
 };
 
 export const checkIfRoomExists = async (userIds: number[]) => {
-  try {
-    const userIdsParam = userIds.join(",");
+  const userIdsParam = userIds.join(",");
 
-    const response = await instance.get(
-      `/chat/room/exist?userIds=${userIdsParam}`
-    );
+  try {
+    const response = await instance.get(`/chat/room/exist`, {
+      params: { userIds: userIdsParam },
+    });
     return response.data.exists ? response.data.room : null;
   } catch (error) {
     console.error("checkIfRoomExists API 호출 중 오류:", error);
@@ -98,21 +97,26 @@ export const joinRoom = async (roomId: number, userId: number) => {
   }
 };
 
-export const postMessage = async (
+export const sendChatMessage = async (
   roomId: number,
   message: string
-): Promise<Message> => {
-  const response = await instance.post(`/chat/room/${roomId}/message`, {
-    message,
-  });
-  if (response.data) {
-    return {
-      id: response.data.id,
-      content: response.data.message,
-      user: response.data.user,
-    };
-  } else {
-    throw new Error("Invalid server response");
+): Promise<Message | null> => {
+  try {
+    const response = await instance.post(`/chat/room/${roomId}/message`, {
+      message,
+    });
+    if (response.data) {
+      return {
+        id: response.data.id,
+        content: response.data.content,
+        user: response.data.user,
+      };
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error in postMessage:", error);
+    return null;
   }
 };
 
