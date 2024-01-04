@@ -23,7 +23,7 @@ import { useEffect, useState } from "react";
 import { Logo } from "../wrapper/StWrapper";
 import { useUserContext } from "./userContext";
 import CustomConfirm from "../alert/CustomConfirm";
-import useUser from "../../hook/UseUser";
+import UseUser from "../../hook/UseUser";
 import { imgGet } from "../../api/mypage";
 import { useDarkMode } from "../darkmode/DarkModeContext";
 import { ImExit } from "react-icons/im";
@@ -42,7 +42,7 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
   const { state, updateUserContext } = useUserContext();
   const location = useLocation();
   const [profileImageUrl, setProfileImageUrl] = useState("/person.png");
-  const { user } = useUser();
+  const { user } = UseUser();
   const [displayName, setDisplayName] = useState("");
   const { darkMode } = useDarkMode();
 

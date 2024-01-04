@@ -5,7 +5,7 @@ import {
   Logo,
 } from "../../components/register/StRegister";
 import { EmailInputLogin, LoginBtn, PwInputLogin } from "./StLogin";
-import useInput from "../../hook/UseInput";
+import UseInput from "../../hook/UseInput";
 import { useCookies } from "react-cookie";
 import { login } from "../../api/auth";
 import { useUserContext } from "../../components/navigation/userContext";
@@ -13,8 +13,8 @@ import { useState } from "react";
 import CustomAlert from "../../components/alert/CustomAlert";
 
 function Login() {
-  const [emailValue, setEmailValue] = useInput();
-  const [pwValue, setPwValue] = useInput();
+  const [emailValue, setEmailValue] = UseInput();
+  const [pwValue, setPwValue] = UseInput();
   const [cookies, setCookie] = useCookies([
     "authorization",
     "userEmail",

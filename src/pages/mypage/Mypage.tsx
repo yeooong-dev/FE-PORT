@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import useUser from "../../hook/UseUser";
+import UseUser from "../../hook/UseUser";
 import Modal from "react-modal";
 import {
   Info,
@@ -27,7 +27,7 @@ import { useUserContext } from "../../components/navigation/userContext";
 
 function Mypage() {
   Modal.setAppElement("#root");
-  const { user, setUser } = useUser();
+  const { user, setUser } = UseUser();
   const [selectedTab, setSelectedTab] = useState<
     "nameEdit" | "pwEdit" | "deleteAccount" | null
   >("nameEdit");

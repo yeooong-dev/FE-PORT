@@ -11,16 +11,16 @@ import {
   PwInput,
   RegisterBtn,
 } from "./StRegister";
-import useInput from "../../hook/UseInput";
+import UseInput from "../../hook/UseInput"
 import { register, usercheckEmail } from "../../api/auth";
 import { useState } from "react";
 import CustomAlert from "../alert/CustomAlert";
 
 function Register() {
-  const [emailValue, setEmailValue] = useInput();
-  const [nameValue, setNameValue] = useInput();
-  const [pwValue, setPwValue] = useInput();
-  const [pwconfirmValue, setPwConfirmValue] = useInput();
+  const [emailValue, setEmailValue] = UseInput();
+  const [nameValue, setNameValue] = UseInput();
+  const [pwValue, setPwValue] = UseInput();
+  const [pwconfirmValue, setPwConfirmValue] = UseInput();
 
   const [emailMessage, setEmailMessage] = useState<string | null>(null);
   const [nameMessage, setNameMessage] = useState<string | null>(null);
