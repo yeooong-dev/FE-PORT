@@ -122,9 +122,7 @@ export const sendChatMessage = async (
 
 export const removeUserFromRoom = async (roomId: number, userId: number) => {
   try {
-    const response = await instance.delete(
-      `/chat/room/${roomId}/user/${userId}`
-    );
+    const response = await instance.put(`/chat/room/${roomId}/user/${userId}`);
     return response.data;
   } catch (error) {
     console.error(error);

@@ -24,9 +24,14 @@ export const Wrap = styled.div`
 `;
 
 export const Profile = styled.div<darkProps>`
+  width: 100%;
+  height: auto;
+  max-height: 300px;
+  margin-bottom: 20px;
+
   .p_img {
-    width: 180px;
-    height: 180px;
+    width: 150px;
+    height: 150px;
     border-radius: 50%;
   }
 
@@ -47,8 +52,7 @@ export const Profile = styled.div<darkProps>`
 
   .hi {
     font-size: 1.6rem;
-    margin-top: 45px;
-    margin-bottom: 8px;
+    margin-top: 20px;
     letter-spacing: 5px;
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
   }
@@ -56,9 +60,9 @@ export const Profile = styled.div<darkProps>`
   .name {
     font-size: 2rem;
     font-weight: 600;
-    margin-bottom: 50px;
     letter-spacing: 5px;
     color: ${({ darkMode }) => (darkMode ? "white" : "#3c57b3")};
+    margin-bottom: 30px;
   }
 
   @media (max-width: 550px) {
@@ -81,15 +85,26 @@ export const Profile = styled.div<darkProps>`
 
     .name {
       font-size: 1.2rem;
-      margin-bottom: 35px;
+      margin-bottom: 10px;
+    }
+  }
+
+  @media (max-width: 320px) {
+    .hi {
+      font-size: 14px;
+    }
+
+    .name {
+      font-size: 1rem;
+      margin-bottom: 20px;
     }
   }
 `;
 
 export const TabContainer = styled.div<darkProps>`
   width: 100%;
+  height: 350px;
   max-width: 900px;
-  height: 480px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -103,6 +118,10 @@ export const TabContainer = styled.div<darkProps>`
   @media (max-width: 550px) {
     height: 300px;
   }
+
+  @media (max-width: 320px) {
+    height: 230px;
+  }
 `;
 
 export const TabTop = styled.div<darkProps>`
@@ -112,7 +131,7 @@ export const TabTop = styled.div<darkProps>`
 
 export const Tab = styled.div<TabProps & darkProps>`
   width: 100%;
-  height: 60px;
+  height: 55px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -143,7 +162,7 @@ export const Tab = styled.div<TabProps & darkProps>`
 
 export const Info = styled.div<darkProps>`
   width: 100%;
-  height: 430px;
+  height: 450px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -158,33 +177,39 @@ export const Info = styled.div<darkProps>`
 
 export const NameEdit = styled.div`
   width: 100%;
-  height: 100%;
+  height: auto;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin: 50px;
 
   input {
-    width: 80%;
-    max-width: 400px;
-    height: 55px;
+    width: 60%;
+    height: 45px;
     margin-bottom: 20px;
     padding-left: 1rem;
     font-size: 1rem;
   }
 
   .lastInput {
-    min-width: 400px;
+    width: 480px;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 
   button {
     width: 80%;
-    max-width: 420px;
-    height: 55px;
+    max-width: 280px;
+    height: 50px;
     font-size: 1.1rem;
     background: #3c57b3;
     color: white;
     cursor: pointer;
+    border-radius: 5px;
   }
 
   button:hover {
@@ -194,28 +219,37 @@ export const NameEdit = styled.div`
 
   @media (max-width: 1000px) {
     .lastInput {
-      min-width: 200px;
+      max-width: 300px;
     }
   }
 
-  @media (max-width: 550px) {
-    input {
-      width: 70%;
-      height: 40px;
-      font-size: 14px;
+  @media (max-width: 850px) {
+    .lastInput {
+      max-width: 200px;
+    }
+  }
+
+  @media (max-width: 660px) {
+    .lastInput {
+      max-width: 150px;
     }
 
-    .lastInput {
-      min-width: 150px;
+    input {
+      height: 35px;
+      font-size: 14px;
     }
 
     button {
-      height: 40px;
+      width: 60%;
+      max-width: 280px;
+      height: 35px;
       font-size: 14px;
     }
+  }
 
-    button:hover {
-      opacity: 100%;
+  @media (max-width: 360px) {
+    .lastInput {
+      max-width: 170px;
     }
   }
 `;

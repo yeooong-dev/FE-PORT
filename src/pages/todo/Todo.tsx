@@ -537,7 +537,7 @@ const Todos = styled.div<darkProps>`
       margin-bottom: 30px;
 
       &:before {
-        bottom: -5px;
+        bottom: -15px;
       }
 
       .left {
@@ -545,7 +545,7 @@ const Todos = styled.div<darkProps>`
           width: 100%;
           font-size: 15px;
           font-weight: bold;
-          line-height: 25px;
+          line-height: 20px;
         }
 
         .check {

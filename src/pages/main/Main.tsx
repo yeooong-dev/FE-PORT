@@ -2,12 +2,12 @@ import { Link } from "react-router-dom";
 import {
   CheckDiv,
   Wrap,
+  WrapBottom,
   WrapCalendar,
   WrapEvent,
-  WrapLeft,
-  WrapRight,
   WrapSocket,
   WrapTodo,
+  WrapTop,
 } from "./StMain";
 import { useEffect, useState } from "react";
 import { todoGet, todoToggleCheck } from "../../api/todo";
@@ -15,6 +15,7 @@ import { getAllFamilyEvents } from "../../api/familyEvents";
 import { BsCheckLg } from "react-icons/bs";
 import { useDarkMode } from "../../components/darkmode/DarkModeContext";
 import CalendarView from "../calendar/CalendarView";
+import Chat from "../chat/Chat";
 
 export interface TodoItem {
   id: number;
@@ -35,7 +36,6 @@ export interface FamilyEventItem {
 function Main() {
   const [todos, setTodos] = useState<TodoItem[]>([]);
   const [events, setEvents] = useState<FamilyEventItem[]>([]);
-  const [showCalendarList, setShowCalendarList] = useState(false);
   const { darkMode } = useDarkMode();
 
   const fetchTodos = async () => {
@@ -91,12 +91,12 @@ function Main() {
 
   return (
     <Wrap>
-      <WrapLeft>
+      <WrapTop>
         <WrapTodo darkMode={darkMode}>
-          <Link to='/todo'>
-            <h1>오늘의 할 일 &nbsp; {">"}</h1>
-          </Link>
           <div className='todolist'>
+            <Link to='/todo'>
+              <h1>오늘의 할 일 &nbsp; {">"}</h1>
+            </Link>
             {todos.map((todo) => (
               <div key={todo.todo_id} className='todoItem'>
                 <CheckDiv
@@ -118,12 +118,19 @@ function Main() {
             ))}
           </div>
         </WrapTodo>
+        <WrapCalendar darkMode={darkMode}>
+          <div>
+            <CalendarView showOnlyCalendar={true} />
+          </div>
+        </WrapCalendar>
+      </WrapTop>
 
+      <WrapBottom>
         <WrapEvent darkMode={darkMode}>
-          <Link to='/event'>
-            <h1>경조사 기록 내역 &nbsp; {">"}</h1>
-          </Link>
           <div className='event'>
+            <Link to='/event'>
+              <h1>경조사 기록 내역 &nbsp; {">"}</h1>
+            </Link>
             <div className='eventHeaders'>
               <span className='who'>경조사 대상</span>
               <span className='date'>경조사 날짜</span>
@@ -140,20 +147,13 @@ function Main() {
             ))}
           </div>
         </WrapEvent>
-      </WrapLeft>
-
-      <WrapRight>
-        <WrapCalendar darkMode={darkMode}>
-          <Link to='/calendar'>
-            <h1>나의 일정 &nbsp; {">"}</h1>
-          </Link>
-          {showCalendarList && <CalendarView />}
-        </WrapCalendar>
-
         <WrapSocket darkMode={darkMode}>
-          <h1>대화하기 &nbsp; {">"}</h1>
+          <Link to='/chat'>
+            <h1>대화하기 &nbsp; {">"}</h1>
+          </Link>
+          <Chat showOnlyChat={true} />
         </WrapSocket>
-      </WrapRight>
+      </WrapBottom>
     </Wrap>
   );
 }

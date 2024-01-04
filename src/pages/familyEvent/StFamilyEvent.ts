@@ -13,7 +13,8 @@ export const Title = styled.h1<darkProps>`
 
 export const FamilyEventWrap = styled.div<darkProps>`
   width: 90%;
-  height: 700px;
+  height: auto;
+  max-height: 500px;
   display: flex;
   align-items: center;
   flex-direction: column;
@@ -21,23 +22,22 @@ export const FamilyEventWrap = styled.div<darkProps>`
   border-radius: 5px;
 
   @media (max-width: 400px) {
-    height: 450px;
+    max-height: 400px;
   }
 `;
 
 export const InputBox = styled.div`
   width: 80%;
   max-width: 800px;
-  height: 80%;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  margin-bottom: 30px;
-  margin-top: 30px;
+  margin-bottom: 120px;
 
-  @media (max-width: 550px) {
-    margin-top: 0px;
+  @media (max-width: 400px) {
+    margin-bottom: 30px;
+    height: 300px;
   }
 `;
 

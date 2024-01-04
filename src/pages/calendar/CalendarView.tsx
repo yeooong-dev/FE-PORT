@@ -32,7 +32,7 @@ interface FormData {
   title: string;
 }
 
-function CalendarView(props: any) {
+function CalendarView({ showOnlyCalendar = false }) {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [mark, setMark] = useState<string[]>([]);
   const [edit, setEdit] = useState<number | null>(null);
@@ -317,6 +317,241 @@ function CalendarView(props: any) {
     };
   }, []);
 
+  const truncateTitle = (title: any) => {
+    const maxLength = 5;
+    return title.length > maxLength
+      ? title.substring(0, maxLength) + "..."
+      : title;
+  };
+
+  if (showOnlyCalendar) {
+    return (
+      <Box>
+        <div className='scroll'>
+          <CalendarWrap darkMode={darkMode}>
+            {alertMessage && (
+              <CustomAlert
+                message={alertMessage}
+                onClose={() => setAlertMessage(null)}
+              />
+            )}
+            <CustomNavi darkMode={darkMode}>
+              <button
+                onClick={() => {
+                  setCurrentMonth(
+                    (prevMonth) =>
+                      new Date(
+                        prevMonth.getFullYear(),
+                        prevMonth.getMonth() - 1,
+                        1
+                      )
+                  );
+                }}
+              >
+                &lt;
+              </button>
+              <span onClick={openYearAndMonthSelection}>
+                {currentMonth.getFullYear()}
+                {"."}
+                {currentMonth.toLocaleString("ko", { month: "long" })}
+              </span>
+              <button
+                onClick={() => {
+                  setCurrentMonth(
+                    (prevMonth) =>
+                      new Date(
+                        prevMonth.getFullYear(),
+                        prevMonth.getMonth() + 1,
+                        1
+                      )
+                  );
+                }}
+              >
+                &gt;
+              </button>
+            </CustomNavi>
+
+            {yearModalOpen && (
+              <Modal
+                isOpen={yearModalOpen}
+                onRequestClose={() => setYearModalOpen(false)}
+                closeTimeoutMS={200}
+                style={{
+                  overlay: {
+                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    zIndex: "999",
+                  },
+                  content: {
+                    width: "70%",
+                    maxWidth: "500px",
+                    height: "40vh",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    backgroundColor: darkMode ? "#333" : "#f6f6f6",
+                    border: "none",
+                    borderRadius: "20px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    flexDirection: "row",
+                    maxWidth: "100%",
+                    height: "90%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {Array.from(
+                    { length: 12 },
+                    (_, i) => currentMonth.getFullYear() - 5 + i
+                  ).map((year) => (
+                    <button
+                      key={year}
+                      onClick={() => {
+                        selectYear(year);
+                        setMonthModalOpen(true);
+                        setYearModalOpen(false);
+                      }}
+                      style={{
+                        display: "flex",
+                        fontSize: "1.5rem",
+                        whiteSpace: "nowrap",
+                        width: "30%",
+                        background: "none",
+                        cursor: "pointer",
+                        color: darkMode ? "white" : "#67686b",
+                        transition: "color 0.3s ease",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      {year}
+                    </button>
+                  ))}
+                </div>
+              </Modal>
+            )}
+
+            {monthModalOpen && (
+              <Modal
+                isOpen={monthModalOpen}
+                onRequestClose={() => setMonthModalOpen(false)}
+                style={{
+                  overlay: {
+                    backgroundColor: "rgba(0, 0, 0, 0.5)",
+                    zIndex: "999",
+                  },
+                  content: {
+                    width: "70%",
+                    maxWidth: "500px",
+                    height: "40vh",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    backgroundColor: darkMode ? "#333" : "#f6f6f6",
+                    border: "none",
+                    borderRadius: "20px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  },
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    flexDirection: "row",
+                    maxWidth: "100%",
+                    height: "90%",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+                    <button
+                      key={month}
+                      onClick={() => selectMonthAndCloseModal(month - 1)}
+                      style={{
+                        display: "flex",
+                        fontSize: "1.5rem",
+                        whiteSpace: "nowrap",
+                        width: "30%",
+                        background: "none",
+                        cursor: "pointer",
+                        color: darkMode ? "white" : "#67686b",
+                        transition: "color 0.3s ease",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      {month}월
+                    </button>
+                  ))}
+                </div>
+              </Modal>
+            )}
+
+            <StyledCalendar
+              darkMode={darkMode}
+              tileSize={tileSize}
+              ref={calendarRef}
+            >
+              <Calendar
+                key={currentMonth.toISOString()}
+                onClickDay={(value: Date) => handleDateClick(value)}
+                value={currentMonth}
+                onChange={(
+                  value: any,
+                  event: React.MouseEvent<HTMLButtonElement>
+                ) => {
+                  if (value instanceof Date) {
+                    setCurrentMonth(value);
+                  } else if (Array.isArray(value) && value[0] instanceof Date) {
+                    setCurrentMonth(value[0]);
+                  }
+                }}
+                view={view}
+              />
+              {hoveredSchedule && (
+                <Modal
+                  isOpen={!!hoveredSchedule}
+                  onRequestClose={() => setHoveredSchedule(null)}
+                  style={{
+                    content: {
+                      top: "50%",
+                      left: "50%",
+                      right: "auto",
+                      bottom: "auto",
+                      marginRight: "-50%",
+                      transform: "translate(-50%, -50%)",
+                      width: "200px",
+                      height: "auto",
+                      padding: "10px",
+                    },
+                  }}
+                >
+                  <div style={{ textAlign: "center" }}>
+                    {hoveredSchedule.title}
+                  </div>
+                </Modal>
+              )}
+            </StyledCalendar>
+          </CalendarWrap>
+        </div>
+      </Box>
+    );
+  }
+
   return (
     <Box>
       <div className='scroll'>
@@ -529,7 +764,7 @@ function CalendarView(props: any) {
                         {scheduleStartingToday && (
                           <>
                             <div className='tooltip'>
-                              {scheduleStartingToday.title}
+                              {truncateTitle(scheduleStartingToday.title)}
                             </div>
                             <div className='start'></div>
                           </>
@@ -906,6 +1141,7 @@ function CalendarView(props: any) {
     </Box>
   );
 }
+
 export default CalendarView;
 
 interface StyledCalendarProps extends darkProps {
@@ -992,12 +1228,12 @@ const CustomNavi = styled.div<darkProps>`
   height: 50px;
   font-weight: bold;
   color: ${({ darkMode }) => (darkMode ? "#fff" : "#2e2e2e")};
-  padding: 20px;
+  padding: 0px 10px 20px 10px;
 
   span {
     cursor: pointer;
     font-family: var(--font-title);
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
   button {
@@ -1005,7 +1241,7 @@ const CustomNavi = styled.div<darkProps>`
     height: 40px;
     font-size: 1.5rem;
     background: none;
-    margin: -3px 20px;
+    margin: -7px 20px;
     color: #a3a3a3;
     cursor: pointer;
     font-family: var(--font-title);
@@ -1096,19 +1332,13 @@ const StyledCalendar = styled.div<StyledCalendarProps>`
     position: relative;
     width: 120px;
     height: ${(props) => props.tileSize}px;
-    min-height: ${(props) => props.tileSize}px;
+    min-height: 38px;
     cursor: pointer;
     background: none;
     font-size: 1.1rem;
     font-weight: bold;
     border-bottom: 1px solid #e3e3e3;
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
-  }
-
-  .react-calendar__month-view__weekdays {
-    overflow: hidden;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
   }
 
   .react-calendar__month-view__days__day {
@@ -1152,7 +1382,7 @@ const StyledCalendar = styled.div<StyledCalendarProps>`
     content: "";
     position: absolute;
     top: 3px;
-    right: 3px;
+    right: 5px;
     width: 40px;
     height: 40px;
     background-color: #3c57b3;
