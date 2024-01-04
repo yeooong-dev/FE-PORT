@@ -17,7 +17,7 @@ import { LuListTodo, LuUser } from "react-icons/lu";
 import { RiCalendarCheckFill } from "react-icons/ri";
 import { BiMessageDetail } from "react-icons/bi";
 import { TbReportMoney } from "react-icons/tb";
-import useIsLogin from "../../hook/UseIsLogin";
+import UseIsLogin from "../../hook/UseIsLogin";
 import UseLogout from "../../hook/UseLogout";
 import { useEffect, useState } from "react";
 import { Logo } from "../wrapper/StWrapper";
@@ -34,7 +34,7 @@ interface NaviBarProps {
 }
 
 function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
-  const [isLogin] = useIsLogin();
+  const [isLogin] = UseIsLogin();
   const { logout } = UseLogout();
   const [activeMenu, setActiveMenu] = useState("main");
   const [width, setWidth] = useState("180px");
