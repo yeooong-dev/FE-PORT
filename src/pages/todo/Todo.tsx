@@ -29,7 +29,6 @@ function Todo() {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const { darkMode } = useDarkMode();
 
-  // 날짜,요일
   const currentDate = new Date();
   const dayNames = [
     "Sunday",
