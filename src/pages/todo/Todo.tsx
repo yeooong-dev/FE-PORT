@@ -41,7 +41,6 @@ function Todo() {
   ];
   const dayName = dayNames[currentDate.getDay()];
 
-  // 모달
   const openModal = () => {
     setIsModalOpen(true);
   };
