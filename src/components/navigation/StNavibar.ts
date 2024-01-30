@@ -20,7 +20,7 @@ export const Wrap = styled.div<WrapProps>`
   transition: width 0.5s ease, margin-right 0.5s ease;
   height: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   flex-direction: column;
   background: ${({ darkMode }) => (darkMode ? "#323336" : "#f4f5fb")};
@@ -28,9 +28,15 @@ export const Wrap = styled.div<WrapProps>`
     isSidebarOpen ? "0px" : "calc(100% - 80px)"};
   text-align: center;
   z-index: 99;
+  padding-top: 100px;
 
   @media (max-width: 550px) {
     display: ${({ isSidebarOpen }) => (isSidebarOpen ? "flex" : "none")};
+    padding-top: 50px;
+  }
+
+  @media (max-width: 320px) {
+    padding-top: 30px;
   }
 `;
 
@@ -51,6 +57,17 @@ export const ProfileImg = styled.img`
 export const Ment = styled.p<MentProps>`
   margin-bottom: 20px;
   font-size: 1.3rem;
+  color: ${({ darkMode }) => (darkMode ? "#fff" : "#293642")};
+
+  @media (max-width: 550px) {
+    margin-bottom: 0;
+    font-size: 18px;
+  }
+`;
+
+export const Code = styled.p<MentProps>`
+  margin-bottom: 20px;
+  font-size: 1rem;
   color: ${({ darkMode }) => (darkMode ? "#fff" : "#293642")};
 
   @media (max-width: 550px) {
@@ -349,13 +366,14 @@ export const Mypage = styled.button<MainProps>`
 
 export const Log = styled.li<MentProps>`
   width: ${({ isSidebarOpen }) => (isSidebarOpen ? "100%" : "55px")};
+  height: 100px;
   cursor: pointer;
   font-size: 1rem;
   color: ${({ darkMode }) => (darkMode ? "#8f8f8f" : "#858585")};
   text-align: center;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
 
   &:hover {
     opacity: 50%;
@@ -364,5 +382,15 @@ export const Log = styled.li<MentProps>`
 
   @media (max-width: 550px) {
     font-size: 14px;
+    padding-top: 0px;
+  }
+
+  @media (max-width: 380px) {
+    height: 50px;
+  }
+
+  @media (max-width: 320px) {
+    height: 50px;
+    align-items: flex-start;
   }
 `;

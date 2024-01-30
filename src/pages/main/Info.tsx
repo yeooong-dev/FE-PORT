@@ -74,14 +74,14 @@ function Info() {
               transition={{ duration: 1 }}
             />
             <p>
-              대화방을 자유롭게 개설하여
+              가입자들과 소통할 수 있는
               <br />
-              소통할 수 있는 채팅방!
+              채팅방!
             </p>
           </Info2>
           <Info3 ref={ref3}>
             <p>
-              종종 까먹는 각종 경조사! <br />
+              자주 까먹는 각종 경조사! <br />
               까먹지 말고 한 눈에 정리하자!
             </p>
             <motion.div

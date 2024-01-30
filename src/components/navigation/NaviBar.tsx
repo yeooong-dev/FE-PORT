@@ -11,6 +11,7 @@ import {
   NavBtn,
   Wrap,
   Log,
+  Code,
 } from "./StNavibar";
 import { FiHome } from "react-icons/fi";
 import { LuListTodo, LuUser } from "react-icons/lu";
@@ -27,13 +28,18 @@ import UseUser from "../../hook/UseUser";
 import { imgGet } from "../../api/mypage";
 import { useDarkMode } from "../darkmode/DarkModeContext";
 import { ImExit } from "react-icons/im";
+import { LuUserCheck2 } from "react-icons/lu";
+import { PiBuildingsFill } from "react-icons/pi";
+import { PiAddressBook } from "react-icons/pi";
+import CustomAlert from "../../components/alert/CustomAlert";
 
 interface NaviBarProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  mode: "FaPeopleGroup" | "IoMdPerson";
 }
 
-function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
+function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
   const [isLogin] = UseIsLogin();
   const { logout } = UseLogout();
   const [activeMenu, setActiveMenu] = useState("main");
@@ -45,6 +51,9 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
   const { user } = UseUser();
   const [displayName, setDisplayName] = useState("");
   const { darkMode } = useDarkMode();
+  // 커스텀 알럿
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertType, setAlertType] = useState<"error" | "success">("error");
 
   useEffect(() => {
     localStorage.setItem("isSidebarOpen", isSidebarOpen.toString());
@@ -62,12 +71,22 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
   }, [isSidebarOpen]);
 
   useEffect(() => {
+    if (user) {
+      const nameToDisplay = user.company_name ? user.company_name : user.name;
+      setDisplayName(nameToDisplay);
+    } else {
+      setDisplayName("");
+    }
+  }, [user]);
+
+  useEffect(() => {
     if (isLogin && user?.id) {
       imgGet(user.id)
         .then((response) => {
           setProfileImageUrl(response.data.imageUrl);
           updateUserContext({
             name: user.name,
+            company_name: user.company_name || "",
             profileImage: response.data.imageUrl,
           });
         })
@@ -79,11 +98,6 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
       setProfileImageUrl("/profile.png");
     }
   }, [isLogin, user?.id, updateUserContext]);
-
-  useEffect(() => {
-    setDisplayName(state.name);
-    setProfileImageUrl(state.profileImage || "/profile.png");
-  }, [state]);
 
   useEffect(() => {
     switch (location.pathname) {
@@ -99,11 +113,20 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
       case "/event":
         setActiveMenu("event");
         break;
+      case "/vac":
+        setActiveMenu("vac");
+        break;
       case "/chat":
         setActiveMenu("chat");
         break;
       case "/mypage":
         setActiveMenu("mypage");
+        break;
+      case "/company":
+        setActiveMenu("company");
+        break;
+      case "/chart":
+        setActiveMenu("chart");
         break;
       default:
         setActiveMenu("main");
@@ -140,8 +163,30 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
     };
   }, []);
 
+  useEffect(() => {
+    setDisplayName(state.name || state.company_name);
+    setProfileImageUrl(state.profileImage || "/profile.png");
+  }, [state]);
+
+  const handleCompanyPageClick = () => {
+    if (!user?.company_code) {
+      setAlertType("error");
+      setAlertMessage("접근 권한이 없습니다.");
+    }
+  };
+
   return (
     <Wrap isSidebarOpen={isSidebarOpen} darkMode={darkMode}>
+      {alertMessage && (
+        <CustomAlert
+          message={alertMessage}
+          type={alertType}
+          onClose={() => {
+            setAlertMessage(null);
+            setAlertType("error");
+          }}
+        />
+      )}
       {isSidebarOpen && (
         <>
           <Link to='/main' onClick={refreshPage}>
@@ -157,81 +202,152 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen }: NaviBarProps) {
           <Ment darkMode={darkMode} isSidebarOpen={isSidebarOpen}>
             {displayName}
           </Ment>
+
+          {user?.company_code && (
+            <Code darkMode={darkMode} isSidebarOpen={isSidebarOpen}>
+              기업코드 - {user.company_code}
+            </Code>
+          )}
         </>
       )}
 
       <NavBtn>
-        <Link to='/main' onClick={() => setActiveMenu("main")}>
-          <Main $active={activeMenu === "main"} isSidebarOpen={isSidebarOpen}>
-            <div>
-              <FiHome size='25' />
-              {isSidebarOpen && <span>&nbsp; 홈</span>}
-            </div>
-          </Main>
-        </Link>
+        {mode === "IoMdPerson" && (
+          <>
+            <Link to='/main' onClick={() => setActiveMenu("main")}>
+              <Main
+                $active={activeMenu === "main"}
+                isSidebarOpen={isSidebarOpen}
+              >
+                <div>
+                  <FiHome size='25' />
+                  {isSidebarOpen && <span>&nbsp; 홈</span>}
+                </div>
+              </Main>
+            </Link>
 
-        <Link to='/todo' onClick={() => setActiveMenu("todo")}>
-          <Todo $active={activeMenu === "todo"} isSidebarOpen={isSidebarOpen}>
-            <div>
-              <LuListTodo size='25' />
-              {isSidebarOpen && <span>&nbsp; 오늘의 할 일</span>}
-            </div>
-          </Todo>
-        </Link>
+            <Link to='/todo' onClick={() => setActiveMenu("todo")}>
+              <Todo
+                $active={activeMenu === "todo"}
+                isSidebarOpen={isSidebarOpen}
+              >
+                <div>
+                  <LuListTodo size='25' />
+                  {isSidebarOpen && <span>&nbsp; 오늘의 할 일</span>}
+                </div>
+              </Todo>
+            </Link>
 
-        <Link to='/calendar' onClick={() => setActiveMenu("calendar")}>
-          <Cal
-            $active={activeMenu === "calendar"}
-            isSidebarOpen={isSidebarOpen}
-          >
-            <div>
-              <RiCalendarCheckFill size='25' />
-              {isSidebarOpen && <span>&nbsp; 나의 캘린더</span>}
-            </div>
-          </Cal>
-        </Link>
+            <Link to='/calendar' onClick={() => setActiveMenu("calendar")}>
+              <Cal
+                $active={activeMenu === "calendar"}
+                isSidebarOpen={isSidebarOpen}
+              >
+                <div>
+                  <RiCalendarCheckFill size='25' />
+                  {isSidebarOpen && <span>&nbsp; 나의 캘린더</span>}
+                </div>
+              </Cal>
+            </Link>
 
-        <Link
-          to='/event'
-          onClick={() => setActiveMenu("event")}
-          style={{ width }}
-        >
-          <Fam $active={activeMenu === "event"} isSidebarOpen={isSidebarOpen}>
-            <div>
-              <TbReportMoney size='25' />
-              {isSidebarOpen && <span>&nbsp; 경조사 기록</span>}
-            </div>
-          </Fam>
-        </Link>
+            <Link
+              to='/event'
+              onClick={() => setActiveMenu("event")}
+              style={{ width }}
+            >
+              <Fam
+                $active={activeMenu === "event"}
+                isSidebarOpen={isSidebarOpen}
+              >
+                <div>
+                  <TbReportMoney size='25' />
+                  {isSidebarOpen && <span>&nbsp; 경조사 기록</span>}
+                </div>
+              </Fam>
+            </Link>
 
-        <Link
-          to='/chat'
-          onClick={() => setActiveMenu("chat")}
-          style={{ width }}
-        >
-          <Talk $active={activeMenu === "chat"} isSidebarOpen={isSidebarOpen}>
-            <div>
-              <BiMessageDetail size='25' />
-              {isSidebarOpen && <span>&nbsp; 대화하기</span>}
-            </div>
-          </Talk>
-        </Link>
+            <Link
+              to='/mypage'
+              onClick={() => setActiveMenu("mypage")}
+              style={{ width }}
+            >
+              <Mypage
+                $active={activeMenu === "mypage"}
+                isSidebarOpen={isSidebarOpen}
+              >
+                <div>
+                  <LuUser size='25' />
+                  {isSidebarOpen && <span>&nbsp; 마이페이지</span>}
+                </div>
+              </Mypage>
+            </Link>
+          </>
+        )}
 
-        <Link
-          to='/mypage'
-          onClick={() => setActiveMenu("mypage")}
-          style={{ width }}
-        >
-          <Mypage
-            $active={activeMenu === "mypage"}
-            isSidebarOpen={isSidebarOpen}
-          >
-            <div>
-              <LuUser size='25' />
-              {isSidebarOpen && <span>&nbsp; 마이페이지</span>}
-            </div>
-          </Mypage>
-        </Link>
+        {mode === "FaPeopleGroup" && (
+          <>
+            <Link
+              to='/chat'
+              onClick={() => setActiveMenu("chat")}
+              style={{ width }}
+            >
+              <Talk
+                $active={activeMenu === "chat"}
+                isSidebarOpen={isSidebarOpen}
+              >
+                <div>
+                  <BiMessageDetail size='25' />
+                  {isSidebarOpen && <span>&nbsp; 대화하기</span>}
+                </div>
+              </Talk>
+            </Link>
+
+            <Link
+              to='/chart'
+              onClick={() => setActiveMenu("chart")}
+              style={{ width }}
+            >
+              <Talk
+                $active={activeMenu === "chart"}
+                isSidebarOpen={isSidebarOpen}
+              >
+                <div>
+                  <PiAddressBook size='25' />
+                  {isSidebarOpen && <span>&nbsp; 조직도</span>}
+                </div>
+              </Talk>
+            </Link>
+
+            <Link
+              to='/vac'
+              onClick={() => setActiveMenu("vac")}
+              style={{ width }}
+            >
+              <Fam $active={activeMenu === "vac"} isSidebarOpen={isSidebarOpen}>
+                <div>
+                  <LuUserCheck2 size='25' />
+                  {isSidebarOpen && <span>&nbsp; 연차 신청</span>}
+                </div>
+              </Fam>
+            </Link>
+
+            <Link
+              to={user?.company_code ? "/company" : "#"}
+              onClick={handleCompanyPageClick}
+              style={{ width }}
+            >
+              <Talk
+                $active={activeMenu === "company"}
+                isSidebarOpen={isSidebarOpen}
+              >
+                <div>
+                  <PiBuildingsFill size='25' />
+                  {isSidebarOpen && <span>&nbsp; 기업페이지</span>}
+                </div>
+              </Talk>
+            </Link>
+          </>
+        )}
 
         {isLogin ? (
           <>

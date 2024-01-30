@@ -3,9 +3,12 @@ import Cookies from "universal-cookie";
 import instance from "../api/instance";
 
 interface User {
-  name: string;
   id: string;
+  name: string;
+  email?: string;
   profileImage: string | null;
+  company_name?: string;
+  company_code?: string | null;
 }
 
 const UseUser = () => {
@@ -21,7 +24,10 @@ const UseUser = () => {
       setUser({
         id: response.data.id,
         name: response.data.name,
+        email: response.data.email,
         profileImage: response.data.profileImage,
+        company_name: response.data.company_name,
+        company_code: response.data.company_code,
       });
     } catch (error) {
       console.error("Failed to fetch user info", error);

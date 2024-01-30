@@ -48,13 +48,15 @@ export const updateName = async (
   userId: string,
   newName: string,
   email: string,
-  password: string
+  password: string,
+  isCompany: boolean
 ) => {
   try {
     const response = await instance.put(`/auth/profile/name/${userId}`, {
       newName,
       email,
       password,
+      isCompany,
     });
     return response.data;
   } catch (error) {

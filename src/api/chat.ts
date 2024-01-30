@@ -1,15 +1,5 @@
 import instance from "./instance";
 
-interface Message {
-  id: number;
-  content: string;
-  user: {
-    id: number;
-    name: string;
-    profile_image: string | null;
-  };
-}
-
 export const getInteractedUsers = async () => {
   try {
     const response = await instance.get("/chat/interactedUsers");
@@ -86,6 +76,11 @@ export const getRoom = async (roomId: number) => {
 };
 
 export const joinRoom = async (roomId: number, userId: number) => {
+  if (!userId) {
+    console.error("User ID is not available.");
+    return;
+  }
+
   try {
     const response = await instance.post(`/chat/room/${roomId}/join`, {
       userId,
@@ -97,32 +92,11 @@ export const joinRoom = async (roomId: number, userId: number) => {
   }
 };
 
-export const sendChatMessage = async (
-  roomId: number,
-  message: string
-): Promise<Message | null> => {
-  try {
-    const response = await instance.post(`/chat/room/${roomId}/message`, {
-      message,
-    });
-    if (response.data) {
-      return {
-        id: response.data.id,
-        content: response.data.content,
-        user: response.data.user,
-      };
-    } else {
-      return null;
-    }
-  } catch (error) {
-    console.error("Error in postMessage:", error);
-    return null;
-  }
-};
-
 export const removeUserFromRoom = async (roomId: number, userId: number) => {
   try {
-    const response = await instance.put(`/chat/room/${roomId}/user/${userId}`);
+    const response = await instance.delete(
+      `/chat/room/${roomId}/user/${userId}`
+    );
     return response.data;
   } catch (error) {
     console.error(error);

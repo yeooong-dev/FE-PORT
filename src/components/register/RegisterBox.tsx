@@ -11,12 +11,16 @@ import {
   PwInput,
   RegisterBtn,
 } from "./StRegister";
-import UseInput from "../../hook/UseInput"
-import { register, usercheckEmail } from "../../api/auth";
+import UseInput from "../../hook/UseInput";
+import { register, registerCompany, usercheckEmail } from "../../api/auth";
 import { useState } from "react";
 import CustomAlert from "../alert/CustomAlert";
 
 function Register() {
+  const [isCompany, setIsCompany] = useState<boolean>(false);
+  const [tabBackgroundColor, setTabBackgroundColor] = useState("#3c57b3");
+  const [tabTextColor, setTabTextColor] = useState("white");
+
   const [emailValue, setEmailValue] = UseInput();
   const [nameValue, setNameValue] = UseInput();
   const [pwValue, setPwValue] = UseInput();
@@ -40,6 +44,19 @@ function Register() {
   const VALID_PW_CONFIRM_MESSAGE = "비밀번호와 동일하게 입력하셨습니다.";
 
   const navigate = useNavigate();
+
+  // 회원가입 탭
+  const handleNormalTabClick = () => {
+    setIsCompany(false);
+    setTabBackgroundColor("#3c57b3");
+    setTabTextColor("white");
+  };
+
+  const handleCompanyTabClick = () => {
+    setIsCompany(true);
+    setTabBackgroundColor("#3c57b3");
+    setTabTextColor("white");
+  };
 
   // email 형식
   const emailValidation = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,29 +159,51 @@ function Register() {
 
     if (!isEmailChecked) {
       setAlertType("error");
-      setAlertMessage("이메일 중복 확인 바랍니다");
+      setAlertMessage("이메일 중복 확인 바랍니다.");
       return;
     }
 
-    // 회원가입 요청
-    register({
-      email: emailValue,
-      name: nameValue,
-      password: pwValue,
-      passwordConfirm: pwconfirmValue,
-    })
-      .then((response) => {
-        setAlertType("success");
-        setAlertMessage("회원가입이 완료되었습니다.");
-
-        setTimeout(() => {
-          navigate("/login");
-        }, 1000);
+    if (isCompany) {
+      // 기업 회원가입 로직
+      registerCompany({
+        email: emailValue,
+        company_name: nameValue,
+        password: pwValue,
+        passwordConfirm: pwconfirmValue,
       })
-      .catch((error) => {
-        setAlertType("error");
-        setAlertMessage("회원가입에 실패하였습니다. 다시 시도해 주세요.");
-      });
+        .then((response) => {
+          setAlertType("success");
+          setAlertMessage("회원가입이 완료되었습니다.");
+
+          setTimeout(() => {
+            navigate("/login");
+          }, 1000);
+        })
+        .catch((error: any) => {
+          setAlertType("error");
+          setAlertMessage("회원가입에 실패하였습니다. 다시 시도해 주세요.");
+        });
+    } else {
+      // 일반 회원가입 로직
+      register({
+        email: emailValue,
+        name: nameValue,
+        password: pwValue,
+        passwordConfirm: pwconfirmValue,
+      })
+        .then((response) => {
+          setAlertType("success");
+          setAlertMessage("회원가입이 완료되었습니다.");
+
+          setTimeout(() => {
+            navigate("/login");
+          }, 1000);
+        })
+        .catch((error) => {
+          setAlertType("error");
+          setAlertMessage("회원가입에 실패하였습니다. 다시 시도해 주세요.");
+        });
+    }
   };
 
   return (
@@ -184,6 +223,26 @@ function Register() {
           <Link to='/'>
             <Logo>PORT</Logo>
           </Link>
+          <div className='or'>
+            <button
+              onClick={handleNormalTabClick}
+              style={{
+                backgroundColor: isCompany ? "#f2f2f2" : tabBackgroundColor,
+                color: isCompany ? "black" : tabTextColor,
+              }}
+            >
+              일반 회원가입
+            </button>
+            <button
+              onClick={handleCompanyTabClick}
+              style={{
+                backgroundColor: isCompany ? tabBackgroundColor : "#f2f2f2",
+                color: isCompany ? tabTextColor : "black",
+              }}
+            >
+              기업 회원가입
+            </button>
+          </div>
           <EmailBox>
             <EmailInput
               type='text'
@@ -214,7 +273,9 @@ function Register() {
               setNameValue(e);
               nameValidation(e);
             }}
-            placeholder='성함을 입력해주세요.'
+            placeholder={
+              isCompany ? "기업명을 입력해주세요." : "성함을 입력해주세요."
+            }
           />
           <div
             style={{

@@ -8,12 +8,13 @@ import Todo from "../pages/todo/Todo";
 import Mypage from "../pages/mypage/Mypage";
 import FamilyEvent from "../pages/familyEvent/FamilyEvent";
 import Vacation from "../pages/vacation/Vacation";
-import Dm from "../pages/dm/Dm";
 import Chat from "../pages/chat/Chat";
 import Calendar from "../pages/calendar/CalendarView";
 import UseIsLogin from "../hook/UseIsLogin";
 import Wrapper from "../components/wrapper/Wrapper";
 import SearchResultsPage from "../components/search/SearchResultsPage";
+import CompanyPage from "../pages/company/CompanyPage";
+import Chart from "../pages/chart/Chart";
 
 interface ProtectedRouteProps {
   element: ReactElement;
@@ -58,12 +59,20 @@ function Router() {
             path='event'
             element={<ProtectedRoute element={<FamilyEvent />} />}
           />
+          <Route path='chat' element={<ProtectedRoute element={<Chat />} />} />
+          <Route
+            path='chart'
+            element={<ProtectedRoute element={<Chart />} />}
+          />
           <Route
             path='vac'
             element={<ProtectedRoute element={<Vacation />} />}
           />
-          <Route path='chat' element={<ProtectedRoute element={<Chat />} />} />
-          <Route path='dm' element={<ProtectedRoute element={<Dm />} />} />
+
+          <Route
+            path='company'
+            element={<ProtectedRoute element={<CompanyPage />} />}
+          />
         </Route>
       </Routes>
     </BrowserRouter>

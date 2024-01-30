@@ -6,6 +6,10 @@ import { useEffect, useState } from "react";
 import { useDarkMode } from "../darkmode/DarkModeContext";
 
 function Wrapper() {
+  const storedMode = localStorage.getItem("mode");
+  const initialMode =
+    storedMode === "IoMdPerson" ? "IoMdPerson" : "FaPeopleGroup";
+  const [mode, setMode] = useState<"FaPeopleGroup" | "IoMdPerson">(initialMode);
   const { darkMode } = useDarkMode();
   const [searchInputVisible, setSearchInputVisible] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
@@ -17,12 +21,17 @@ function Wrapper() {
     localStorage.setItem("isSidebarOpen", isSidebarOpen.toString());
   }, [isSidebarOpen]);
 
+  useEffect(() => {
+    localStorage.setItem("mode", mode);
+  }, [mode]);
+
   return (
     <Wrap darkMode={darkMode} searchInputVisible={searchInputVisible}>
       <Left>
         <NaviBar
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
+          mode={mode}
         />
       </Left>
 
@@ -30,6 +39,8 @@ function Wrapper() {
         <SearchBar
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
+          mode={mode}
+          setMode={setMode}
         />
         <Contents darkMode={darkMode}>
           <Outlet />

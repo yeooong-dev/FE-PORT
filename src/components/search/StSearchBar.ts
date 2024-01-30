@@ -46,6 +46,36 @@ export const SearchWrap = styled.div<SearchInputProps>`
   }
 `;
 
+export const Mode = styled.li<SearchInputProps>`
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 60px;
+  font-size: 1.2rem;
+  color: ${({ darkMode }) => (darkMode ? "#fff" : "#293642")};
+  font-weight: 900;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  left: 55px;
+  transform: translate(0, -50%);
+  border: 1.5px solid #3c57b3;
+  border-radius: 10px;
+
+  &:hover {
+    opacity: 50%;
+    transition: 0.3s;
+  }
+
+  @media (max-width: 550px) {
+    width: 30px;
+    height: 30px;
+    left: 45px;
+  }
+`;
+
 export const Dark = styled.li<SearchInputProps>`
   width: 40px;
   height: 40px;
@@ -59,7 +89,7 @@ export const Dark = styled.li<SearchInputProps>`
   cursor: pointer;
   position: absolute;
   top: 50%;
-  left: 60px;
+  left: 120px;
   transform: translate(0, -50%);
   border: 1.5px solid #e8d1b0;
   border-radius: 10px;
@@ -72,11 +102,7 @@ export const Dark = styled.li<SearchInputProps>`
   @media (max-width: 550px) {
     width: 30px;
     height: 30px;
-    left: 50px;
-  }
-
-  @media (max-width: 320px) {
-    left: 46px;
+    left: 95px;
   }
 `;
 

@@ -3,6 +3,7 @@ import { useSearchResults } from "./SearchResultsContext";
 import {
   Action,
   Dark,
+  Mode,
   Search,
   SearchBtn,
   SearchInput,
@@ -15,18 +16,37 @@ import { useDarkMode } from "../darkmode/DarkModeContext";
 import { useNavigate } from "react-router-dom";
 import { BsSunFill, BsFillMoonFill } from "react-icons/bs";
 import { HiOutlineMenuAlt2, HiOutlineMenuAlt3 } from "react-icons/hi";
+import { FaPeopleGroup } from "react-icons/fa6";
+import { IoMdPerson } from "react-icons/io";
 
 interface SearchBarProps {
   setIsSidebarOpen: (isOpen: boolean) => void;
   isSidebarOpen: boolean;
+  mode: "FaPeopleGroup" | "IoMdPerson";
+  setMode: React.Dispatch<React.SetStateAction<"FaPeopleGroup" | "IoMdPerson">>;
 }
 
-function SearchBar({ setIsSidebarOpen, isSidebarOpen }: SearchBarProps) {
+function SearchBar({
+  setIsSidebarOpen,
+  isSidebarOpen,
+  mode,
+  setMode,
+}: SearchBarProps) {
   const { setSearchResults, setLastSearchTerm } = useSearchResults();
   const [searchTerm, setSearchTerm] = useState("");
   const [alertMessage, setAlertMessage] = useState("");
   const [searchInputVisible, setSearchInputVisible] = useState(false);
   const [isSearchAttempted, setIsSearchAttempted] = useState(false);
+
+  const changeMode = () => {
+    if (mode === "FaPeopleGroup") {
+      setMode("IoMdPerson");
+      navigate("/main");
+    } else {
+      setMode("FaPeopleGroup");
+      navigate("/vac");
+    }
+  };
 
   const navigate = useNavigate();
   const { darkMode, toggleDarkMode } = useDarkMode();
@@ -94,6 +114,19 @@ function SearchBar({ setIsSidebarOpen, isSidebarOpen }: SearchBarProps) {
           <HiOutlineMenuAlt2 size='32' />
         )}
       </div>
+
+      <Mode
+        darkMode={darkMode}
+        visible={searchInputVisible}
+        isSidebarOpen={isSidebarOpen}
+        onClick={changeMode}
+      >
+        {mode === "FaPeopleGroup" ? (
+          <FaPeopleGroup color='#3c57b3' />
+        ) : (
+          <IoMdPerson color='#3c57b3' />
+        )}
+      </Mode>
 
       <Dark
         onClick={toggleDarkMode}

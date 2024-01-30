@@ -9,7 +9,8 @@ import React, {
 
 interface UserState {
   name: string;
-  profileImage: string;
+  company_name: string;
+  profileImage: string | null;
 }
 
 interface UserContextProps {
@@ -20,6 +21,7 @@ interface UserContextProps {
 
 const initialState: UserState = {
   name: "",
+  company_name: "",
   profileImage: "",
 };
 

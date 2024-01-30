@@ -1,7 +1,17 @@
 import axios from "axios";
 import instance from "./instance";
 
-// 회원가입
+// 이메일 중복 체크
+export const usercheckEmail = async (email?: string) => {
+  const value = { email: email };
+  const response = await axios.post(
+    `${process.env.REACT_APP_BE_SERVER}/auth/checkEmail`,
+    value
+  );
+  return response;
+};
+
+// 일반 회원가입
 export const register = async ({
   email,
   name,
@@ -22,13 +32,24 @@ export const register = async ({
   return response;
 };
 
-// 이메일 중복 체크
-export const usercheckEmail = async (email?: string) => {
-  const value = { email: email };
-  const response = await axios.post(
-    `${process.env.REACT_APP_BE_SERVER}/auth/checkEmail`,
-    value
-  );
+// 기업 회원가입
+export const registerCompany = async ({
+  email,
+  company_name,
+  password,
+  passwordConfirm,
+}: {
+  email: string;
+  company_name: string;
+  password: string;
+  passwordConfirm: string;
+}) => {
+  const response = await instance.post(`/auth/registerCompany`, {
+    email,
+    company_name,
+    password,
+    passwordConfirm,
+  });
   return response;
 };
 

@@ -39,6 +39,7 @@ function Mypage() {
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const { state, updateUserContext } = useUserContext();
   const navigate = useNavigate();
   const { darkMode } = useDarkMode();
@@ -182,6 +183,15 @@ function Mypage() {
     }
   };
 
+  useEffect(() => {
+    if (user) {
+      const nameToDisplay = user.company_name ? user.company_name : user.name;
+      setDisplayName(nameToDisplay);
+      setName("");
+      setEmail("");
+    }
+  }, [user]);
+
   // 프로필 업로드
   const handleImageUpload = async () => {
     if (profileImage && user?.id) {
@@ -232,25 +242,31 @@ function Mypage() {
 
     if (!user?.id || !name || !password || !email) {
       setAlertType("error");
-      setAlertMessage("모든 필드를 올바르게 입력해주세요.");
+      setAlertMessage("모든 필드를 필수로 입력해주세요.");
       return;
     }
+
     try {
-      await updateName(user.id, name, email, password);
-      const updatedUser = { ...user, name: name };
-      setUser(updatedUser);
-      updateUserContext({
-        ...state,
+      const isCompany = !!user.company_name;
+      await updateName(user.id, name, email, password, isCompany);
+
+      const updatedUser = {
+        ...user,
         name: name,
-      });
+        company_name: isCompany ? name : user.company_name || "",
+        profileImage: state.profileImage || "",
+      };
+      updateUserContext(updatedUser);
+      setUser(updatedUser);
+      setDisplayName(name);
       setAlertType("success");
-      setAlertMessage("이름이 성공적으로 변경되었습니다.");
+      setAlertMessage("성공적으로 변경되었습니다.");
       setName("");
       setEmail("");
       setPassword("");
     } catch (error) {
       setAlertType("error");
-      setAlertMessage("이름 변경에 실패했습니다.");
+      setAlertMessage("모든 필드를 올바르게 입력해주세요.");
     }
   };
 
@@ -359,7 +375,7 @@ function Mypage() {
           <RiEditCircleFill className='edit' size='45' color='#3c57b3' />
         </div>
         <p className='hi'>안녕하세요!</p>
-        <p className='name'>{user && user.name ? `${user.name}님` : null}</p>
+        <p className='name'>{displayName}님</p>
       </Profile>
 
       <Modal

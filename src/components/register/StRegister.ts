@@ -32,6 +32,14 @@ export const AuthContent = styled.div`
   border-radius: 20px;
   -webkit-box-shadow: 3px 3px 7px 1px #cacdd5;
   box-shadow: 3px 3px 7px 1px #cacdd5;
+
+  .or {
+    button {
+      cursor: pointer;
+      padding: 8px;
+      margin-top: 20px;
+    }
+  }
 `;
 
 export const EmailBox = styled.div`
