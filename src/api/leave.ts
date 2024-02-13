@@ -25,11 +25,11 @@ export const applyForLeave = async (date: Date, userId: number) => {
     });
     return response.data;
   } catch (error: any) {
-    if (error.response && error.response.status === 400) {
-      alert(error.response.data);
+    if (error.response) {
+      throw new Error(error.response.data);
     } else {
       console.error("Error applying for leave:", error);
-      alert("신청 중 오류가 발생했습니다.");
+      throw new Error("신청 중 오류가 발생했습니다.");
     }
   }
 };
@@ -39,8 +39,7 @@ export const deleteLeave = async (leaveId: number) => {
   try {
     const response = await instance.delete(`leave/delete/${leaveId}`);
     return response.data;
-  } catch (error) {
-    console.error("Error deleting leave:", error);
-    throw error;
+  } catch (error: any) {
+    throw error.response.data;
   }
 };

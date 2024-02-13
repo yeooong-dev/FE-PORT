@@ -715,8 +715,9 @@ export const LeftWrap = styled.div<showProps>`
   align-items: flex-start;
   margin-left: 20px;
   flex-direction: column;
+  border-radius: 30px 0 0 30px;
   border-right: ${({ darkMode }) =>
-    darkMode ? "2px solid #2e2e2e" : "2px solid #ebebeb"};
+    darkMode ? "1.5px solid #2e2e2e" : "1.5px solid #ebebeb"};
 
   @media (max-width: 550px) {
     width: ${(props) => (props.show ? "100%" : "100%")};
@@ -790,7 +791,7 @@ export const ListWrap = styled.div<showProps>`
 `;
 
 export const List = styled.div<ListProps>`
-  width: 100%;
+  width: 95%;
   height: 100px;
   min-height: 100px;
   display: flex;
@@ -959,7 +960,7 @@ export const RightWrap = styled.div<showProps>`
     display: ${(props) => (props.show ? "flex" : "none")};
     width: ${(props) => (props.show ? "100%" : "0")};
     margin-right: 0px;
-    height: 75vh;
+    height: 70vh;
 
     .chatBox {
       width: 90%;

@@ -44,7 +44,7 @@ function SearchBar({
       navigate("/main");
     } else {
       setMode("FaPeopleGroup");
-      navigate("/vac");
+      navigate("/chat");
     }
   };
 

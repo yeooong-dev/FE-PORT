@@ -5,6 +5,10 @@ export const Logo = styled.div`
   color: #3c57b3;
   font-family: var(--font-logo);
   cursor: pointer;
+
+  @media (max-width: 550px) {
+    font-size: 2rem;
+  }
 `;
 
 export const AuthWrap = styled.div`
@@ -40,6 +44,16 @@ export const AuthContent = styled.div`
       margin-top: 20px;
     }
   }
+
+  @media (max-width: 550px) {
+    .or {
+      button {
+        font-size: 11px;
+        padding: 6px;
+        margin-top: 15px;
+      }
+    }
+  }
 `;
 
 export const EmailBox = styled.div`
@@ -52,7 +66,8 @@ export const EmailBox = styled.div`
   margin-top: 35px;
 
   @media (max-width: 550px) {
-    max-width: 450px;
+    width: 90%;
+    margin-top: 25px;
   }
 `;
 
@@ -67,8 +82,9 @@ export const EmailInput = styled.input`
 
   @media (max-width: 550px) {
     width: 50%;
-    height: 40px;
-    font-size: 14px;
+    height: 35px;
+    font-size: 12px;
+    margin-bottom: -15px;
   }
 `;
 
@@ -81,8 +97,9 @@ export const EmailCheck = styled.button`
 
   @media (max-width: 550px) {
     width: 60px;
-    height: 40px;
+    height: 35px;
     font-size: 12px;
+    margin-bottom: -15px;
   }
 `;
 
@@ -95,8 +112,9 @@ export const NameInput = styled.input`
   font-size: 1rem;
 
   @media (max-width: 550px) {
-    height: 40px;
-    font-size: 14px;
+    height: 35px;
+    font-size: 12px;
+    margin-bottom: -15px;
   }
 `;
 
@@ -109,8 +127,9 @@ export const PwInput = styled.input`
   font-size: 1rem;
 
   @media (max-width: 550px) {
-    height: 40px;
-    font-size: 14px;
+    height: 35px;
+    font-size: 12px;
+    margin-bottom: -15px;
   }
 `;
 
@@ -123,8 +142,9 @@ export const PwConfilmInput = styled.input`
   font-size: 1rem;
 
   @media (max-width: 550px) {
-    height: 40px;
-    font-size: 14px;
+    height: 35px;
+    font-size: 12px;
+    margin-bottom: -15px;
   }
 `;
 
@@ -150,5 +170,7 @@ export const RegisterBtn = styled.button`
   @media (max-width: 550px) {
     height: 40px;
     font-size: 14px;
+    margin-top: 5px;
+    margin-bottom: 10px;
   }
 `;

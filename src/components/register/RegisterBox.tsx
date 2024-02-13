@@ -126,15 +126,24 @@ function Register() {
 
     usercheckEmail(emailValue)
       .then((res) => {
-        setIsEmailChecked(true);
-        setAlertType("success");
-        setAlertMessage("사용 가능한 이메일입니다.");
+        if (res.data && res.status === 200) {
+          setIsEmailChecked(true);
+          setAlertType("success");
+          setAlertMessage(res.data.message);
+        } else {
+          setIsEmailChecked(false);
+          setAlertType("error");
+          setAlertMessage("중복 확인 중 문제가 발생했습니다.");
+        }
       })
       .catch((err) => {
-        console.log(err);
         setIsEmailChecked(false);
         setAlertType("error");
-        setAlertMessage("중복된 이메일입니다.");
+        let errorMessage = "중복 확인 중 문제가 발생했습니다.";
+        if (err.response && err.response.data && err.response.data.message) {
+          errorMessage = err.response.data.message;
+        }
+        setAlertMessage(errorMessage);
       });
   };
 

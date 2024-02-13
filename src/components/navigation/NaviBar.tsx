@@ -11,7 +11,6 @@ import {
   NavBtn,
   Wrap,
   Log,
-  Code,
 } from "./StNavibar";
 import { FiHome } from "react-icons/fi";
 import { LuListTodo, LuUser } from "react-icons/lu";
@@ -54,6 +53,15 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
   // 커스텀 알럿
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [alertType, setAlertType] = useState<"error" | "success">("error");
+
+  // 기업 페이지 접근 권한 확인
+  const hasAccessToCompanyPage = user && user.isCompany;
+
+  // 조직도 및 연차 신청 페이지 접근 권한 확인
+  const hasAccessToOrganizationChart =
+    user && (user.isEmployeeRegistered || user.company_code);
+  const hasAccessToVacationRequest =
+    user && (user.isEmployeeRegistered || user.company_code);
 
   useEffect(() => {
     localStorage.setItem("isSidebarOpen", isSidebarOpen.toString());
@@ -168,11 +176,27 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
     setProfileImageUrl(state.profileImage || "/profile.png");
   }, [state]);
 
+  const handleChartPageAccess = () => {
+    if (!hasAccessToOrganizationChart) {
+      setAlertType("error");
+      setAlertMessage("직원 등록 후 이용이 가능합니다.");
+    }
+  };
+
+  const handleVacationPageAccess = () => {
+    if (!hasAccessToVacationRequest) {
+      setAlertType("error");
+      setAlertMessage("직원 등록 후 이용이 가능합니다.");
+    }
+  };
+
   const handleCompanyPageClick = () => {
-    if (!user?.company_code) {
+    if (!hasAccessToCompanyPage) {
       setAlertType("error");
       setAlertMessage("접근 권한이 없습니다.");
+      return false;
     }
+    return true;
   };
 
   return (
@@ -202,12 +226,6 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
           <Ment darkMode={darkMode} isSidebarOpen={isSidebarOpen}>
             {displayName}
           </Ment>
-
-          {user?.company_code && (
-            <Code darkMode={darkMode} isSidebarOpen={isSidebarOpen}>
-              기업코드 - {user.company_code}
-            </Code>
-          )}
         </>
       )}
 
@@ -303,8 +321,8 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
             </Link>
 
             <Link
-              to='/chart'
-              onClick={() => setActiveMenu("chart")}
+              to={hasAccessToOrganizationChart ? "/chart" : "#"}
+              onClick={handleChartPageAccess}
               style={{ width }}
             >
               <Talk
@@ -319,8 +337,8 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
             </Link>
 
             <Link
-              to='/vac'
-              onClick={() => setActiveMenu("vac")}
+              to={hasAccessToVacationRequest ? "/vac" : "#"}
+              onClick={handleVacationPageAccess}
               style={{ width }}
             >
               <Fam $active={activeMenu === "vac"} isSidebarOpen={isSidebarOpen}>
@@ -332,8 +350,16 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
             </Link>
 
             <Link
-              to={user?.company_code ? "/company" : "#"}
-              onClick={handleCompanyPageClick}
+              to='/company'
+              onClick={(e) => {
+                if (!hasAccessToCompanyPage) {
+                  e.preventDefault();
+                  setAlertType("error");
+                  setAlertMessage("접근 권한이 없습니다.");
+                } else {
+                  setActiveMenu("company");
+                }
+              }}
               style={{ width }}
             >
               <Talk

@@ -9,6 +9,8 @@ interface User {
   profileImage: string | null;
   company_name?: string;
   company_code?: string | null;
+  isEmployeeRegistered?: boolean;
+  isCompany?: boolean;
 }
 
 const UseUser = () => {
@@ -28,6 +30,8 @@ const UseUser = () => {
         profileImage: response.data.profileImage,
         company_name: response.data.company_name,
         company_code: response.data.company_code,
+        isEmployeeRegistered: response.data.isEmployeeRegistered,
+        isCompany: response.data.isCompany,
       });
     } catch (error) {
       console.error("Failed to fetch user info", error);

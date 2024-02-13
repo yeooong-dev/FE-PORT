@@ -32,44 +32,44 @@ function Login() {
   const onClickLoginBtn = () => {
     if (!emailValue || !pwValue) {
       setAlertType("error");
-      setAlertMessage("이메일과 비밀번호를 입력바랍니다.");
+      setAlertMessage("이메일과 비밀번호를 입력해 주세요.");
     } else {
       login({ email: emailValue, password: pwValue })
         .then((res) => {
-          const authId = res.data.token;
-          const userData = {
-            name: res.data.user.name,
-            profileImage: res.data.user.profile_image,
-          };
-          setCookie("authorization", "Bearer " + authId);
-          setCookie("userEmail", res.data.user.email);
-          localStorage.setItem("user", JSON.stringify(userData));
+          if (res.status === 200) {
+            const { token, user } = res.data;
+            setCookie("authorization", "Bearer " + token, { path: "/" });
+            setCookie("userEmail", user.email, { path: "/" });
+            localStorage.setItem(
+              "user",
+              JSON.stringify({
+                name: user.name,
+                profileImage: user.profile_image,
+              })
+            );
 
-          dispatch({
-            type: "SET_USER",
-            payload: userData,
-          });
+            dispatch({
+              type: "SET_USER",
+              payload: { name: user.name, profileImage: user.profile_image },
+            });
 
-          setAlertType("success");
-          setAlertMessage("로그인이 완료되었습니다.");
-
-          setTimeout(() => {
-            navigate("/main");
-          }, 1000);
+            setAlertType("success");
+            setAlertMessage("로그인에 성공했습니다.");
+            setTimeout(() => {
+              navigate("/main");
+            }, 1000);
+          } else {
+            setAlertType("error");
+            setAlertMessage("로그인 처리 중 문제가 발생했습니다.");
+          }
         })
         .catch((err) => {
-          if (err.response) {
-            // 서버가 응답을 제공한 경우, 에러 메시지를 alert로 표시
-            console.error("Server response:", err.response.data);
-            setAlertType("error");
-            setAlertMessage(err.response.data.message);
-          } else if (err.request) {
-            // 요청이 보내졌으나 응답을 받지 못한 경우
-            console.error("No response received:", err.request);
-          } else {
-            // 요청을 만드는 동안 오류가 발생한 경우
-            console.error("Error creating request:", err.message);
+          let errorMessage = "로그인 처리 중 문제가 발생했습니다.";
+          if (err.response && err.response.data && err.response.data.message) {
+            errorMessage = err.response.data.message;
           }
+          setAlertType("error");
+          setAlertMessage(errorMessage);
         });
     }
   };

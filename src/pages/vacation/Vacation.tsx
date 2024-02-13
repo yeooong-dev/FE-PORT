@@ -6,6 +6,10 @@ import styled from "styled-components";
 import { useDarkMode } from "../../components/darkmode/DarkModeContext";
 import moment from "moment";
 import UseUser from "../../hook/UseUser";
+import { getDailyMaxLeaves, getDepartments } from "../../api/chart";
+import { GiCheckMark } from "react-icons/gi";
+import CustomConfirm from "../../components/alert/CustomConfirm";
+import CustomAlert from "../../components/alert/CustomAlert";
 
 interface Leave {
   id: number;
@@ -15,6 +19,17 @@ interface Leave {
   User?: {
     name: string;
   };
+}
+
+interface EmployeeAttributes {
+  name: string;
+  email: string;
+  joinYear: number;
+  annualLeaveLimit: number;
+}
+
+interface DepartmentAttributes {
+  [departmentName: string]: { [employeeName: string]: EmployeeAttributes };
 }
 
 function Vacation() {
@@ -29,6 +44,21 @@ function Vacation() {
   const [monthLeavesInfo, setMonthLeavesInfo] = useState<{
     [dateString: string]: boolean;
   }>({});
+  const [dailyMaxLeaves, setDailyMaxLeaves] = useState<number | null>(null);
+  const [userAnnualLeaveLimit, setUserAnnualLeaveLimit] = useState<
+    number | null
+  >(null);
+
+  const [showCustomAlert, setShowCustomAlert] = useState(false);
+  const [customAlertMessage, setCustomAlertMessage] = useState("");
+  const [customAlertType, setCustomAlertType] = useState<"error" | "success">(
+    "error"
+  );
+  const [showCustomConfirm, setShowCustomConfirm] = useState(false);
+  const [customConfirmMessage, setCustomConfirmMessage] = useState("");
+  const [confirmAction, setConfirmAction] = useState<() => Promise<void>>(
+    async () => {}
+  );
 
   useEffect(() => {
     fetchLeaves();
@@ -114,10 +144,12 @@ function Vacation() {
     }
 
     try {
+      const dailyMaxLeaves = await getDailyMaxLeaves();
+
       const results = await Promise.all(leavesPromises);
       const monthlyLeaves = results.flat();
 
-      const newMonthLeavesInfo: { [dateString: string]: boolean } = {};
+      const newMonthLeavesInfo: { [key: string]: boolean } = {};
 
       for (
         let day = new Date(startOfMonth);
@@ -125,19 +157,17 @@ function Vacation() {
         day.setDate(day.getDate() + 1)
       ) {
         const dayString = day.toISOString().split("T")[0];
+        const leaveCount = monthlyLeaves.filter((leave) => {
+          const leaveDateLocal = moment(leave.date)
+            .tz("Asia/Seoul")
+            .format("YYYY-MM-DD");
+          return leaveDateLocal === dayString;
+        }).length;
+
         newMonthLeavesInfo[dayString] =
-          monthlyLeaves
-            .filter((leave) => {
-              // 서버에서 받은 날짜를 로컬 시간대로 변환
-              const leaveDateLocal = moment(leave.date)
-                .tz("Asia/Seoul")
-                .format("YYYY-MM-DD");
-              return leaveDateLocal === dayString;
-            })
-            .map((leave) => leave.userId)
-            .filter((userId, index, array) => array.indexOf(userId) === index)
-            .length >= 2;
+          leaveCount >= (dailyMaxLeaves || Infinity);
       }
+
       setMonthLeavesInfo(newMonthLeavesInfo);
     } catch (error) {
       console.error(error);
@@ -148,73 +178,137 @@ function Vacation() {
     fetchLeavesForMonth();
   }, [currentMonth]);
 
-  const hasAppliedThisMonth = (userId: number) => {
-    if (userId === null) return false;
-
-    const currentMonth = date.getMonth();
-    const currentYear = date.getFullYear();
-    return (
-      leaves.filter(
-        (leave) =>
-          leave.userId === userId &&
-          new Date(leave.date).getMonth() === currentMonth &&
-          new Date(leave.date).getFullYear() === currentYear
-      ).length >= 1
-    );
-  };
-
   const handleDateApply = async (selectedDate: string) => {
-    const applyConfirmation = window.confirm("이 날짜에 신청하시겠습니까?");
-    if (!applyConfirmation) {
-      return;
-    }
+    setCustomConfirmMessage("이 날짜에 신청하시겠습니까?");
+    setConfirmAction(() => async () => {
+      try {
+        if (moment(selectedDate).isBefore(moment().format("YYYY-MM-DD"))) {
+          throw new Error("해당 날짜엔 신청할 수 없습니다.");
+        }
+        if (userId === null) {
+          throw new Error("사용자 ID를 확인할 수 없습니다.");
+        }
+        if (monthLeavesInfo[selectedDate]) {
+          throw new Error("이 날짜에는 더 이상 신청할 수 없습니다.");
+        }
 
-    if (moment(selectedDate).isBefore(moment().format("YYYY-MM-DD"))) {
-      alert("해당 날짜엔 신청할 수 없습니다.");
-      return;
-    }
+        const response = await applyForLeave(new Date(selectedDate), userId);
 
-    if (userId === null) {
-      alert("사용자 ID를 확인할 수 없습니다.");
-      return;
-    }
+        await fetchLeavesForMonth();
+        if (userAnnualLeaveLimit !== null) {
+          setUserAnnualLeaveLimit(userAnnualLeaveLimit - 1);
+        }
 
-    if (hasAppliedThisMonth(userId)) {
-      alert("한달에 한번만 신청 가능합니다.");
-      return;
-    }
+        setCustomAlertMessage(response.message || "신청 완료되었습니다.");
+        setCustomAlertType("success");
+      } catch (error: any) {
+        console.error("Error applying for leave:", error);
+        let errorMessage = "신청 중 오류가 발생했습니다.";
+        if (error && error.message) {
+          errorMessage = error.message;
+        }
 
-    if (monthLeavesInfo[selectedDate]) {
-      alert("이 날짜에는 더 이상 신청할 수 없습니다.");
-      return;
-    }
-
-    try {
-      await applyForLeave(new Date(selectedDate), userId);
-      await fetchLeaves();
-      await fetchLeavesForMonth();
-    } catch (error) {
-      alert("신청 중 오류가 발생했습니다.");
-      console.error(error);
-    }
+        setCustomAlertMessage(errorMessage);
+        setCustomAlertType("error");
+      } finally {
+        setShowCustomAlert(true);
+      }
+    });
+    setShowCustomConfirm(true);
   };
 
   const handleDeleteLeave = async (leaveId: number) => {
-    const confirmDelete = window.confirm("연차 신청을 취소하시겠습니까?");
-    if (confirmDelete) {
+    setCustomConfirmMessage("연차 신청을 취소하시겠습니까?");
+    setConfirmAction(() => async () => {
       try {
-        await deleteLeave(leaveId);
         await fetchLeaves();
         await fetchLeavesForMonth();
+        if (userAnnualLeaveLimit !== null) {
+          setUserAnnualLeaveLimit(userAnnualLeaveLimit + 1);
+        }
+
+        setCustomAlertMessage("취소 완료되었습니다.");
+        setCustomAlertType("success");
       } catch (error) {
         console.error("Error deleting leave:", error);
-        alert("취소 중 오류가 발생했습니다.");
+        setCustomAlertMessage("취소 중 오류가 발생했습니다.");
+        setCustomAlertType("error");
+      } finally {
+        setShowCustomAlert(true);
       }
-    }
+    });
+    setShowCustomConfirm(true);
   };
 
+  useEffect(() => {
+    const fetchDailyMaxLeaves = async () => {
+      try {
+        const maxLeaves = await getDailyMaxLeaves();
+        setDailyMaxLeaves(maxLeaves);
+      } catch (error) {
+        console.error("Error fetching dailyMaxLeaves:", error);
+      }
+    };
+
+    fetchDailyMaxLeaves();
+  }, []);
+
+  useEffect(() => {
+    const fetchUserAnnualLeaveLimit = async () => {
+      try {
+        const departmentsData =
+          (await getDepartments()) as DepartmentAttributes;
+        Object.values(departmentsData).forEach((department) => {
+          Object.values(department).forEach((employee: EmployeeAttributes) => {
+            if (employee.email === user?.email) {
+              setUserAnnualLeaveLimit(employee.annualLeaveLimit);
+            }
+          });
+        });
+      } catch (error) {
+        console.error("Error fetching user annual leave limit:", error);
+      }
+    };
+
+    if (user) {
+      fetchUserAnnualLeaveLimit();
+    }
+  }, [user]);
+
   return (
-    <Wrap>
+    <Wrap darkMode={darkMode}>
+      <div className='page'>
+        {!dailyMaxLeaves ? (
+          <p>기업페이지에서 "하루 신청 가능 인원수"를 설정해주세요.</p>
+        ) : (
+          <p>
+            <GiCheckMark /> 하루 {dailyMaxLeaves}명만 연차 신청 가능
+          </p>
+        )}
+
+        {!user?.isCompany && (
+          <p>
+            <GiCheckMark /> {user?.name}님의 남은 연차 갯수 :{" "}
+            {userAnnualLeaveLimit}
+          </p>
+        )}
+      </div>
+      {showCustomConfirm && (
+        <CustomConfirm
+          message={customConfirmMessage}
+          onConfirm={() => {
+            confirmAction().then(() => setShowCustomConfirm(false));
+          }}
+          onCancel={() => setShowCustomConfirm(false)}
+        />
+      )}
+      {showCustomAlert && (
+        <CustomAlert
+          message={customAlertMessage}
+          type={customAlertType}
+          onClose={() => setShowCustomAlert(false)}
+        />
+      )}
       <CustomNavi darkMode={darkMode}>
         <button
           onClick={() => {
@@ -275,7 +369,6 @@ function Vacation() {
                 .tz("Asia/Seoul")
                 .format("YYYY-MM-DD");
 
-              // 현재 표시 중인 달에 속하는지 확인
               const isCurrentMonth =
                 date.getMonth() === currentMonth.getMonth() &&
                 date.getFullYear() === currentMonth.getFullYear();
@@ -285,10 +378,8 @@ function Vacation() {
                 monthLeavesInfo[dateString] &&
                 !isPastDate(date)
               ) {
-                // 현재 달이고 과거 날짜가 아닌 경우에만 마감 표시
                 return <div className='close'>마감</div>;
               } else if (isCurrentMonth && !isPastDate(date) && !isWeekend) {
-                // 현재 달이고 과거 날짜가 아니고 주말이 아닌 경우에만 '신청' 버튼 표시
                 return (
                   <div
                     onClick={() => handleDateApply(dateString)}
@@ -338,7 +429,7 @@ interface darkProps {
   darkMode: boolean;
 }
 
-const Wrap = styled.div`
+const Wrap = styled.div<darkProps>`
   width: 90%;
   max-width: 900px;
   height: 80vh;
@@ -346,6 +437,30 @@ const Wrap = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  // background: gray;
+
+  .page {
+    width: 80%;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border-radius: 20px;
+    border: ${({ darkMode }) =>
+      darkMode ? "2px solid #696969" : "2px solid #d6d6d6"};
+    margin-bottom: 10px;
+    padding: 5px;
+    box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
+    -webkit-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
+    -moz-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
+
+    p {
+      margin: 6px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+  }
 `;
 
 const CustomNavi = styled.div<darkProps>`
@@ -355,7 +470,7 @@ const CustomNavi = styled.div<darkProps>`
   width: 100%;
   font-weight: bold;
   color: ${({ darkMode }) => (darkMode ? "#fff" : "#2e2e2e")};
-  padding: 30px 0;
+  padding: 20px 0;
 
   span {
     font-family: var(--font-title);
@@ -390,18 +505,19 @@ const CustomNavi = styled.div<darkProps>`
 `;
 
 const VacationList = styled.div<darkProps>`
-  width: 100%;
-  height: auto;
+  width: 80%;
+  height: 50px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  background: #f6f6f6;
 
   div {
     display: flex;
     justify-content: center;
     align-items: center;
     width: auto;
-    margin: 5px 0;
   }
 
   button {
@@ -425,7 +541,7 @@ const StyledCalendar = styled.div<StyledCalendarProps>`
   border-radius: 40px;
 
   .react-calendar {
-    width: 100%;
+    width: 80%;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -522,9 +638,7 @@ const StyledCalendar = styled.div<StyledCalendarProps>`
 
   .react-calendar__tile {
     position: relative;
-    width: 120px;
-    height: ${(props) => props.tileSize}px;
-    min-height: 38px;
+    height: ${(props) => props.tileSize - 15}px;
     cursor: pointer;
     background: none;
     font-size: 1.1rem;

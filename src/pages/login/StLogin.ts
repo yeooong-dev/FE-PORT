@@ -13,7 +13,7 @@ export const EmailInputLogin = styled.input`
 
   @media (max-width: 550px) {
     height: 40px;
-    font-size: 14px;
+    font-size: 12px;
   }
 `;
 
@@ -29,7 +29,7 @@ export const PwInputLogin = styled.input`
 
   @media (max-width: 550px) {
     height: 40px;
-    font-size: 14px;
+    font-size: 12px;
   }
 `;
 

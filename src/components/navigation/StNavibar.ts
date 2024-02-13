@@ -36,7 +36,7 @@ export const Wrap = styled.div<WrapProps>`
   }
 
   @media (max-width: 320px) {
-    padding-top: 30px;
+    // padding-top: 30px;
   }
 `;
 

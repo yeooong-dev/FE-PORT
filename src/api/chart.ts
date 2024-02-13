@@ -4,6 +4,7 @@ interface EmployeeAttributes {
   name: string;
   email: string;
   joinYear: number;
+  annualLeaveLimit: string;
 }
 
 // 대표 이름 가져오기
@@ -70,6 +71,7 @@ export const deleteDepartment = async (departmentName: string) => {
   }
 };
 
+// 직원 등록
 export const registerEmployee = async ({
   departmentName,
   employee,
@@ -84,24 +86,56 @@ export const registerEmployee = async ({
     });
 
     return response.data;
-  } catch (error) {
-    console.error("Error registering employee:", error);
-    throw error;
+  } catch (error: any) {
+    if (error.response && error.response.data && error.response.data.message) {
+      throw new Error(error.response.data.message);
+    } else {
+      console.error("Error registering employee:", error);
+      throw error;
+    }
   }
 };
 
-export const deleteEmployee = async (
-  departmentName: string,
-  employeeName: string
-) => {
+// 직원 삭제
+export const deleteEmployee = async ({
+  departmentName,
+  employee,
+}: {
+  departmentName: string;
+  employee: { email: string };
+}) => {
   try {
     const response = await instance.post("chart/deleteEmployee", {
       departmentName,
-      employeeName,
+      employee,
     });
     return response.data;
   } catch (error) {
     console.error("Error deleting employee:", error);
+    throw error;
+  }
+};
+
+// 기업 연차 설정
+export const getDailyMaxLeaves = async () => {
+  try {
+    const response = await instance.get("chart/getDailyMaxLeaves");
+    return response.data.dailyMaxLeaves;
+  } catch (error) {
+    console.error("Error fetching dailyMaxLeaves:", error);
+    throw error;
+  }
+};
+
+// 기업 연차 수정
+export const updateDailyMaxLeaves = async (dailyMaxLeaves: string) => {
+  try {
+    const response = await instance.post("chart/updateDailyMaxLeaves", {
+      dailyMaxLeaves,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating dailyMaxLeaves:", error);
     throw error;
   }
 };
