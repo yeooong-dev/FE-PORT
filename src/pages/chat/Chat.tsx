@@ -42,9 +42,28 @@ interface Message {
     id: number;
     name: string;
     profile_image: string | null;
-    company_name?: string;
+    company_name?: string | null;
   };
   roomId?: number;
+}
+
+interface ChatUser {
+  id: number;
+  name: string;
+  profile_image: string | null;
+  company_name?: string | null;
+}
+
+interface MessageData {
+  id: number;
+  roomId: number;
+  message: string;
+  user: ChatUser;
+}
+
+interface NewMessageEventData {
+  messageData: MessageData;
+  updatedChatList: User[];
 }
 
 function Chat({ showOnlyChat = false }) {
@@ -62,6 +81,7 @@ function Chat({ showOnlyChat = false }) {
   const [deletedRooms, setDeletedRooms] = useState<number[]>([]);
   const { darkMode } = useDarkMode();
   const [showConfirm, setShowConfirm] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
   // 소켓 설정
   useEffect(() => {
@@ -73,11 +93,15 @@ function Chat({ showOnlyChat = false }) {
     });
 
     newSocket.on("new chat room", (data) => {
+      console.log(
+        `[클라이언트] 새 메시지 수신 (방 ID: ${data.messageData.roomId})`
+      );
       updateChatList();
     });
 
     return () => {
       newSocket.off("updated chat list");
+      console.log(`[클라이언트] 채팅 목록 업데이트 수신`);
       newSocket.off("new chat room");
       newSocket.close();
     };
@@ -86,19 +110,15 @@ function Chat({ showOnlyChat = false }) {
   // 채팅 목록 업데이트 함수
   const updateChatList = useCallback(async () => {
     try {
-      const updatedUsers: User[] = await getInteractedUsers();
-      setInteractedUsers((prevUsers) => {
-        const updatedUsersMap = new Map(
-          updatedUsers.map((u: User) => [u.roomId, u])
-        );
-        return prevUsers.map(
-          (user) => updatedUsersMap.get(user.roomId) || user
-        );
-      });
+      let updatedUsers: User[] = await getInteractedUsers();
+      updatedUsers = updatedUsers.filter(
+        (user) => !deletedRooms.includes(user.roomId)
+      );
+      setInteractedUsers(updatedUsers);
     } catch (error) {
       console.error("채팅 목록 업데이트 중 오류 발생:", error);
     }
-  }, []);
+  }, [deletedRooms]);
 
   const handleSendMessage = async () => {
     if (selectedUser && inputValue.trim() && socket && user) {
@@ -127,6 +147,18 @@ function Chat({ showOnlyChat = false }) {
           userId,
         });
 
+        const newMessage = {
+          id: Date.now(),
+          message: inputValue,
+          user: {
+            id: userId,
+            name: user.name,
+            profile_image: user.profileImage,
+          },
+          roomId,
+        };
+        setMessages((prevMessages) => [...prevMessages, newMessage]);
+
         setInputValue("");
       } catch (error) {
         console.error("Failed to send message", error);
@@ -134,34 +166,27 @@ function Chat({ showOnlyChat = false }) {
     }
   };
 
-  // 새 메시지 수신 핸들러
   useEffect(() => {
-    if (!socket) return;
+    if (!socket || !user) return;
 
-    const handleNewMessage = ({
-      messageData,
-      updatedChatList,
-    }: {
-      messageData: Message;
-      updatedChatList: User[];
-    }) => {
-      // 새 메시지에 해당하는 사용자 찾기
-      const userIndex = interactedUsers.findIndex(
-        (u) => u.id === messageData.user.id
-      );
-      if (userIndex !== -1) {
-        // 사용자 목록 업데이트
-        const newInteractedUsers = [...interactedUsers];
-        newInteractedUsers[userIndex] = {
-          ...newInteractedUsers[userIndex],
-          lastMessage: messageData.message,
-        };
-        setInteractedUsers(newInteractedUsers);
-      }
+    const handleNewMessage = (data: NewMessageEventData) => {
+      const { messageData } = data;
 
-      // 현재 채팅방 메시지 업데이트
-      if (selectedUser && selectedUser.roomId === messageData.roomId) {
-        setMessages((prevMessages) => [...prevMessages, messageData]);
+      // 여기서 selectedUser와 messageData의 존재 여부를 확인합니다.
+      if (
+        selectedUser &&
+        messageData &&
+        selectedUser.roomId === messageData.roomId
+      ) {
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            id: messageData.id,
+            message: messageData.message,
+            user: messageData.user,
+            roomId: messageData.roomId,
+          },
+        ]);
       }
     };
 
@@ -170,7 +195,7 @@ function Chat({ showOnlyChat = false }) {
     return () => {
       socket.off("new message", handleNewMessage);
     };
-  }, [socket, selectedUser, interactedUsers]);
+  }, [socket, selectedUser, setMessages]);
 
   // 상호작용한 사용자 목록 업데이트 함수
   const updateInteractedUsers = useCallback(async () => {
@@ -205,8 +230,15 @@ function Chat({ showOnlyChat = false }) {
     }
 
     const fetchMessages = async () => {
+      console.log(
+        `[Client] fetchMessages - Fetching messages for Room ID: ${selectedUser?.roomId}`
+      );
+
       const roomMessages = await getRoom(selectedUser.roomId);
       setMessages(roomMessages.chats || []);
+      console.log(
+        `[fetchMessages] Fetching messages for Room ID: ${selectedUser.roomId}`
+      );
     };
 
     fetchMessages();
@@ -263,18 +295,6 @@ function Chat({ showOnlyChat = false }) {
     }
   }, [selectedUser]);
 
-  const selectUser = async (user: User) => {
-    if (!deletedRooms.includes(user.roomId)) {
-      const roomMessages = await getRoom(user.roomId);
-      setMessages(roomMessages.chats || []);
-    } else {
-      setMessages([]);
-    }
-    joinRoom(user.roomId);
-    setSelectedUser(user);
-    await updateChatList();
-  };
-
   const handleNewChat = async (targetUserId: number) => {
     if (!user || !user.id) {
       console.error("User ID is not available.");
@@ -292,15 +312,15 @@ function Chat({ showOnlyChat = false }) {
       const roomExistence = await checkIfRoomExists(userIds);
 
       let roomId: number;
-      if (
-        roomExistence &&
-        roomExistence.exists &&
-        !deletedRooms.includes(roomExistence.room.id)
-      ) {
+      if (roomExistence && roomExistence.exists) {
         roomId = roomExistence.room.id;
 
-        const fetchedRoom = await getRoom(roomId);
-        setMessages(fetchedRoom.chats || []);
+        if (deletedRooms.includes(roomId)) {
+          setMessages([]);
+        } else {
+          const fetchedRoom = await getRoom(roomId);
+          setMessages(fetchedRoom.chats || []);
+        }
 
         const selectedUserIndex = allUsers.findIndex(
           (u) => u.id === targetUserId
@@ -335,24 +355,23 @@ function Chat({ showOnlyChat = false }) {
   };
 
   // 채팅방 나가기 로직
-  const handleLeaveChatRoom = (roomId: number) => {
-    if (selectedUser && user) {
-      setShowConfirm(true);
-    }
-  };
-
-  // 실제로 채팅방을 나가는 로직
-  const confirmLeaveRoom = async (roomId: number) => {
+  const handleLeaveChatRoom = async (roomId: number) => {
     if (!user || !selectedUser) return;
+
     try {
       const response = await removeUserFromRoom(roomId, Number(user.id));
       if (response && response.success) {
         setDeletedRooms((prev) => [...prev, roomId]);
+
+        if (selectedUser.roomId === roomId) {
+          setMessages([]);
+          setSelectedUser(null);
+        }
+
         setInteractedUsers((prevUsers) =>
           prevUsers.filter((u) => u.roomId !== roomId)
         );
-        setSelectedUser(null);
-        setMessages([]);
+
         socket?.emit("leave room", { roomId, userId: user.id });
       } else {
         console.error("Failed to leave chat room");
@@ -363,6 +382,33 @@ function Chat({ showOnlyChat = false }) {
     setShowConfirm(false);
   };
 
+  const selectUser = async (user: User) => {
+    console.log(
+      `[Client] selectUser - Selected User ID: ${user.id}, Room ID: ${user.roomId}`
+    );
+
+    if (deletedRooms.includes(user.roomId)) {
+      console.log(`Room ${user.roomId} has been left. Clearing messages.`);
+      setMessages([]);
+      setSelectedUser(user);
+      return;
+    }
+
+    joinRoom(user.roomId);
+    // 나가지 않은 채팅방의 경우에만 메시지 목록 불러오기
+    const roomMessages = await getRoom(user.roomId);
+    if (roomMessages && roomMessages.chats) {
+      setMessages(roomMessages.chats);
+    }
+    setSelectedUser(user);
+    await updateChatList();
+
+    const isMobile = window.innerWidth <= 550;
+    if (isMobile) {
+      setShowLeftWrap(true);
+    }
+  };
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -370,6 +416,17 @@ function Chat({ showOnlyChat = false }) {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    // 컴포넌트가 언마운트될 때 이벤트 리스너 제거
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   if (showOnlyChat) {
     return (
@@ -379,61 +436,67 @@ function Chat({ showOnlyChat = false }) {
         ) : (
           <>
             <ListWrap show={showLeftWrap} darkMode={darkMode}>
-              {interactedUsers.map((interactedUser, index) => {
-                if (!interactedUser.user) {
-                  return null;
-                }
+              {interactedUsers.length > 0 ? (
+                interactedUsers.map((interactedUser, index) => {
+                  if (!interactedUser.user) {
+                    return null;
+                  }
 
-                const isUserSelected =
-                  selectedUser && selectedUser.user
-                    ? selectedUser.user.id === interactedUser.user.id
-                    : false;
+                  const isUserSelected =
+                    selectedUser && selectedUser.user
+                      ? selectedUser.user.id === interactedUser.user.id
+                      : false;
 
-                return (
-                  <List
-                    key={interactedUser.user.id}
-                    isSelected={isUserSelected}
-                    onClick={() => selectUser(interactedUser)}
-                    darkMode={darkMode}
-                  >
-                    <img
-                      src={
-                        interactedUser.user?.profile_image
-                          ? `https://yeong-port.s3.ap-northeast-2.amazonaws.com/${interactedUser.user.profile_image}`
-                          : "https://yeong-port.s3.ap-northeast-2.amazonaws.com/person.png"
-                      }
-                      alt={`${interactedUser.user?.name || "User"}'s profile`}
-                      style={{
-                        borderRadius: "50%",
-                      }}
-                    />
-                    <div className='flex'>
+                  return (
+                    <List
+                      key={interactedUser.user.id}
+                      isSelected={isUserSelected}
+                      onClick={() => selectUser(interactedUser)}
+                      darkMode={darkMode}
+                    >
+                      <img
+                        src={
+                          interactedUser.user?.profile_image
+                            ? `https://yeong-port.s3.ap-northeast-2.amazonaws.com/${interactedUser.user.profile_image}`
+                            : "https://yeong-port.s3.ap-northeast-2.amazonaws.com/person.png"
+                        }
+                        alt={`${interactedUser.user?.name || "User"}'s profile`}
+                        style={{
+                          borderRadius: "50%",
+                        }}
+                      />
+
                       <p>
                         {interactedUser.user?.name ||
                           interactedUser.user?.company_name}
                       </p>
-                    </div>
-                    {isUserSelected && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleLeaveChatRoom(interactedUser.roomId);
-                        }}
-                        className='exit'
-                      >
-                        나가기
-                      </button>
-                    )}
-                    {showConfirm && selectedUser && (
-                      <CustomConfirm
-                        message='채팅방을 나가겠습니까?'
-                        onConfirm={() => confirmLeaveRoom(selectedUser.roomId)}
-                        onCancel={() => setShowConfirm(false)}
-                      />
-                    )}
-                  </List>
-                );
-              })}
+
+                      {isUserSelected && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleLeaveChatRoom(interactedUser.roomId);
+                          }}
+                          className='exit'
+                        >
+                          X
+                        </button>
+                      )}
+                      {showConfirm && selectedUser && (
+                        <CustomConfirm
+                          message='채팅방을 나가겠습니까?'
+                          onConfirm={() =>
+                            handleLeaveChatRoom(selectedUser.roomId)
+                          }
+                          onCancel={() => setShowConfirm(false)}
+                        />
+                      )}
+                    </List>
+                  );
+                })
+              ) : (
+                <div>채팅한 사용자가 없습니다.</div>
+              )}
             </ListWrap>
           </>
         )}
@@ -473,19 +536,22 @@ function Chat({ showOnlyChat = false }) {
                   },
                   content: {
                     width: "80%",
-                    maxWidth: "260px",
-                    height: "550px",
-                    overflowY: "scroll",
-                    padding: "30px",
+                    maxWidth: "450px",
+                    height: "80%",
+                    maxHeight: "500px",
                     top: "50%",
                     left: "50%",
                     transform: "translate(-50%, -50%)",
-                    backgroundColor: "#f6f6f6",
+                    backgroundColor: darkMode ? "#333" : "#f6f6f6",
+                    color: darkMode ? "white" : "black",
                     border: "none",
                     borderRadius: "20px",
                     display: "flex",
                     flexDirection: "column",
+                    alignItems: "center",
+                    justifyContent: "flex-start",
                     position: "relative",
+                    overflowY: "scroll",
                   },
                 }}
               >
@@ -518,7 +584,9 @@ function Chat({ showOnlyChat = false }) {
                         alignItems: "center",
                         justifyContent: "center",
                         fontWeight: "bold",
-                        borderBottom: "1.5px solid #e8e8e8",
+                        borderBottom: darkMode
+                          ? "1.5px solid #424242"
+                          : "1.5px solid #e8e8e8",
                         padding: "20px",
                       }}
                     >
@@ -553,67 +621,81 @@ function Chat({ showOnlyChat = false }) {
                   ))}
                 </div>
               </Modal>
-              {interactedUsers.map((interactedUser, index) => {
-                if (!interactedUser.user) {
-                  return null;
-                }
+              {interactedUsers.length > 0
+                ? interactedUsers.map((interactedUser, index) => {
+                    if (!interactedUser.user) {
+                      return null;
+                    }
 
-                const isUserSelected =
-                  selectedUser && selectedUser.user
-                    ? selectedUser.user.id === interactedUser.user.id
-                    : false;
+                    const isUserSelected =
+                      selectedUser && selectedUser.user
+                        ? selectedUser.user.id === interactedUser.user.id
+                        : false;
 
-                return (
-                  <List
-                    key={interactedUser.user.id}
-                    isSelected={isUserSelected}
-                    onClick={() => selectUser(interactedUser)}
-                    darkMode={darkMode}
-                  >
-                    <img
-                      src={
-                        interactedUser.user?.profile_image
-                          ? `https://yeong-port.s3.ap-northeast-2.amazonaws.com/${interactedUser.user.profile_image}`
-                          : "https://yeong-port.s3.ap-northeast-2.amazonaws.com/person.png"
-                      }
-                      alt={`${interactedUser.user?.name || "User"}'s profile`}
-                      style={{
-                        borderRadius: "50%",
-                      }}
-                    />
-                    <div className='flex'>
-                      <p>
-                        {interactedUser.user?.name ||
-                          interactedUser.user?.company_name}
-                      </p>
-                    </div>
-                    {isUserSelected && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleLeaveChatRoom(interactedUser.roomId);
-                        }}
-                        className='exit'
+                    return (
+                      <List
+                        key={interactedUser.user.id}
+                        isSelected={isUserSelected}
+                        onClick={() => selectUser(interactedUser)}
+                        darkMode={darkMode}
                       >
-                        나가기
-                      </button>
-                    )}
-                    {showConfirm && selectedUser && (
-                      <CustomConfirm
-                        message='채팅방을 나가겠습니까?'
-                        onConfirm={() => confirmLeaveRoom(selectedUser.roomId)}
-                        onCancel={() => setShowConfirm(false)}
-                      />
-                    )}
-                  </List>
-                );
-              })}
+                        <img
+                          src={
+                            interactedUser.user?.profile_image
+                              ? `https://yeong-port.s3.ap-northeast-2.amazonaws.com/${interactedUser.user.profile_image}`
+                              : "https://yeong-port.s3.ap-northeast-2.amazonaws.com/person.png"
+                          }
+                          alt={`${
+                            interactedUser.user?.name || "User"
+                          }'s profile`}
+                          style={{
+                            borderRadius: "50%",
+                          }}
+                        />
+
+                        <p>
+                          {interactedUser.user?.name ||
+                            interactedUser.user?.company_name}
+                        </p>
+
+                        {isUserSelected && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleLeaveChatRoom(interactedUser.roomId);
+                            }}
+                            className='exit'
+                          >
+                            X
+                          </button>
+                        )}
+                        {showConfirm && selectedUser && (
+                          <CustomConfirm
+                            message='채팅방을 나가겠습니까?'
+                            onConfirm={() =>
+                              handleLeaveChatRoom(selectedUser.roomId)
+                            }
+                            onCancel={() => setShowConfirm(false)}
+                          />
+                        )}
+                      </List>
+                    );
+                  })
+                : windowWidth <= 550 && (
+                    <div style={{ textAlign: "center", padding: "20px" }}>
+                      채팅한 사용자가 없습니다.
+                    </div>
+                  )}
             </ListWrap>
           </LeftWrap>
           <RightWrap show={showLeftWrap} darkMode={darkMode}>
             {selectedUser ? (
               <div className='chatBox'>
-                <h3>{selectedUser.name}</h3>
+                <h3>
+                  {selectedUser.user
+                    ? selectedUser.user.name || selectedUser.user.company_name
+                    : selectedUser.name || selectedUser.company_name}
+                </h3>
                 <div className='chatting'>
                   {messages.map((message, index) => (
                     <div
@@ -696,10 +778,11 @@ interface showProps {
 
 export const ChatWrap = styled.div`
   width: 100%;
-  height: 85vh;
+  height: 88vh;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
+  padding: 10px;
 
   @media (max-width: 550px) {
     flex-direction: column;
@@ -709,20 +792,17 @@ export const ChatWrap = styled.div`
 export const LeftWrap = styled.div<showProps>`
   width: 40%;
   max-width: 365px;
-  height: 83vh;
+  height: auto;
   display: flex;
-  justify-content: flex-start;
-  align-items: flex-start;
-  margin-left: 20px;
+  align-items: center;
   flex-direction: column;
-  border-radius: 30px 0 0 30px;
   border-right: ${({ darkMode }) =>
     darkMode ? "1.5px solid #2e2e2e" : "1.5px solid #ebebeb"};
 
   @media (max-width: 550px) {
     width: ${(props) => (props.show ? "100%" : "100%")};
     max-width: ${(props) => (props.show ? "400px" : "500px")};
-    height: ${(props) => (props.show ? "60px" : "83vh")};
+    height: ${(props) => (props.show ? "50px" : "75vh")};
     border: none;
   }
 `;
@@ -732,13 +812,11 @@ export const BtnBox = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
-  margin-bottom: 10px;
   padding-left: 10px;
 
   h1 {
     font-size: 18px;
-    margin-right: 10px;
+    margin: 10px;
   }
 
   .addBtn {
@@ -750,11 +828,11 @@ export const BtnBox = styled.div`
     justify-content: flex-start;
 
     h1 {
-      margin-right: 20px;
+      margin: 15px;
     }
 
     .addBtn {
-      margin-right: 10px;
+      margin-right: 15px;
     }
   }
 `;
@@ -778,67 +856,97 @@ export const ListWrap = styled.div<showProps>`
   overflow-y: scroll;
   display: flex;
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
   flex-direction: column;
 
   @media (max-width: 550px) {
     display: ${(props) => (props.show ? "flex" : "flex")};
-    width: ${(props) => (props.show ? "95%" : "95%")};
+    width: ${(props) => (props.show ? "95%" : "90%")};
     max-width: ${(props) => (props.show ? "500px" : "500px")};
     align-items: center;
-    margin-top: 40px;
+    margin-top: 20px;
   }
 `;
 
 export const List = styled.div<ListProps>`
-  width: 95%;
-  height: 100px;
-  min-height: 100px;
+  position: relative;
+  width: 90%;
+  height: 80px;
+  margin: 10px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   cursor: pointer;
   border-radius: 10px;
-  background-color: ${(props) =>
+  border: ${(props) =>
+    props.isSelected
+      ? "2px solid #3c57b3"
+      : props.darkMode
+      ? "2px solid #28292b"
+      : "2px solid #fafafa"};
+
+  color: ${({ darkMode }) => (darkMode ? "white" : "black")};
+
+  box-shadow: ${(props) =>
     props.isSelected
       ? props.darkMode
-        ? "#28292b"
-        : "#f4f5fb"
+        ? "5px 5px 5px 0px rgba(0, 0, 0, 0.1)"
+        : "5px 6px 5px 0px rgba(0, 0, 0, 0.1)"
       : "transparent"};
 
   img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    margin-right: 30px;
+    margin: 20px;
   }
 
-  .flex {
-    margin-right: 30px;
-
-    p {
-      width: 100%;
-    }
-
-    p:first-child {
-      font-weight: bold;
-      font-size: 18px;
-      margin-bottom: 5px;
-    }
+  p {
+    font-weight: bold;
+    font-size: 16px;
   }
 
   .exit {
-    width: 50px;
+    position: absolute;
+    right: 30px;
+    width: 30px;
     height: 30px;
-    background: #3c57b3;
+    background: #f25b50;
+    border-radius: 50px;
     color: white;
+  }
+
+  @media (max-width: 800px) {
+    img {
+      width: 45px;
+      height: 45px;
+      margin: 10px;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .exit {
+      right: 10px;
+    }
+  }
+
+  @media (max-width: 550px) {
+    img {
+      width: 50px;
+      height: 50px;
+      margin: 20px;
+    }
+
+    .exit {
+      right: 20px;
+    }
   }
 `;
 
 export const RightWrap = styled.div<showProps>`
   width: 80%;
   max-width: 1400px;
-  height: 80vh;
+  height: 75vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -864,14 +972,14 @@ export const RightWrap = styled.div<showProps>`
       font-weight: bold;
       margin: 25px;
       font-family: var(--font-title);
-      color: #454545;
+      color: ${({ darkMode }) => (darkMode ? "white" : "#454545")};
     }
 
     .chatting {
       width: 100%;
       height: auto;
       overflow-y: scroll;
-      max-height: 700px;
+      max-height: 600px;
       display: flex;
       justify-content: flex-start;
       align-items: center;
@@ -881,7 +989,7 @@ export const RightWrap = styled.div<showProps>`
     .you {
       display: flex;
       align-items: center;
-      margin-bottom: 20px;
+      margin: 8px;
 
       .you_msg {
         background: #f4f5fb;
@@ -914,7 +1022,7 @@ export const RightWrap = styled.div<showProps>`
       padding: 13px 15px;
       border-radius: 10px;
       align-self: flex-end;
-      margin-bottom: 20px;
+      margin: 8px;
       color: black;
     }
 
@@ -964,20 +1072,28 @@ export const RightWrap = styled.div<showProps>`
 
     .chatBox {
       width: 90%;
-
-      .chatting {
-        max-height: 550px;
-      }
+      height: 68vh;
 
       .you {
-        margin-bottom: 10px;
+        margin: 5px;
       }
 
       .me {
-        margin-bottom: 10px;
+        margin: 5px;
+      }
+
+      h3 {
+        font-size: 1rem;
+        margin: 15px;
+      }
+
+      .chatting {
+        height: 68%;
       }
 
       .inputBox {
+        height: 40px;
+
         input {
           width: 70%;
           height: 100%;
@@ -985,6 +1101,11 @@ export const RightWrap = styled.div<showProps>`
           margin-right: 0px;
           padding-left: 0.5rem;
           font-size: 15px;
+        }
+
+        button {
+          width: 40px;
+          height: 40px;
         }
       }
     }

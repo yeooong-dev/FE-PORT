@@ -10,6 +10,7 @@ import {
   PwConfilmInput,
   PwInput,
   RegisterBtn,
+  ValidMessage,
 } from "./StRegister";
 import UseInput from "../../hook/UseInput";
 import { register, registerCompany, usercheckEmail } from "../../api/auth";
@@ -265,15 +266,9 @@ function Register() {
 
             <EmailCheck onClick={checkEmail}>중복 확인</EmailCheck>
           </EmailBox>
-          <div
-            style={{
-              color: emailMessage === VALID_EMAIL_MESSAGE ? "green" : "red",
-              marginTop: "10px",
-              marginBottom: "20px",
-            }}
-          >
+          <ValidMessage valid={emailMessage === VALID_EMAIL_MESSAGE}>
             {emailMessage}
-          </div>
+          </ValidMessage>
 
           <NameInput
             type='text'
@@ -286,15 +281,9 @@ function Register() {
               isCompany ? "기업명을 입력해주세요." : "성함을 입력해주세요."
             }
           />
-          <div
-            style={{
-              color: nameMessage === VALID_NAME_MESSAGE ? "green" : "red",
-              marginTop: "10px",
-              marginBottom: "20px",
-            }}
-          >
+          <ValidMessage valid={nameMessage === VALID_NAME_MESSAGE}>
             {nameMessage}
-          </div>
+          </ValidMessage>
 
           <PwInput
             type='password'
@@ -305,15 +294,9 @@ function Register() {
             }}
             placeholder='비밀번호를 입력해주세요.'
           />
-          <div
-            style={{
-              color: pwMessage === VALID_PASSWORD_MESSAGE ? "green" : "red",
-              marginTop: "10px",
-              marginBottom: "20px",
-            }}
-          >
+          <ValidMessage valid={pwMessage === VALID_PASSWORD_MESSAGE}>
             {pwMessage}
-          </div>
+          </ValidMessage>
 
           <PwConfilmInput
             type='password'
@@ -324,16 +307,9 @@ function Register() {
             }}
             placeholder='비밀번호를 다시 입력해주세요.'
           />
-          <div
-            style={{
-              color:
-                pwConfirmMessage === VALID_PW_CONFIRM_MESSAGE ? "green" : "red",
-              marginTop: "10px",
-              marginBottom: "20px",
-            }}
-          >
+          <ValidMessage valid={pwConfirmMessage === VALID_PW_CONFIRM_MESSAGE}>
             {pwConfirmMessage}
-          </div>
+          </ValidMessage>
           <RegisterBtn
             onClick={() => {
               onClickRegisterBtn();

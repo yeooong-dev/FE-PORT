@@ -221,6 +221,7 @@ function Vacation() {
     setCustomConfirmMessage("연차 신청을 취소하시겠습니까?");
     setConfirmAction(() => async () => {
       try {
+        await deleteLeave(leaveId);
         await fetchLeaves();
         await fetchLeavesForMonth();
         if (userAnnualLeaveLimit !== null) {
@@ -395,7 +396,7 @@ function Vacation() {
 
         <VacationList darkMode={darkMode}>
           {leaves.length === 0 ? (
-            <p>신청내역이 없습니다.</p>
+            <p style={{ margin: "20px" }}>신청내역이 없습니다.</p>
           ) : (
             <>
               {leaves.map((leave) => (
@@ -432,12 +433,12 @@ interface darkProps {
 const Wrap = styled.div<darkProps>`
   width: 90%;
   max-width: 900px;
-  height: 80vh;
+  height: 70vh;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   flex-direction: column;
-  // background: gray;
+  overflow-y: scroll;
 
   .page {
     width: 80%;
@@ -459,6 +460,14 @@ const Wrap = styled.div<darkProps>`
       margin: 6px;
       font-size: 18px;
       font-weight: bold;
+    }
+  }
+
+  @media (max-width: 550px) {
+    .page {
+      p {
+        font-size: 14px;
+      }
     }
   }
 `;
@@ -506,18 +515,23 @@ const CustomNavi = styled.div<darkProps>`
 
 const VacationList = styled.div<darkProps>`
   width: 80%;
-  height: 50px;
+  height: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #f6f6f6;
+  background: ${({ darkMode }) => (darkMode ? "#2e2e2e" : "#f6f6f6")};
+  border-radius: 10px;
+  color: ${({ darkMode }) => (darkMode ? "#fff" : "#2e2e2e")};
+  margin-bottom: 10px;
 
   div {
     display: flex;
     justify-content: center;
     align-items: center;
     width: auto;
+    height: 30px;
+    margin: 10px;
   }
 
   button {
@@ -528,6 +542,13 @@ const VacationList = styled.div<darkProps>`
     border-radius: 5px;
     cursor: pointer;
     margin-left: 8px;
+  }
+
+  @media (max-width: 550px) {
+    div {
+      height: 20px;
+      font-size: 14px;
+    }
   }
 `;
 
@@ -675,25 +696,6 @@ const StyledCalendar = styled.div<StyledCalendarProps>`
     border-bottom: none;
   }
 
-  .react-calendar__tile--now {
-    background: none;
-    z-index: 0;
-  }
-
-  .react-calendar__tile--now::before {
-    content: "";
-    position: absolute;
-    top: 5px;
-    right: 6.5px;
-    width: 30px;
-    height: 30px;
-    background-color: #3c57b3;
-    border-radius: 40px;
-    border: 2px solid #b3c1e3;
-    z-index: -1;
-    opacity: 50%;
-  }
-
   .react-calendar__year-view__months__month {
     height: auto;
   }
@@ -722,30 +724,40 @@ const StyledCalendar = styled.div<StyledCalendarProps>`
     transition: background-color 0.3s;
   }
 
+  @media (max-width: 650px) {
+    .react-calendar {
+      .apply {
+        font-size: 14px;
+        margin-top: 2px;
+      }
+
+      .close {
+        font-size: 14px;
+        margin-top: 2px;
+      }
+    }
+
+    .react-calendar__tile {
+      padding: 5px;
+      font-size: 14px;
+    }
+  }
+
   @media (max-width: 550px) {
+    .react-calendar {
+      width: 100%;
+    }
+
     .react-calendar__month-view__weekdays__weekday {
-      font-size: 1rem;
+      font-size: 14px;
+      height: 30px;
+      line-height: 18px;
     }
 
     .react-calendar__tile {
       padding: 10px;
       font-size: 14px;
-    }
-
-    .react-calendar__tile--now::before {
-      top: 8px;
-      right: 7px;
-      width: 20px;
-      height: 20px;
-    }
-
-    .react-calendar__tile.dot::after {
-      bottom: 0px;
-      left: 0;
-      width: 100%;
-      height: 10px;
-      background-color: #91a5d9;
-      opacity: 20%;
+      height: ${(props) => props.tileSize + 3}px;
     }
 
     .tooltip {
@@ -754,22 +766,6 @@ const StyledCalendar = styled.div<StyledCalendarProps>`
 
     .start {
       height: 10px;
-    }
-  }
-
-  @media (max-width: 500px) {
-    .react-calendar {
-      .apply {
-        margin-top: 3px;
-      }
-
-      .close {
-        margin-top: 3px;
-      }
-    }
-
-    .react-calendar__tile--now::before {
-      right: 7.5px;
     }
   }
 

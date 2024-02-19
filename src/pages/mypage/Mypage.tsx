@@ -85,7 +85,7 @@ function Mypage() {
       case "nameEdit":
         return (
           <TabContainer darkMode={darkMode}>
-            <NameEdit>
+            <NameEdit darkMode={darkMode}>
               <form onSubmit={handleNameChange}>
                 <input
                   type='text'
@@ -118,7 +118,7 @@ function Mypage() {
       case "pwEdit":
         return (
           <TabContainer darkMode={darkMode}>
-            <NameEdit>
+            <NameEdit darkMode={darkMode}>
               <form onSubmit={handlePasswordChange}>
                 <input
                   type='text'
@@ -149,7 +149,7 @@ function Mypage() {
       case "deleteAccount":
         return (
           <TabContainer darkMode={darkMode}>
-            <NameEdit>
+            <NameEdit darkMode={darkMode}>
               <form onSubmit={handleAccountDelete}>
                 <input
                   type='password'
@@ -194,7 +194,13 @@ function Mypage() {
 
   // 프로필 업로드
   const handleImageUpload = async () => {
-    if (profileImage && user?.id) {
+    if (!profileImage) {
+      setAlertType("error");
+      setAlertMessage("파일 선택 후 프로필 변경을 해주세요.");
+      return;
+    }
+
+    if (user?.id) {
       try {
         await imgAdd(user.id, profileImage);
         const response = await imgGet(user.id);
@@ -212,22 +218,25 @@ function Mypage() {
         setAlertMessage("프로필 이미지 업로드에 실패했습니다.");
       }
     } else {
-      console.error("Profile image or user ID is not set");
+      console.error("User ID is not set");
     }
   };
 
   const handleImageDelete = async () => {
+    if (!currentImage || currentImage.endsWith("/person.png")) {
+      setAlertType("error");
+      setAlertMessage("삭제할 이미지가 없습니다.");
+      return;
+    }
+
     if (user?.id) {
       try {
         await imgDelete(user.id);
-        setCurrentImage(null);
+        setCurrentImage("/person.png");
         updateUserContext({
           ...state,
           profileImage: "/default-profile.png",
         });
-        setAlertType("success");
-        setAlertMessage("프로필 이미지가 삭제되었습니다.");
-        window.location.reload();
       } catch (error) {
         console.error(error);
         setAlertType("error");

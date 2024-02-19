@@ -17,6 +17,7 @@ export const FamilyEventWrap = styled.div<darkProps>`
   max-height: 500px;
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-direction: column;
   background: ${({ darkMode }) => (darkMode ? "#222327" : "white")};
   border-radius: 5px;
@@ -28,22 +29,17 @@ export const FamilyEventWrap = styled.div<darkProps>`
 
 export const InputBox = styled.div`
   width: 80%;
+  height: auto;
   max-width: 800px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  margin-bottom: 120px;
-
-  @media (max-width: 400px) {
-    margin-bottom: 30px;
-    height: 300px;
-  }
 `;
 
 export const Target = styled.input`
   width: 80%;
-  height: 35px;
+  height: 25px;
   background: #f0f0f0;
   padding: 1rem;
   margin-bottom: 20px;
@@ -52,7 +48,7 @@ export const Target = styled.input`
 
 export const Date = styled.input`
   width: 80%;
-  height: 35px;
+  height: 25px;
   background: #f0f0f0;
   padding: 1rem;
   margin-bottom: 20px;
@@ -61,7 +57,7 @@ export const Date = styled.input`
 
 export const Type = styled.input`
   width: 80%;
-  height: 35px;
+  height: 25px;
   background: #f0f0f0;
   padding: 1rem;
   margin-bottom: 20px;
@@ -70,7 +66,7 @@ export const Type = styled.input`
 
 export const Amount = styled.input`
   width: 80%;
-  height: 35px;
+  height: 25px;
   background: #f0f0f0;
   padding: 1rem;
   font-size: 0.9rem;
@@ -83,7 +79,7 @@ export const BtnBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-top: -100px;
+  margin-top: 50px;
 
   .add {
     width: 40%;
@@ -115,7 +111,7 @@ export const BtnBox = styled.div`
   }
 
   @media (max-width: 400px) {
-    margin-top: 0px;
+    margin-top: 20px;
   }
 
   @media (max-width: 550px) {

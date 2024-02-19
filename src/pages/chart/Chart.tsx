@@ -214,7 +214,6 @@ export const CEO = styled.div<darkProps>`
   }
 
   @media (max-width: 550px) {
-    margin-top: 40px;
     min-width: 200px;
   }
 `;
@@ -246,7 +245,7 @@ export const Employee = styled.div<darkProps>`
 
   @media (max-width: 550px) {
     width: 80%;
-    height: 50vh;
+    height: 45vh;
   }
 `;
 

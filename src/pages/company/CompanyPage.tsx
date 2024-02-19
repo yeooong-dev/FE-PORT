@@ -403,6 +403,10 @@ const TabContainer = styled.div<darkProps>`
 export const TabTop = styled.div<darkProps>`
   width: 50%;
   display: flex;
+
+  @media (max-width: 550px) {
+    width: 80%;
+  }
 `;
 
 export const Tab = styled.div<TabProps & darkProps>`
@@ -611,6 +615,8 @@ export const Setting = styled.div<darkProps>`
   }
 
   @media (max-width: 550px) {
+    margin: 30px 0 0 0;
+
     .page {
       .listBox {
         width: 80%;

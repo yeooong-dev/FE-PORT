@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Modal from "react-modal";
 import { IoTrashOutline } from "react-icons/io5";
 import { BsPencil, BsCheckLg } from "react-icons/bs";
@@ -28,6 +28,7 @@ function Todo() {
   const [checkedTodoIds, setCheckedTodoIds] = useState<number[]>([]);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const { darkMode } = useDarkMode();
+  const EndRef = useRef<HTMLDivElement>(null);
 
   const currentDate = new Date();
   const dayNames = [
@@ -80,6 +81,7 @@ function Todo() {
       setInputValue("");
       setEditTodoId(null);
       setIsModalOpen(false);
+      setTimeout(scrollToBottom, 100);
     } catch (error) {
       console.error(error);
       setAlertMessage("항목을 추가하는 데 실패하였습니다.");
@@ -137,6 +139,14 @@ function Todo() {
     fetchTodos();
   }, []);
 
+  const scrollToBottom = () => {
+    EndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
+
   return (
     <>
       {alertMessage && (
@@ -168,15 +178,17 @@ function Todo() {
             },
             content: {
               width: "80%",
-              maxWidth: "500px",
-              minHeight: "500px",
+              maxWidth: "450px",
+              height: "80%",
+              maxHeight: "500px",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              backgroundColor: "white",
+              backgroundColor: darkMode ? "#333" : "#f6f6f6",
               border: "none",
-              borderRadius: "5px",
+              borderRadius: "20px",
               display: "flex",
+              flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
               position: "relative",
@@ -190,10 +202,10 @@ function Todo() {
               left: "50%",
               transform: "translate(-50%, 0)",
               fontSize: "1.2rem",
-              color: "#858087",
+              color: darkMode ? "white" : "black",
             }}
           >
-            할일 추가
+            {editTodoId !== null ? "할일 수정" : "할일 추가"}
           </h1>
           <button
             style={{
@@ -202,10 +214,10 @@ function Todo() {
               right: "20px",
               backgroundColor: "#858087",
               border: "none",
-              width: "40px",
-              height: "40px",
+              width: "30px",
+              height: "30px",
               borderRadius: "50%",
-              fontSize: "1.3rem",
+              fontSize: "1rem",
               cursor: "pointer",
               color: "white",
             }}
@@ -217,12 +229,13 @@ function Todo() {
           <input
             autoFocus
             style={{
-              width: "50%",
+              width: "70%",
               minWidth: "100px",
-              height: "70px",
+              height: "55px",
               backgroundColor: "#f0f0f0",
               paddingLeft: "1rem",
-              fontSize: "0.9rem",
+              fontSize: "14px",
+              marginBottom: "20px",
             }}
             value={inputValue}
             onChange={(e) => {
@@ -240,12 +253,13 @@ function Todo() {
           <button
             className='AddBtn'
             style={{
-              minWidth: "80px",
-              height: "70px",
-              fontSize: "1.2rem",
+              minWidth: "78%",
+              height: "50px",
+              fontSize: "16px",
               cursor: "pointer",
               backgroundColor: "#3c57b3",
               color: "white",
+              borderRadius: "10px",
             }}
             onClick={handleAddTodo}
           >
@@ -263,6 +277,7 @@ function Todo() {
                   checkedTodoIds.includes(todo.todo_id) ? "checked" : ""
                 }`}
                 key={todo.todo_id}
+                ref={EndRef}
               >
                 <div className='left'>
                   <div
@@ -367,11 +382,12 @@ const TodoTop = styled.div<darkProps>`
   }
 
   @media (max-width: 550px) {
-    width: 90%;
+    width: 95%;
 
     div {
       .date {
         font-size: 1.3rem;
+        margin-bottom: 10px;
       }
     }
 
@@ -416,13 +432,14 @@ const Todos = styled.div<darkProps>`
     justify-content: space-between;
     margin-bottom: 40px;
     position: relative;
+    overflow: hidden;
 
     &:before {
       content: "";
       position: absolute;
       left: 0px;
       right: 0;
-      bottom: -5px;
+      bottom: 0;
       border-bottom: ${({ darkMode }) =>
         darkMode ? "1.5px solid #616161" : "1.5px solid #d6d6d6"};
       transition: bottom 0.3s ease;
@@ -513,6 +530,7 @@ const Todos = styled.div<darkProps>`
       }
     }
   }
+
   .between.checked .left .check {
     border: none;
     display: flex;
@@ -524,26 +542,27 @@ const Todos = styled.div<darkProps>`
     width: 100%;
     height: 650px;
     max-height: 650px;
+    margin-top: 50px;
 
-    b{
-      font-size:16px;
+    b {
+      font-size: 16px;
     }
 
     .between {
-      height: 45px;
-      min-height: 45px;
-      margin-bottom: 30px;
+      height: auto;
+      margin-bottom: 10px;
+      overflow: hidden;
 
       &:before {
-        bottom: -15px;
+        bottom: 0;
       }
 
       .left {
         .text {
           width: 100%;
-          font-size: 15px;
+          font-size: 14px;
           font-weight: bold;
-          line-height: 20px;
+          line-height: 17px;
         }
 
         .check {
@@ -559,33 +578,29 @@ const Todos = styled.div<darkProps>`
           font-size: 1.2rem;
           color: #555555;
         }
-  
+
         .time.checked {
           color: #d6d6d6;
         }
-  
+
         .pen {
           width: 25px;
           padding-left: 8px;
-          z-index: 3;
-        
         }
-  
+
         .pen:hover {
           color: ${({ darkMode }) => (darkMode ? "white" : "#222327")};
         }
-  
+
         .trash {
           width: 25px;
-          padding-left: 15px;
-      
+          padding-left: 10px;
         }
-  
+
         .trash:hover {
           color: ${({ darkMode }) => (darkMode ? "white" : "#222327")};
         }
       }
-    }
     }
   }
 `;

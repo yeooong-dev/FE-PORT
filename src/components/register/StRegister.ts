@@ -1,5 +1,9 @@
 import { styled } from "styled-components";
 
+interface ValidEmailMessageProps {
+  valid: boolean;
+}
+
 export const Logo = styled.div`
   font-size: 2.3rem;
   color: #3c57b3;
@@ -63,11 +67,26 @@ export const EmailBox = styled.div`
   align-items: center;
   vertical-align: middle;
   justify-content: center;
-  margin-top: 35px;
+  margin-top: 30px;
 
   @media (max-width: 550px) {
+    width: 100%;
+    max-width: 320px;
+    margin-top: 20px;
+  }
+
+  @media (max-width: 400px) {
     width: 90%;
-    margin-top: 25px;
+  }
+
+  @media (max-width: 375px) {
+    max-width: 280px;
+    width: 92%;
+  }
+
+  @media (max-width: 350px) {
+    max-width: 250px;
+    width: 87%;
   }
 `;
 
@@ -75,83 +94,83 @@ export const EmailInput = styled.input`
   margin-right: 10px;
   width: 60%;
   max-width: 400px;
-  height: 50px;
+  height: 45px;
   background: #f6f6f6;
   padding-left: 1rem;
   font-size: 1rem;
 
   @media (max-width: 550px) {
     width: 50%;
-    height: 35px;
+    height: 30px;
     font-size: 12px;
-    margin-bottom: -15px;
+    margin-bottom: -5px;
   }
 `;
 
 export const EmailCheck = styled.button`
   width: 90px;
-  height: 50px;
+  height: 45px;
   font-size: 1rem;
   cursor: pointer;
   background: #e0e0e0;
 
   @media (max-width: 550px) {
     width: 60px;
-    height: 35px;
+    height: 30px;
     font-size: 12px;
-    margin-bottom: -15px;
+    margin-bottom: -5px;
   }
 `;
 
 export const NameInput = styled.input`
   width: 70%;
   max-width: 400px;
-  height: 50px;
+  height: 45px;
   background: #f6f6f6;
   padding-left: 1rem;
   font-size: 1rem;
 
   @media (max-width: 550px) {
-    height: 35px;
+    height: 30px;
     font-size: 12px;
-    margin-bottom: -15px;
+    margin-bottom: -5px;
   }
 `;
 
 export const PwInput = styled.input`
   width: 70%;
   max-width: 400px;
-  height: 50px;
+  height: 45px;
   background: #f6f6f6;
   padding-left: 1rem;
   font-size: 1rem;
 
   @media (max-width: 550px) {
-    height: 35px;
+    height: 30px;
     font-size: 12px;
-    margin-bottom: -15px;
+    margin-bottom: -5px;
   }
 `;
 
 export const PwConfilmInput = styled.input`
   width: 70%;
   max-width: 400px;
-  height: 50px;
+  height: 45px;
   background: #f6f6f6;
   padding-left: 1rem;
   font-size: 1rem;
 
   @media (max-width: 550px) {
-    height: 35px;
+    height: 30px;
     font-size: 12px;
-    margin-bottom: -15px;
+    margin-bottom: -5px;
   }
 `;
 
 export const RegisterBtn = styled.button`
   width: 73%;
   max-width: 420px;
-  height: 55px;
+  height: 50px;
   margin-top: 10px;
   margin-bottom: 30px;
   cursor: pointer;
@@ -168,9 +187,30 @@ export const RegisterBtn = styled.button`
   }
 
   @media (max-width: 550px) {
-    height: 40px;
+    width: 76%;
+    height: 35px;
     font-size: 14px;
     margin-top: 5px;
     margin-bottom: 10px;
+
+    &:hover {
+      background: #3c57b3;
+      color: white;
+      font-weight: 400;
+      border: none;
+    }
+  }
+`;
+
+export const ValidMessage = styled.div<ValidEmailMessageProps>`
+  color: ${(props) => (props.valid ? "green" : "red")};
+  margin-top: 10px;
+  margin-bottom: 20px;
+
+  @media (max-width: 550px) {
+    width: 80%;
+    font-size: 12px;
+    margin-bottom: 15px;
+    text-align: center;
   }
 `;

@@ -16,18 +16,14 @@ export const getUsers = async () => {
     return response.data;
   } catch (error) {
     console.error(error);
+    throw error;
   }
 };
 
 export const createRoom = async (userIds: number[], name: string) => {
   try {
     const response = await instance.post("/chat/room", { userIds, name });
-
-    if (response.data && typeof response.data === "object") {
-      return response.data;
-    } else {
-      throw new Error("Unexpected server response");
-    }
+    return response.data;
   } catch (error) {
     console.error(error);
     throw error;
@@ -35,15 +31,12 @@ export const createRoom = async (userIds: number[], name: string) => {
 };
 
 export const checkIfRoomExists = async (userIds: number[]) => {
-  const userIdsParam = userIds.join(",");
-
   try {
     const response = await instance.get(`/chat/room/exist`, {
-      params: { userIds: userIdsParam },
+      params: { userIds: userIds.join(",") },
     });
     return response.data.exists ? response.data.room : null;
   } catch (error) {
-    console.error("checkIfRoomExists API 호출 중 오류:", error);
     throw error;
   }
 };
@@ -51,24 +44,7 @@ export const checkIfRoomExists = async (userIds: number[]) => {
 export const getRoom = async (roomId: number) => {
   try {
     const response = await instance.get(`/chat/room/${roomId}`);
-
-    if (response.status === 404) {
-      throw new Error("Room not found");
-    }
-
-    if (response.status !== 200) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-
-    const data = response.data;
-    if (!data) {
-      throw new Error("Invalid response data");
-    }
-
-    if (!("chats" in data)) {
-      console.warn("Received room data without chats", data);
-    }
-    return data;
+    return response.data;
   } catch (error) {
     console.error(error);
     throw error;
@@ -76,11 +52,6 @@ export const getRoom = async (roomId: number) => {
 };
 
 export const joinRoom = async (roomId: number, userId: number) => {
-  if (!userId) {
-    console.error("User ID is not available.");
-    return;
-  }
-
   try {
     const response = await instance.post(`/chat/room/${roomId}/join`, {
       userId,

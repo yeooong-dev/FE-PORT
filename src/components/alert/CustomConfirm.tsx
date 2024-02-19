@@ -1,4 +1,5 @@
 import React from "react";
+import { useDarkMode } from "../darkmode/DarkModeContext";
 
 interface CustomConfirmProps {
   message: string;
@@ -11,6 +12,8 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const { darkMode } = useDarkMode();
+
   return (
     <>
       <div
@@ -20,7 +23,7 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
           left: 0,
           right: 0,
           bottom: 0,
-          backgroundColor: "rgba(0,0,0,0.1)",
+          backgroundColor: "rgba(0,0,0,0.3)",
           zIndex: 99,
         }}
       ></div>
@@ -30,19 +33,20 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          backgroundColor: "#fff",
-          padding: "5rem 5rem",
+          backgroundColor: darkMode ? "#3d3d3d" : "#fff",
+          padding: "4rem",
           borderRadius: "5px",
           fontSize: "1.3rem",
           zIndex: 100,
-          width: "20%",
+          width: "50%",
           minWidth: "100px",
-          maxWidth: "220px",
+          maxWidth: "240px",
         }}
       >
         <div
           style={{
-            color: "black",
+            width: "100%",
+            color: darkMode ? "#fff" : "#000",
             marginBottom: "30px",
             fontWeight: "bold",
             textAlign: "center",
@@ -54,6 +58,7 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
           style={{
             display: "flex",
             justifyContent: "center",
+            height: "50px",
           }}
         >
           <button
@@ -79,7 +84,7 @@ const CustomConfirm: React.FC<CustomConfirmProps> = ({
           <button
             onClick={onCancel}
             style={{
-              background: "#d1d1d1",
+              background: darkMode ? "#696969" : "#d1d1d1",
               color: "white",
               width: "20%",
               minWidth: "100px",

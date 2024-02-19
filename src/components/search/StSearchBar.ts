@@ -6,6 +6,10 @@ interface SearchInputProps {
   isSidebarOpen: boolean;
 }
 
+interface ModalBackgroundProps {
+  isModalOpen: boolean;
+}
+
 const slideInAnimation = keyframes`
   from {
     transform: translateX(100%);
@@ -28,6 +32,15 @@ const slideOutAnimation = keyframes`
   }
 `;
 
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+`;
+
 export const SearchWrap = styled.div<SearchInputProps>`
   width: 100%;
   height: 90px;
@@ -43,6 +56,15 @@ export const SearchWrap = styled.div<SearchInputProps>`
     position: absolute;
     left: 0px;
     color: ${({ darkMode }) => (darkMode ? "#fff" : "#666666")};
+  }
+
+  @media (max-width: 550px) {
+    height: 60px;
+
+    .open_btn {
+      top: 0;
+      left: 30px;
+    }
   }
 `;
 
@@ -70,9 +92,8 @@ export const Mode = styled.li<SearchInputProps>`
   }
 
   @media (max-width: 550px) {
-    width: 30px;
-    height: 30px;
-    left: 45px;
+    top: 30%;
+    left: 80px;
   }
 `;
 
@@ -100,9 +121,8 @@ export const Dark = styled.li<SearchInputProps>`
   }
 
   @media (max-width: 550px) {
-    width: 30px;
-    height: 30px;
-    left: 95px;
+    top: 30%;
+    left: 140px;
   }
 `;
 
@@ -114,6 +134,11 @@ export const SearchRight = styled.div`
   right: 60px;
 
   @media (max-width: 860px) {
+    right: 30px;
+  }
+
+  @media (max-width: 550px) {
+    top: 30px;
     right: 30px;
   }
 `;
@@ -132,10 +157,10 @@ export const Action = styled.div<SearchInputProps>`
 `;
 
 export const SearchInput = styled.input<SearchInputProps>`
-  width: 200px;
-  height: 35px;
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
+  width: 220px;
+  height: 40px;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
   border: 2px solid #ededed;
   padding-left: 1rem;
   margin-left: 0px;
@@ -144,16 +169,8 @@ export const SearchInput = styled.input<SearchInputProps>`
   position: relative;
   z-index: 999;
 
-  @media (max-width: 790px) {
-    width: 150px;
-  }
-
   @media (max-width: 550px) {
-    width: 100px;
-  }
-
-  @media (max-width: 320px) {
-    width: 80px;
+    width: 160px;
   }
 `;
 
@@ -182,14 +199,15 @@ export const SearchBtn = styled.button<SearchInputProps>`
 
 export const Search = styled.button<{ darkMode: boolean }>`
   width: 70px;
-  height: 38px;
+  height: 43px;
   cursor: pointer;
   background: #3c57b3;
   color: white;
   font-size: 1rem;
-  border-top-right-radius: 8px;
-  border-bottom-right-radius: 8px;
+  border-top-right-radius: 5px;
+  border-bottom-right-radius: 5px;
   margin-right: 0px;
+  z-index: 999;
 
   animation: ${({ darkMode }) =>
     darkMode
@@ -199,9 +217,8 @@ export const Search = styled.button<{ darkMode: boolean }>`
       : "none"};
 
   @media (max-width: 550px) {
-    width: 45px;
+    width: 55px;
     font-size: 14px;
-    margin-right: -30px;
   }
 `;
 
@@ -286,4 +303,18 @@ export const ResultWrap = styled.div<{ darkMode: boolean }>`
       font-size: 1rem;
     }
   }
+`;
+
+export const ModalBackground = styled.div<ModalBackgroundProps>`
+  display: ${({ isModalOpen }) => (isModalOpen ? "flex" : "none")};
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.65);
+  z-index: 999;
+  justify-content: center;
+  align-items: center;
+  animation: ${fadeIn} 0.3s forwards;
 `;

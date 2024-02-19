@@ -10,7 +10,6 @@ export const getLeavesForDate = async (date: Date) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching leaves:", error);
     throw error;
   }
 };
@@ -28,7 +27,6 @@ export const applyForLeave = async (date: Date, userId: number) => {
     if (error.response) {
       throw new Error(error.response.data);
     } else {
-      console.error("Error applying for leave:", error);
       throw new Error("신청 중 오류가 발생했습니다.");
     }
   }

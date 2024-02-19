@@ -55,7 +55,7 @@ export const todoToggleCheck = async (todo_id: number) => {
     const response = await instance.put(`/todo/toggle/${todo_id}`);
     return response.data;
   } catch (error) {
-    console.error("Error toggling todo", error);
+    console.error(error);
     throw error;
   }
 };

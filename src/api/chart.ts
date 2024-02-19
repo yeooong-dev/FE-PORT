@@ -13,7 +13,6 @@ export const getCeoName = async () => {
     const response = await instance.get("chart/getCeoName");
     return response.data.ceoName;
   } catch (error) {
-    console.error("Error fetching CEO name:", error);
     throw error;
   }
 };
@@ -26,7 +25,6 @@ export const updateCeoName = async (ceoName: string) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error updating CEO name:", error);
     throw error;
   }
 };
@@ -38,7 +36,6 @@ export const getDepartments = async () => {
 
     return response.data;
   } catch (error) {
-    console.error("Error fetching departments:", error);
     throw error;
   }
 };
@@ -53,7 +50,6 @@ export const updateDepartments = async (departments: {
     });
     return response.data;
   } catch (error) {
-    console.error("Error updating departments:", error);
     throw error;
   }
 };
@@ -66,7 +62,6 @@ export const deleteDepartment = async (departmentName: string) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error deleting department:", error);
     throw error;
   }
 };
@@ -90,7 +85,6 @@ export const registerEmployee = async ({
     if (error.response && error.response.data && error.response.data.message) {
       throw new Error(error.response.data.message);
     } else {
-      console.error("Error registering employee:", error);
       throw error;
     }
   }
@@ -111,7 +105,6 @@ export const deleteEmployee = async ({
     });
     return response.data;
   } catch (error) {
-    console.error("Error deleting employee:", error);
     throw error;
   }
 };
@@ -122,7 +115,6 @@ export const getDailyMaxLeaves = async () => {
     const response = await instance.get("chart/getDailyMaxLeaves");
     return response.data.dailyMaxLeaves;
   } catch (error) {
-    console.error("Error fetching dailyMaxLeaves:", error);
     throw error;
   }
 };
@@ -135,7 +127,6 @@ export const updateDailyMaxLeaves = async (dailyMaxLeaves: string) => {
     });
     return response.data;
   } catch (error) {
-    console.error("Error updating dailyMaxLeaves:", error);
     throw error;
   }
 };

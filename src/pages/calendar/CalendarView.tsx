@@ -649,7 +649,7 @@ function CalendarView({ showOnlyCalendar = false }) {
                     }}
                     style={{
                       display: "flex",
-                      fontSize: "1.5rem",
+                      fontSize: "1.4rem",
                       whiteSpace: "nowrap",
                       width: "30%",
                       background: "none",
@@ -710,7 +710,7 @@ function CalendarView({ showOnlyCalendar = false }) {
                     onClick={() => selectMonthAndCloseModal(month - 1)}
                     style={{
                       display: "flex",
-                      fontSize: "1.5rem",
+                      fontSize: "1.4rem",
                       whiteSpace: "nowrap",
                       width: "30%",
                       background: "none",
@@ -844,8 +844,8 @@ function CalendarView({ showOnlyCalendar = false }) {
                   style={{
                     paddingBottom: "10px",
                     borderBottom: darkMode
-                      ? "1.5px solid #595959"
-                      : "1.5px solid #e3e3e3",
+                      ? "1.5px solid #474747"
+                      : "1.5px solid #f0f0f0",
                     textAlign: "left",
                   }}
                 >
@@ -927,8 +927,8 @@ function CalendarView({ showOnlyCalendar = false }) {
                 content: {
                   width: "80%",
                   maxWidth: "450px",
-                  height: "550px",
-                  maxHeight: "480px",
+                  height: "80%",
+                  maxHeight: "500px",
                   top: "50%",
                   left: "50%",
                   transform: "translate(-50%, -50%)",
@@ -950,10 +950,10 @@ function CalendarView({ showOnlyCalendar = false }) {
                   right: "20px",
                   backgroundColor: "#858087",
                   border: "none",
-                  width: "40px",
-                  height: "40px",
+                  width: "30px",
+                  height: "30px",
                   borderRadius: "50%",
-                  fontSize: "1.3rem",
+                  fontSize: "1rem",
                   cursor: "pointer",
                   color: "white",
                 }}
@@ -966,22 +966,26 @@ function CalendarView({ showOnlyCalendar = false }) {
                   width: "100%",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
                   flexDirection: "column",
                 }}
               >
-                <h3 style={{ marginBottom: "20px", color: "gray" }}>
+                <h3
+                  style={{
+                    marginBottom: "30px",
+                    color: darkMode ? "white" : "black",
+                  }}
+                >
                   {edit !== null ? "일정 수정하기" : "일정 추가하기"}
                 </h3>
 
                 <div
                   style={{
                     width: "100%",
-                    height: "50px",
+                    height: "auto",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    marginBottom: "10px",
+                    marginBottom: "13px",
                   }}
                 >
                   <span style={{ color: "gray", marginRight: "5px" }}>
@@ -995,7 +999,7 @@ function CalendarView({ showOnlyCalendar = false }) {
                     }
                     style={{
                       width: "60%",
-                      height: "15px",
+                      height: "10px",
                       padding: "1rem",
                       fontSize: "1rem",
                       cursor: "pointer",
@@ -1008,11 +1012,11 @@ function CalendarView({ showOnlyCalendar = false }) {
                 <div
                   style={{
                     width: "100%",
-                    height: "50px",
+                    height: "auto",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    marginBottom: "10px",
+                    marginBottom: "13px",
                   }}
                 >
                   <span style={{ color: "gray", marginRight: "5px" }}>
@@ -1026,7 +1030,7 @@ function CalendarView({ showOnlyCalendar = false }) {
                     }
                     style={{
                       width: "60%",
-                      height: "15px",
+                      height: "10px",
                       padding: "1rem",
                       fontSize: "1rem",
                       cursor: "pointer",
@@ -1039,11 +1043,11 @@ function CalendarView({ showOnlyCalendar = false }) {
                 <div
                   style={{
                     width: "100%",
-                    height: "50px",
+                    height: "auto",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    marginBottom: "10px",
+                    marginBottom: "13px",
                   }}
                 >
                   <span style={{ color: "gray", marginRight: "5px" }}>
@@ -1057,7 +1061,7 @@ function CalendarView({ showOnlyCalendar = false }) {
                     }
                     style={{
                       width: "60%",
-                      height: "15px",
+                      height: "10px",
                       padding: "1rem",
                       fontSize: "1rem",
                       cursor: "pointer",
@@ -1070,11 +1074,11 @@ function CalendarView({ showOnlyCalendar = false }) {
                 <div
                   style={{
                     width: "100%",
-                    height: "50px",
+                    height: "auto",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    marginBottom: "10px",
+                    marginBottom: "13px",
                   }}
                 >
                   <span style={{ color: "gray", marginRight: "5px" }}>
@@ -1088,7 +1092,7 @@ function CalendarView({ showOnlyCalendar = false }) {
                     }
                     style={{
                       width: "60%",
-                      height: "15px",
+                      height: "10px",
                       padding: "1rem",
                       fontSize: "1rem",
                       cursor: "pointer",
@@ -1109,11 +1113,11 @@ function CalendarView({ showOnlyCalendar = false }) {
                   style={{
                     width: "83%",
                     maxWidth: "335px",
-                    height: "15px",
+                    height: "10px",
                     padding: "1rem",
-                    fontSize: "1.1rem",
+                    fontSize: "1rem",
                     cursor: "pointer",
-                    marginBottom: "20px",
+                    marginBottom: "25px",
                   }}
                 />
 
@@ -1122,11 +1126,10 @@ function CalendarView({ showOnlyCalendar = false }) {
                   style={{
                     width: "95%",
                     maxWidth: "370px",
-                    height: "50px",
-                    fontSize: "1.1rem",
+                    height: "45px",
+                    fontSize: "1rem",
                     cursor: "pointer",
                     fontWeight: "bold",
-                    marginBottom: "50px",
                     backgroundColor: darkMode ? "#3c57b3" : "#3c57b3",
                     color: "white",
                   }}
@@ -1250,7 +1253,7 @@ const CustomNavi = styled.div<darkProps>`
   @media (max-width: 550px) {
     height: 0px;
     margin-top: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 20px;
 
     span {
       font-size: 1rem;
@@ -1382,7 +1385,7 @@ const StyledCalendar = styled.div<StyledCalendarProps>`
     content: "";
     position: absolute;
     top: 3px;
-    right: 5px;
+    right: 3px;
     width: 40px;
     height: 40px;
     background-color: #3c57b3;
@@ -1441,10 +1444,10 @@ const StyledCalendar = styled.div<StyledCalendarProps>`
     }
 
     .react-calendar__tile--now::before {
-      top: 8px;
-      right: 7px;
-      width: 20px;
-      height: 20px;
+      top: 5px;
+      right: 4px;
+      width: 25px;
+      height: 25px;
     }
 
     .react-calendar__tile.dot::after {

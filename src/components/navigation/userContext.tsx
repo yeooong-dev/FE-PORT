@@ -85,7 +85,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 export const useUserContext = () => {
   const context = useContext(UserContext);
   if (!context) {
-    throw new Error("useUserContext must be used within a UserProvider");
+    throw new Error("UseUserContext는 UserProvider 내에서 사용해야 합니다.");
   }
   return context;
 };

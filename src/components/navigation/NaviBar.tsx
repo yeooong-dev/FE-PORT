@@ -190,13 +190,10 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
     }
   };
 
-  const handleCompanyPageClick = () => {
-    if (!hasAccessToCompanyPage) {
-      setAlertType("error");
-      setAlertMessage("접근 권한이 없습니다.");
-      return false;
+  const handleMenuClick = () => {
+    if (window.innerWidth <= 550) {
+      setIsSidebarOpen(false);
     }
-    return true;
   };
 
   return (
@@ -232,7 +229,13 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
       <NavBtn>
         {mode === "IoMdPerson" && (
           <>
-            <Link to='/main' onClick={() => setActiveMenu("main")}>
+            <Link
+              to='/main'
+              onClick={() => {
+                setActiveMenu("main");
+                handleMenuClick();
+              }}
+            >
               <Main
                 $active={activeMenu === "main"}
                 isSidebarOpen={isSidebarOpen}
@@ -244,7 +247,13 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
               </Main>
             </Link>
 
-            <Link to='/todo' onClick={() => setActiveMenu("todo")}>
+            <Link
+              to='/todo'
+              onClick={() => {
+                setActiveMenu("todo");
+                handleMenuClick();
+              }}
+            >
               <Todo
                 $active={activeMenu === "todo"}
                 isSidebarOpen={isSidebarOpen}
@@ -256,7 +265,13 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
               </Todo>
             </Link>
 
-            <Link to='/calendar' onClick={() => setActiveMenu("calendar")}>
+            <Link
+              to='/calendar'
+              onClick={() => {
+                setActiveMenu("calendar");
+                handleMenuClick();
+              }}
+            >
               <Cal
                 $active={activeMenu === "calendar"}
                 isSidebarOpen={isSidebarOpen}
@@ -270,7 +285,10 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
 
             <Link
               to='/event'
-              onClick={() => setActiveMenu("event")}
+              onClick={() => {
+                setActiveMenu("event");
+                handleMenuClick();
+              }}
               style={{ width }}
             >
               <Fam
@@ -286,7 +304,10 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
 
             <Link
               to='/mypage'
-              onClick={() => setActiveMenu("mypage")}
+              onClick={() => {
+                setActiveMenu("mypage");
+                handleMenuClick();
+              }}
               style={{ width }}
             >
               <Mypage
@@ -306,7 +327,10 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
           <>
             <Link
               to='/chat'
-              onClick={() => setActiveMenu("chat")}
+              onClick={() => {
+                setActiveMenu("chat");
+                handleMenuClick();
+              }}
               style={{ width }}
             >
               <Talk
@@ -322,7 +346,10 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
 
             <Link
               to={hasAccessToOrganizationChart ? "/chart" : "#"}
-              onClick={handleChartPageAccess}
+              onClick={() => {
+                setActiveMenu("handleChartPageAccess");
+                handleMenuClick();
+              }}
               style={{ width }}
             >
               <Talk
@@ -338,7 +365,10 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
 
             <Link
               to={hasAccessToVacationRequest ? "/vac" : "#"}
-              onClick={handleVacationPageAccess}
+              onClick={() => {
+                setActiveMenu("handleVacationPageAccess");
+                handleMenuClick();
+              }}
               style={{ width }}
             >
               <Fam $active={activeMenu === "vac"} isSidebarOpen={isSidebarOpen}>
@@ -358,6 +388,7 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
                   setAlertMessage("접근 권한이 없습니다.");
                 } else {
                   setActiveMenu("company");
+                  handleMenuClick();
                 }
               }}
               style={{ width }}

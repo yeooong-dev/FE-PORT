@@ -1,8 +1,10 @@
+import ReactDOM from "react-dom";
 import { useState, ChangeEvent, FormEvent } from "react";
 import { useSearchResults } from "./SearchResultsContext";
 import {
   Action,
   Dark,
+  ModalBackground,
   Mode,
   Search,
   SearchBtn,
@@ -37,6 +39,7 @@ function SearchBar({
   const [alertMessage, setAlertMessage] = useState("");
   const [searchInputVisible, setSearchInputVisible] = useState(false);
   const [isSearchAttempted, setIsSearchAttempted] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const changeMode = () => {
     if (mode === "FaPeopleGroup") {
@@ -71,6 +74,7 @@ function SearchBar({
       );
       setSearchResults(response.data);
       navigate("/search-results");
+      setIsModalOpen(false);
     } catch (error) {
       console.error("검색 결과를 가져오는 중 에러가 발생했습니다:", error);
     }
@@ -82,12 +86,16 @@ function SearchBar({
   };
 
   const toggleSearchInput = () => {
-    if (!searchInputVisible) {
-      setTimeout(() => {
-        setSearchInputVisible(true);
-      }, 0);
+    if (window.innerWidth <= 880) {
+      setIsModalOpen(true);
     } else {
-      setSearchInputVisible(false);
+      if (!searchInputVisible) {
+        setTimeout(() => {
+          setSearchInputVisible(true);
+        }, 0);
+      } else {
+        setSearchInputVisible(false);
+      }
     }
   };
 
@@ -97,6 +105,12 @@ function SearchBar({
       setSearchInputVisible(false);
     } else {
       setIsSidebarOpen(!isSidebarOpen);
+    }
+  };
+
+  const toggleModal = (e: any) => {
+    if (e.target === e.currentTarget) {
+      setIsModalOpen(!isModalOpen);
     }
   };
 
@@ -151,13 +165,14 @@ function SearchBar({
           <BiSearchAlt size='32' className='icon' />
         </SearchBtn>
 
-        {searchInputVisible && (
+        {searchInputVisible && !isModalOpen && (
           <Action
             darkMode={darkMode}
             visible={searchInputVisible}
             isSidebarOpen={isSidebarOpen}
           >
             <SearchInput
+              autoFocus
               id='search-input'
               value={searchTerm}
               onChange={handleSearchChange}
@@ -167,12 +182,54 @@ function SearchBar({
               }
               visible={searchInputVisible}
               darkMode={darkMode}
+              onKeyPress={(e: any) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSearchSubmit();
+                }
+              }}
             />
             <Search onClick={handleSearchSubmit} darkMode={darkMode}>
               검색
             </Search>
           </Action>
         )}
+
+        {isModalOpen &&
+          ReactDOM.createPortal(
+            <ModalBackground isModalOpen={isModalOpen} onClick={toggleModal}>
+              <Action
+                darkMode={darkMode}
+                visible={true}
+                isSidebarOpen={isSidebarOpen}
+              >
+                <SearchInput
+                  autoFocus
+                  id='search-input'
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  isSidebarOpen={isSidebarOpen}
+                  placeholder={
+                    isSearchAttempted && !searchTerm
+                      ? "검색어를 입력해주세요."
+                      : ""
+                  }
+                  visible={true}
+                  darkMode={darkMode}
+                  onKeyPress={(e: any) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleSearchSubmit();
+                    }
+                  }}
+                />
+                <Search onClick={handleSearchSubmit} darkMode={darkMode}>
+                  검색
+                </Search>
+              </Action>
+            </ModalBackground>,
+            document.body
+          )}
       </SearchRight>
     </SearchWrap>
   );

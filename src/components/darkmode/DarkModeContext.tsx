@@ -22,7 +22,7 @@ export const DarkModeProvider: React.FC<DarkModeProviderProps> = ({
   });
 
   const toggleDarkMode = () => {
-    setDarkMode((prev:any) => {
+    setDarkMode((prev: any) => {
       const nextMode = !prev;
       localStorage.setItem("darkMode", JSON.stringify(nextMode));
       return nextMode;
@@ -39,7 +39,9 @@ export const DarkModeProvider: React.FC<DarkModeProviderProps> = ({
 export const useDarkMode = () => {
   const context = useContext(DarkModeContext);
   if (context === undefined) {
-    throw new Error("useDarkMode must be used within a DarkModeProvider");
+    throw new Error(
+      "useDarkMode는 DarkModeProvider 내부에서 사용되어야 합니다."
+    );
   }
   return context;
 };

@@ -243,10 +243,9 @@ function FamilyEvent() {
             },
             content: {
               width: "80%",
-              maxWidth: "600px",
-              minWidth: "250px",
-              maxHeight: "600px",
-              height: "90%",
+              maxWidth: "500px",
+              height: "80%",
+              maxHeight: "500px",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
@@ -258,6 +257,7 @@ function FamilyEvent() {
               alignItems: "center",
               justifyContent: "flex-start",
               position: "relative",
+              overflowY: "scroll",
             },
           }}
         >
@@ -268,10 +268,10 @@ function FamilyEvent() {
               right: "20px",
               backgroundColor: "#858087",
               border: "none",
-              width: "40px",
-              height: "40px",
+              width: "30px",
+              height: "30px",
               borderRadius: "50%",
-              fontSize: "1.3rem",
+              fontSize: "1rem",
               cursor: "pointer",
               color: "white",
             }}
@@ -279,22 +279,19 @@ function FamilyEvent() {
           >
             X
           </button>
-          <p
+          <h3
             style={{
-              fontSize: "1.3rem",
-              marginTop: "20px",
-              marginBottom: "20px",
-              textAlign: "center",
-              fontWeight: "bold",
-              color: darkMode ? "white" : "#2e2e2e",
+              paddingTop: "40px",
+              paddingBottom: "20px",
+              color: darkMode ? "white" : "black",
             }}
           >
             경조사 기록 내역
-          </p>
+          </h3>
           <div
             style={{
-              width: "90%",
-              height: "70px",
+              width: "100%",
+              height: "30px",
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
@@ -303,51 +300,57 @@ function FamilyEvent() {
             <div
               style={{
                 width: "100%",
-                height: "43px",
+                height: "30px",
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "flex-start",
                 background: "#e6e6e6",
                 borderRadius: "10px",
                 color: "#5e5e5e",
+                fontSize: "14px",
+                paddingLeft: "10px",
               }}
             >
               <span
                 style={{
-                  width: "20%",
-                  textAlign: "center",
+                  width: "15%",
+                  textAlign: "left",
                   fontWeight: "bold",
+                  marginRight: "10px",
                 }}
               >
-                경조사 대상
+                대상
+              </span>
+
+              <span
+                style={{
+                  width: "15%",
+                  textAlign: "left",
+                  fontWeight: "bold",
+                  marginRight: "10px",
+                }}
+              >
+                날짜
+              </span>
+              <span
+                style={{
+                  width: "15%",
+                  textAlign: "left",
+                  fontWeight: "bold",
+                  marginRight: "10px",
+                }}
+              >
+                유형
               </span>
 
               <span
                 style={{
                   width: "20%",
-                  textAlign: "center",
+                  textAlign: "left",
                   fontWeight: "bold",
                 }}
               >
-                경조사 날짜
-              </span>
-              <span
-                style={{
-                  width: "20%",
-                  textAlign: "center",
-                  fontWeight: "bold",
-                }}
-              >
-                경조사 유형
-              </span>
-
-              <span
-                style={{
-                  width: "20%",
-                  textAlign: "center",
-                  fontWeight: "bold",
-                }}
-              >
-                경조사 금액
+                금액
               </span>
             </div>
           </div>
@@ -357,7 +360,7 @@ function FamilyEvent() {
               key={event.id}
               style={{
                 width: "100%",
-                height: "70px",
+                height: "auto",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -367,31 +370,33 @@ function FamilyEvent() {
               <div
                 key={event.id}
                 style={{
-                  width: "90%",
-                  height: "65px",
+                  width: "100%",
+                  height: "auto",
                   borderBottom: darkMode
                     ? "1.5px solid #595959"
                     : "1.5px solid #d9d9d9",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  marginTop: "-20px",
+                  justifyContent: "flex-start",
+                  padding: "10px 0 10px 10px",
                 }}
               >
                 <span
                   style={{
-                    width: "20%",
-                    textAlign: "center",
-                    fontSize: "0.9rem",
+                    width: "15%",
+                    textAlign: "left",
+                    fontSize: "14px",
+                    marginRight: "10px",
                   }}
                 >
                   {event.target}
                 </span>
                 <span
                   style={{
-                    width: "22%",
-                    textAlign: "center",
-                    fontSize: "0.9rem",
+                    width: "15%",
+                    textAlign: "left",
+                    fontSize: "13px",
+                    marginRight: "10px",
                   }}
                 >
                   {event.date.split("T")[0]}{" "}
@@ -399,9 +404,10 @@ function FamilyEvent() {
 
                 <span
                   style={{
-                    width: "22%",
-                    textAlign: "center",
-                    fontSize: "0.9rem",
+                    width: "15%",
+                    textAlign: "left",
+                    fontSize: "13px",
+                    marginRight: "10px",
                   }}
                 >
                   {event.type}
@@ -409,9 +415,11 @@ function FamilyEvent() {
 
                 <span
                   style={{
-                    width: "22%",
-                    textAlign: "center",
-                    fontSize: "0.9rem",
+                    width: "20%",
+                    textAlign: "left",
+                    fontSize: "13px",
+                    marginRight: "20px",
+                    wordBreak: "break-all",
                   }}
                 >
                   {event.amount}원
@@ -419,11 +427,12 @@ function FamilyEvent() {
 
                 <div
                   style={{
-                    width: "20%",
+                    width: "10%",
                     textAlign: "center",
                     display: "flex",
                     justifyContent: "center",
                     marginTop: "5px",
+                    gap: "5px",
                   }}
                 >
                   <button
@@ -438,7 +447,7 @@ function FamilyEvent() {
                       fontSize: "1.2rem",
                       cursor: "pointer",
                       background: "none",
-                      marginRight: "20px",
+                      marginRight: "5px",
                       color: darkMode ? "white" : "#3c57b3",
                     }}
                   >
@@ -479,13 +488,13 @@ function FamilyEvent() {
                   width: "30px",
                   height: "30px",
                   fontSize: "1.2rem",
-                  margin: "0.5rem",
+                  margin: "10px 5px 0 5px",
                   background: "none",
                   cursor: "pointer",
                   borderRadius: "20%",
                   backgroundColor:
                     currentPage === number ? "#3c57b3" : "transparent",
-                  color: currentPage === number ? "white" : "black",
+                  color: currentPage === number ? "white" : "#969696",
                 }}
               >
                 {number}
@@ -510,12 +519,11 @@ function FamilyEvent() {
               }}
               style={{
                 marginTop: "20px",
-                marginBottom: "20px",
                 background: "none",
-                fontSize: "1.2rem",
+                fontSize: "1rem",
                 border: "1.5px solid #e34f39",
                 borderRadius: "10px",
-                padding: "13px",
+                padding: "10px",
                 color: "#e34f39",
                 cursor: "pointer",
               }}
@@ -534,10 +542,9 @@ function FamilyEvent() {
             },
             content: {
               width: "80%",
-              maxWidth: "600px",
-              minWidth: "250px",
-              maxHeight: "600px",
-              height: "90%",
+              maxWidth: "500px",
+              height: "80%",
+              maxHeight: "500px",
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
@@ -547,8 +554,9 @@ function FamilyEvent() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              justifyContent: "flex-start",
+              justifyContent: "center",
               position: "relative",
+              overflowY: "scroll",
             },
           }}
         >
@@ -559,10 +567,10 @@ function FamilyEvent() {
               right: "20px",
               backgroundColor: "#858087",
               border: "none",
-              width: "40px",
-              height: "40px",
+              width: "30px",
+              height: "30px",
               borderRadius: "50%",
-              fontSize: "1.3rem",
+              fontSize: "1rem",
               cursor: "pointer",
               color: "white",
             }}
@@ -579,9 +587,7 @@ function FamilyEvent() {
               }
               placeholder='경조사 대상'
               style={{
-                paddingLeft: "2rem",
                 fontSize: "1rem",
-                marginTop: "80px",
               }}
             />
             <Date
@@ -592,7 +598,6 @@ function FamilyEvent() {
               }
               placeholder='경조사 날짜'
               style={{
-                paddingLeft: "2rem",
                 fontSize: "1rem",
               }}
             />
@@ -604,7 +609,6 @@ function FamilyEvent() {
               }
               placeholder='경조사 유형'
               style={{
-                paddingLeft: "2rem",
                 fontSize: "1rem",
               }}
             />
@@ -616,20 +620,20 @@ function FamilyEvent() {
               }
               placeholder='경조사 금액'
               style={{
-                paddingLeft: "2rem",
                 fontSize: "1rem",
-                marginBottom: "50px",
+                marginBottom: "30px",
               }}
             />
             <button
               onClick={handleUpdateEventConfirm}
               style={{
-                width: "90%",
-                height: "65px",
-                fontSize: "1.2rem",
+                width: "100%",
+                fontSize: "16px",
                 background: "#3c57b3",
                 color: "white",
                 cursor: "pointer",
+                borderRadius: "10px",
+                padding: "15px",
               }}
             >
               수정하기

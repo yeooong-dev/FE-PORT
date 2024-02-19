@@ -56,5 +56,12 @@ export const LoginBtn = styled.button`
     width: 80%;
     height: 40px;
     font-size: 14px;
+
+    &:hover {
+      background: #3c57b3;
+      color: white;
+      font-weight: 400;
+      border: none;
+    }
   }
 `;

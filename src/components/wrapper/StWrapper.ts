@@ -42,10 +42,11 @@ export const Right = styled.div<RightProps>`
   flex-direction: column;
 
   @media (max-width: 550px) {
-    width: ${(props) => (props.isSidebarOpen ? "100%" : "90%")};
-    margin-left: ${(props) => (props.isSidebarOpen ? "-100px" : "-242px")};
+    width: ${(props) => (props.isSidebarOpen ? "100%" : "100%")};
+    height: 100vh;
+    margin-left: ${(props) => (props.isSidebarOpen ? "-135px" : "-300px")};
     transform: translateX(
-      ${(props) => (props.isSidebarOpen ? "100px" : "-20px")}
+      ${(props) => (props.isSidebarOpen ? "100px" : "2px")}
     );
     transition: transform 0.5s ease;
   }
@@ -66,7 +67,13 @@ export const Contents = styled.div<{ darkMode: boolean }>`
   -moz-box-shadow: 6px 6px 10px 5px rgba(0, 0, 0, 0.07);
 
   @media (max-width: 550px) {
-    width: 100%;
+    margin-left: 20px;
+    width: 90%;
+    height: 80%;
+  }
+
+  @media (max-width: 380px) {
+    margin-left: 15px;
   }
 `;
 

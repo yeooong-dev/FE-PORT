@@ -18,25 +18,19 @@ interface MentProps {
 export const Wrap = styled.div<WrapProps>`
   width: ${({ isSidebarOpen }) => (isSidebarOpen ? "100%" : "50px")};
   transition: width 0.5s ease, margin-right 0.5s ease;
-  height: 100%;
+  height: 100vh;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
   flex-direction: column;
   background: ${({ darkMode }) => (darkMode ? "#323336" : "#f4f5fb")};
   margin-right: ${({ isSidebarOpen }) =>
     isSidebarOpen ? "0px" : "calc(100% - 80px)"};
   text-align: center;
-  z-index: 99;
-  padding-top: 100px;
 
   @media (max-width: 550px) {
     display: ${({ isSidebarOpen }) => (isSidebarOpen ? "flex" : "none")};
-    padding-top: 50px;
-  }
-
-  @media (max-width: 320px) {
-    // padding-top: 30px;
+    margin-right: 20px;
   }
 `;
 
@@ -51,17 +45,18 @@ export const ProfileImg = styled.img`
   @media (max-width: 550px) {
     width: 60px;
     height: 60px;
+    margin: 15px;
   }
 `;
 
 export const Ment = styled.p<MentProps>`
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   font-size: 1.3rem;
   color: ${({ darkMode }) => (darkMode ? "#fff" : "#293642")};
 
   @media (max-width: 550px) {
-    margin-bottom: 0;
     font-size: 18px;
+    margin: 0px;
   }
 `;
 
@@ -125,8 +120,10 @@ export const Main = styled.button<MainProps>`
   }
 
   @media (max-width: 550px) {
-    height: 45px;
-    margin-bottom: 10px;
+    height: 35px;
+    margin-bottom: 17px;
+    font-size: 14px;
+    border-radius: 5px;
   }
 `;
 
@@ -172,8 +169,10 @@ export const Todo = styled.button<MainProps>`
   }
 
   @media (max-width: 550px) {
-    height: 45px;
-    margin-bottom: 10px;
+    height: 35px;
+    margin-bottom: 17px;
+    font-size: 14px;
+    border-radius: 5px;
   }
 `;
 
@@ -219,8 +218,10 @@ export const Cal = styled.button<MainProps>`
   }
 
   @media (max-width: 550px) {
-    height: 45px;
-    margin-bottom: 10px;
+    height: 35px;
+    margin-bottom: 17px;
+    font-size: 14px;
+    border-radius: 5px;
   }
 `;
 
@@ -266,8 +267,10 @@ export const Fam = styled.button<MainProps>`
   }
 
   @media (max-width: 550px) {
-    height: 45px;
-    margin-bottom: 10px;
+    height: 35px;
+    margin-bottom: 17px;
+    font-size: 14px;
+    border-radius: 5px;
   }
 `;
 
@@ -312,8 +315,10 @@ export const Talk = styled.button<MainProps>`
   }
 
   @media (max-width: 550px) {
-    height: 45px;
-    margin-bottom: 10px;
+    height: 35px;
+    margin-bottom: 17px;
+    font-size: 14px;
+    border-radius: 5px;
   }
 `;
 
@@ -359,8 +364,10 @@ export const Mypage = styled.button<MainProps>`
   }
 
   @media (max-width: 550px) {
-    height: 45px;
+    height: 35px;
     margin-bottom: 50px;
+    font-size: 14px;
+    border-radius: 5px;
   }
 `;
 
@@ -390,7 +397,7 @@ export const Log = styled.li<MentProps>`
   }
 
   @media (max-width: 320px) {
-    height: 50px;
+    height: 20px;
     align-items: flex-start;
   }
 `;
