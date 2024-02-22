@@ -5,7 +5,7 @@ import UseLogout from "../hook/UseLogout";
 const cookies = new Cookies();
 
 const instance = axios.create({
-    baseURL: process.env.REACT_APP_BE_LOCAL,
+    baseURL: process.env.REACT_APP_BE_SERVER,
 });
 
 let isRefreshing = false;

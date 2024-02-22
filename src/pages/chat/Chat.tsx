@@ -85,7 +85,7 @@ function Chat({ showOnlyChat = false }) {
 
     // 소켓 설정
     useEffect(() => {
-        const newSocket = io(process.env.REACT_APP_BE_LOCAL || "");
+        const newSocket = io(process.env.REACT_APP_BE_SERVER || "");
         setSocket(newSocket);
 
         newSocket.on("updated chat list", (updatedChatList) => {
