@@ -6,6 +6,7 @@ const cookies = new Cookies();
 
 const instance = axios.create({
     baseURL: process.env.REACT_APP_BE_SERVER,
+    withCredentials: true,
 });
 
 let isRefreshing = false;

@@ -4,7 +4,7 @@ import instance from "./instance";
 // 이메일 중복 체크
 export const usercheckEmail = async (email?: string) => {
     const value = { email: email };
-    const response = await axios.post(`${process.env.REACT_APP_BE_SERVER}/auth/checkEmail`, value);
+    const response = await instance.post(`/auth/checkEmail`, value);
     return response;
 };
 
