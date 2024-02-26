@@ -62,7 +62,7 @@
             "last 1 safari version"
         ]
     },
-    "proxy": "https://portport.shop",
+    "proxy": "https://port-six-theta.vercel.app",
     "devDependencies": {
         "@types/react-modal": "^3.16.0",
         "@types/styled-components": "^5.1.26"
