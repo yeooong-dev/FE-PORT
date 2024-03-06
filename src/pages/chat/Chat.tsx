@@ -412,62 +412,60 @@ function Chat({ showOnlyChat = false }) {
                 ) : (
                     <>
                         <ListWrap show={showLeftWrap} darkMode={darkMode}>
-                            {interactedUsers.length > 0 ? (
-                                interactedUsers.map((interactedUser, index) => {
-                                    if (!interactedUser.user) {
-                                        return null;
-                                    }
+                            {interactedUsers.length > 0
+                                ? interactedUsers.map((interactedUser, index) => {
+                                      if (!interactedUser.user) {
+                                          return null;
+                                      }
 
-                                    const isUserSelected =
-                                        selectedUser && selectedUser.user
-                                            ? selectedUser.user.id === interactedUser.user.id
-                                            : false;
+                                      const isUserSelected =
+                                          selectedUser && selectedUser.user
+                                              ? selectedUser.user.id === interactedUser.user.id
+                                              : false;
 
-                                    return (
-                                        <List
-                                            key={interactedUser.user.id}
-                                            isSelected={isUserSelected}
-                                            onClick={() => selectUser(interactedUser)}
-                                            darkMode={darkMode}
-                                        >
-                                            <img
-                                                src={
-                                                    interactedUser.user?.profile_image
-                                                        ? `https://yeong-port.s3.ap-northeast-2.amazonaws.com/${interactedUser.user.profile_image}`
-                                                        : "https://yeong-port.s3.ap-northeast-2.amazonaws.com/person.png"
-                                                }
-                                                alt={`${interactedUser.user?.name || "User"}'s profile`}
-                                                style={{
-                                                    borderRadius: "50%",
-                                                }}
-                                            />
+                                      return (
+                                          <List
+                                              key={interactedUser.user.id}
+                                              isSelected={isUserSelected}
+                                              onClick={() => selectUser(interactedUser)}
+                                              darkMode={darkMode}
+                                          >
+                                              <img
+                                                  src={
+                                                      interactedUser.user?.profile_image
+                                                          ? `https://yeong-port.s3.ap-northeast-2.amazonaws.com/${interactedUser.user.profile_image}`
+                                                          : "https://yeong-port.s3.ap-northeast-2.amazonaws.com/person.png"
+                                                  }
+                                                  alt={`${interactedUser.user?.name || "User"}'s profile`}
+                                                  style={{
+                                                      borderRadius: "50%",
+                                                  }}
+                                              />
 
-                                            <p>{interactedUser.user?.name || interactedUser.user?.company_name}</p>
+                                              <p>{interactedUser.user?.name || interactedUser.user?.company_name}</p>
 
-                                            {isUserSelected && (
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleLeaveChatRoom(interactedUser.roomId);
-                                                    }}
-                                                    className='exit'
-                                                >
-                                                    X
-                                                </button>
-                                            )}
-                                            {showConfirm && selectedUser && (
-                                                <CustomConfirm
-                                                    message='채팅방을 나가겠습니까?'
-                                                    onConfirm={() => handleLeaveChatRoom(selectedUser.roomId)}
-                                                    onCancel={() => setShowConfirm(false)}
-                                                />
-                                            )}
-                                        </List>
-                                    );
-                                })
-                            ) : (
-                                <div>채팅한 사용자가 없습니다.</div>
-                            )}
+                                              {isUserSelected && (
+                                                  <button
+                                                      onClick={(e) => {
+                                                          e.stopPropagation();
+                                                          handleLeaveChatRoom(interactedUser.roomId);
+                                                      }}
+                                                      className='exit'
+                                                  >
+                                                      X
+                                                  </button>
+                                              )}
+                                              {showConfirm && selectedUser && (
+                                                  <CustomConfirm
+                                                      message='채팅방을 나가겠습니까?'
+                                                      onConfirm={() => handleLeaveChatRoom(selectedUser.roomId)}
+                                                      onCancel={() => setShowConfirm(false)}
+                                                  />
+                                              )}
+                                          </List>
+                                      );
+                                  })
+                                : null}
                         </ListWrap>
                     </>
                 )}
@@ -734,7 +732,7 @@ interface showProps {
 
 export const ChatWrap = styled.div`
     width: 100%;
-    height: 88vh;
+    height: auto;
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -768,6 +766,7 @@ export const BtnBox = styled.div`
     justify-content: space-between;
     align-items: center;
     padding-left: 10px;
+    padding-top: 80px;
 
     h1 {
         font-size: 18px;
