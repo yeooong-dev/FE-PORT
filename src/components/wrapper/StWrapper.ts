@@ -16,6 +16,10 @@ export const Wrap = styled.div<{
     justify-content: space-between;
     background-color: ${({ darkMode }) => (darkMode ? "#323336" : "#f4f5fb")};
     color: ${({ darkMode }) => (darkMode ? "#fff" : "#000")};
+
+    @media (max-width: 550px) {
+        height: auto;
+    }
 `;
 
 export const Left = styled.div`
@@ -29,6 +33,7 @@ export const Left = styled.div`
 
     @media (max-width: 1200px) {
         width: 30%;
+        height: auto;
     }
 `;
 
@@ -43,7 +48,7 @@ export const Right = styled.div<RightProps>`
 
     @media (max-width: 550px) {
         width: ${(props) => (props.isSidebarOpen ? "100%" : "100%")};
-        height: 100vh;
+        height: auto;
         margin-left: ${(props) => (props.isSidebarOpen ? "-135px" : "-300px")};
         transform: translateX(${(props) => (props.isSidebarOpen ? "100px" : "2px")});
         transition: transform 0.5s ease;
@@ -67,7 +72,9 @@ export const Contents = styled.div<{ darkMode: boolean }>`
     @media (max-width: 550px) {
         margin-left: 20px;
         width: 90%;
-        height: 80%;
+        height: auto;
+        margin-top: 25px;
+        margin-bottom: 50px;
     }
 
     @media (max-width: 380px) {

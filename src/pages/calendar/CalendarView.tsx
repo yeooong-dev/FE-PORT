@@ -253,7 +253,7 @@ function CalendarView({ showOnlyCalendar = false }) {
             endTime: "",
             title: "",
         });
-
+        setEdit(null);
         setIsModalOpen(true);
     };
 
@@ -1112,6 +1112,7 @@ const CalendarWrap = styled.div<darkProps>`
         padding: 0px;
         width: 100%;
         border: none;
+        height: auto;
     }
 `;
 

@@ -9,8 +9,7 @@ export const Wrap = styled.div`
     height: 100vh;
     display: flex;
     align-items: flex-start;
-    justify-content: flex-start;
-    flex-direction: column;
+    justify-content: space-between;
     overflow-x: hidden;
     overflow-y: scroll;
     padding: 80px;
@@ -18,31 +17,35 @@ export const Wrap = styled.div`
     @media (max-width: 550px) {
         height: auto;
         justify-content: flex-start;
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 50px;
     }
 `;
 
-export const WrapTop = styled.div`
-    width: 100%;
-    height: 40vh;
+export const WrapLeft = styled.div`
+    width: 60%;
+    height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 120px;
+    flex-direction: column;
+    margin-right: 10px;
 
     @media (max-width: 550px) {
-        flex-direction: column;
+        width: 100%;
         height: auto;
-        margin-top: 50px;
     }
 `;
 
 export const WrapTodo = styled.div<darkProps>`
-    width: 70%;
+    width: 100%;
     max-width: 1000px;
     height: auto;
     display: flex;
     align-items: center;
     margin-right: 20px;
+    margin-bottom: 30px;
 
     h1 {
         font-size: 1rem;
@@ -54,10 +57,10 @@ export const WrapTodo = styled.div<darkProps>`
 
     .todolist {
         width: 100%;
-        height: 350px;
+        height: 320px;
         max-height: 350px;
         background: ${({ darkMode }) => (darkMode ? "#323336" : "#f7f7f7")};
-        color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
+        color: ${({ darkMode }) => (darkMode ? "white" : "#5b5b5b")};
         border-radius: 20px;
         padding: 2rem;
         overflow-y: auto;
@@ -76,9 +79,10 @@ export const WrapTodo = styled.div<darkProps>`
     }
 
     @media (max-width: 550px) {
-        width: 90%;
+        width: 100%;
+        align-items: flex-start;
         margin-right: 0px;
-        margin-bottom: 20px;
+        margin-bottom: 40px;
     }
 `;
 
@@ -100,55 +104,10 @@ export const CheckDiv = styled.div`
     }
 `;
 
-export const WrapCalendar = styled.div<darkProps>`
-    width: 30%;
-    height: 100%;
-    max-height: 385px;
-    max-width: 800px;
-    color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
-    border-radius: 20px;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-
-    div {
-        width: 100%;
-        max-width: 500px;
-        height: auto;
-        max-height: 385px;
-        position: relative;
-        bottom: 0;
-        left: 0;
-        margin: 0;
-    }
-
-    @media (max-width: 550px) {
-        width: 90%;
-        padding-top: 100px;
-        background: ${({ darkMode }) => (darkMode ? "#323336" : "#f7f7f7")};
-        margin-bottom: -5px;
-        max-height: 280px;
-    }
-`;
-
-export const WrapBottom = styled.div`
-    width: 100%;
-    height: 40vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 15px;
-
-    @media (max-width: 550px) {
-        flex-direction: column;
-        height: auto;
-    }
-`;
-
 export const WrapEvent = styled.div<darkProps>`
-    width: 70%;
+    width: 100%;
     max-width: 1000px;
-    height: 100%;
+    height: auto;
     display: flex;
     align-items: center;
     margin-right: 20px;
@@ -163,7 +122,7 @@ export const WrapEvent = styled.div<darkProps>`
 
     .event {
         width: 100%;
-        height: 350px;
+        height: 320px;
         background: ${({ darkMode }) => (darkMode ? "#323336" : "#f7f7f7")};
         border-radius: 20px;
         padding: 2rem;
@@ -178,7 +137,7 @@ export const WrapEvent = styled.div<darkProps>`
         }
 
         .eventItem {
-            font-size: 1.1rem;
+            font-size: 1rem;
             padding-top: 20px;
             margin-bottom: 10px;
             color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
@@ -202,12 +161,14 @@ export const WrapEvent = styled.div<darkProps>`
     }
 
     @media (max-width: 550px) {
-        width: 90%;
-        height: 50%;
+        width: 100%;
+        height: 50vh;
         margin-right: 0px;
-        margin-bottom: 20px;
+        margin-bottom: 40px;
 
         .event {
+            height: 300px;
+
             .eventHeaders {
                 font-size: 1rem;
             }
@@ -219,26 +180,90 @@ export const WrapEvent = styled.div<darkProps>`
     }
 `;
 
-export const WrapSocket = styled.div<darkProps>`
-    width: 30%;
-    max-height: 410px;
-    overflow-y: auto;
-    max-width: 600px;
+export const WrapRight = styled.div<darkProps>`
+    width: 40%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    padding: 0;
+    border-radius: 20px;
+    overflow-y: scroll;
     background: ${({ darkMode }) => (darkMode ? "#323336" : "#f7f7f7")};
+
+    @media (max-width: 550px) {
+        width: 100%;
+        height: auto;
+    }
+`;
+
+export const WrapCalendar = styled.div<darkProps>`
+    width: 100%;
+    height: auto;
+    max-width: 800px;
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
     border-radius: 20px;
 
-    h1 {
-        color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
-        font-size: 1rem;
-        text-align: left;
-        font-family: var(--font-title);
-        margin-bottom: -60px;
-        padding: 35px;
+    div {
+        width: 100%;
+        max-width: 500px;
+        height: auto;
+        max-height: 400px;
     }
 
     @media (max-width: 550px) {
         width: 90%;
-        margin-bottom: 20px;
+        background: ${({ darkMode }) => (darkMode ? "#323336" : "#f7f7f7")};
+    }
+`;
+
+export const SchedulesList = styled.div<darkProps>`
+    width: 50%;
+    height: 700px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: center;
+    padding: 50px;
+    border-radius: 20px;
+    background: ${({ darkMode }) => (darkMode ? "#323336" : "#ffffff")};
+    margin-bottom: 50px;
+
+    .schedule-item {
+        width: 100%;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        line-height: 2.5rem;
+        text-align: left;
+
+        p:last-child {
+            color: #afafaf;
+        }
+    }
+    @media (max-width: 550px) {
+        height: auto;
+        width: 70%;
+        padding: 20px;
+
+        .schedule-item {
+            width: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.5rem;
+            text-align: center;
+        }
+
+        p {
+            width: 100%;
+        }
+
+        p:last-child {
+            font-size: 14px;
+        }
     }
 `;

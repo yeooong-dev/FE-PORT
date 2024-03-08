@@ -8,7 +8,6 @@ import Todo from "../pages/todo/Todo";
 import Mypage from "../pages/mypage/Mypage";
 import FamilyEvent from "../pages/familyEvent/FamilyEvent";
 import Vacation from "../pages/vacation/Vacation";
-import Chat from "../pages/chat/Chat";
 import Calendar from "../pages/calendar/CalendarView";
 import UseIsLogin from "../hook/UseIsLogin";
 import Wrapper from "../components/wrapper/Wrapper";
@@ -17,66 +16,46 @@ import CompanyPage from "../pages/company/CompanyPage";
 import Chart from "../pages/chart/Chart";
 
 interface ProtectedRouteProps {
-  element: ReactElement;
+    element: ReactElement;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element }) => {
-  const [isLogin, loading] = UseIsLogin();
-  const navigate = useNavigate();
+    const [isLogin, loading] = UseIsLogin();
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!loading) {
-      if (!isLogin) {
-        navigate("/login");
-      }
-    }
-  }, [isLogin, loading, navigate]);
+    useEffect(() => {
+        if (!loading) {
+            if (!isLogin) {
+                navigate("/login");
+            }
+        }
+    }, [isLogin, loading, navigate]);
 
-  return loading ? null : isLogin ? element : null;
+    return loading ? null : isLogin ? element : null;
 };
 
 function Router() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<Info />} />
-        <Route path='/register' element={<Register />} />
-        <Route path='/login' element={<Login />} />
+    return (
+        <BrowserRouter>
+            <Routes>
+                <Route path='/' element={<Info />} />
+                <Route path='/register' element={<Register />} />
+                <Route path='/login' element={<Login />} />
 
-        <Route path='/' element={<Wrapper />}>
-          <Route path='/search-results' element={<SearchResultsPage />} />
-          <Route path='main' element={<Main />} />
-          <Route
-            path='mypage'
-            element={<ProtectedRoute element={<Mypage />} />}
-          />
-          <Route path='todo' element={<ProtectedRoute element={<Todo />} />} />
-          <Route
-            path='calendar'
-            element={<ProtectedRoute element={<Calendar />} />}
-          />
-          <Route
-            path='event'
-            element={<ProtectedRoute element={<FamilyEvent />} />}
-          />
-          <Route path='chat' element={<ProtectedRoute element={<Chat />} />} />
-          <Route
-            path='chart'
-            element={<ProtectedRoute element={<Chart />} />}
-          />
-          <Route
-            path='vac'
-            element={<ProtectedRoute element={<Vacation />} />}
-          />
-
-          <Route
-            path='company'
-            element={<ProtectedRoute element={<CompanyPage />} />}
-          />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  );
+                <Route path='/' element={<Wrapper />}>
+                    <Route path='/search-results' element={<SearchResultsPage />} />
+                    <Route path='main' element={<Main />} />
+                    <Route path='mypage' element={<ProtectedRoute element={<Mypage />} />} />
+                    <Route path='todo' element={<ProtectedRoute element={<Todo />} />} />
+                    <Route path='calendar' element={<ProtectedRoute element={<Calendar />} />} />
+                    <Route path='event' element={<ProtectedRoute element={<FamilyEvent />} />} />
+                    <Route path='chart' element={<ProtectedRoute element={<Chart />} />} />
+                    <Route path='vac' element={<ProtectedRoute element={<Vacation />} />} />
+                    <Route path='company' element={<ProtectedRoute element={<CompanyPage />} />} />
+                </Route>
+            </Routes>
+        </BrowserRouter>
+    );
 }
 
 export default Router;
