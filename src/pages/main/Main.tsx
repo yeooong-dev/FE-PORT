@@ -151,6 +151,9 @@ function Main() {
 
             <WrapRight darkMode={darkMode}>
                 <WrapCalendar darkMode={darkMode}>
+                    <Link to='/calendar'>
+                        <h1>나의 캘린더 &nbsp; {">"}</h1>
+                    </Link>
                     <div>
                         <CalendarView showOnlyCalendar={true} />
                     </div>

@@ -78,7 +78,7 @@ export const Contents = styled.div<{ darkMode: boolean }>`
     }
 
     @media (max-width: 380px) {
-        margin-left: 15px;
+        margin-left: 17px;
     }
 `;
 

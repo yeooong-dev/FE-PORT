@@ -375,6 +375,7 @@ const Todos = styled.div<darkProps>`
     align-items: center;
     flex-direction: column;
     margin-top: 80px;
+    padding-bottom: 20px;
     overflow-y: auto;
 
     b {

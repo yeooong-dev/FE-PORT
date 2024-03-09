@@ -205,6 +205,15 @@ export const WrapCalendar = styled.div<darkProps>`
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
     border-radius: 20px;
 
+    h1 {
+        color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
+        font-size: 1rem;
+        text-align: left;
+        font-family: var(--font-title);
+        padding: 25px 20px;
+        /* margin-bottom: 40px; */
+    }
+
     div {
         width: 100%;
         max-width: 500px;
@@ -227,7 +236,7 @@ export const SchedulesList = styled.div<darkProps>`
     align-items: center;
     padding: 50px;
     border-radius: 20px;
-    background: ${({ darkMode }) => (darkMode ? "#323336" : "#ffffff")};
+    background: ${({ darkMode }) => (darkMode ? "#2a2a2a" : "#ffffff")};
     margin-bottom: 50px;
 
     .schedule-item {

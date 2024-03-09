@@ -54,7 +54,7 @@ function NaviBar({ isSidebarOpen, setIsSidebarOpen, mode }: NaviBarProps) {
 
     useEffect(() => {
         const storedIsSidebarOpen = localStorage.getItem("isSidebarOpen");
-        setIsSidebarOpen(storedIsSidebarOpen !== null ? storedIsSidebarOpen === "true" : true);
+        setIsSidebarOpen(storedIsSidebarOpen !== null ? storedIsSidebarOpen === "true" : false);
     }, []);
 
     useEffect(() => {

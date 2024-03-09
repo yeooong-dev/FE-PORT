@@ -114,7 +114,7 @@ export const Main = styled.button<MainProps>`
     }
 
     @media (max-width: 550px) {
-        height: 35px;
+        height: 38px;
         margin-bottom: 17px;
         font-size: 14px;
         border-radius: 5px;
@@ -159,7 +159,7 @@ export const Todo = styled.button<MainProps>`
     }
 
     @media (max-width: 550px) {
-        height: 35px;
+        height: 38px;
         margin-bottom: 17px;
         font-size: 14px;
         border-radius: 5px;
@@ -204,7 +204,7 @@ export const Cal = styled.button<MainProps>`
     }
 
     @media (max-width: 550px) {
-        height: 35px;
+        height: 38px;
         margin-bottom: 17px;
         font-size: 14px;
         border-radius: 5px;
@@ -249,7 +249,7 @@ export const Fam = styled.button<MainProps>`
     }
 
     @media (max-width: 550px) {
-        height: 35px;
+        height: 38px;
         margin-bottom: 17px;
         font-size: 14px;
         border-radius: 5px;
@@ -293,7 +293,7 @@ export const Talk = styled.button<MainProps>`
     }
 
     @media (max-width: 550px) {
-        height: 35px;
+        height: 38px;
         margin-bottom: 17px;
         font-size: 14px;
         border-radius: 5px;
@@ -337,7 +337,7 @@ export const Mypage = styled.button<MainProps>`
     }
 
     @media (max-width: 550px) {
-        height: 35px;
+        height: 38px;
         margin-bottom: 50px;
         font-size: 14px;
         border-radius: 5px;
