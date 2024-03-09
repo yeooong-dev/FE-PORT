@@ -295,7 +295,7 @@ export const Info4 = styled.div`
 
     @media (max-width: 550px) {
         flex-direction: column;
-        height: 80vh;
+        height: 70vh;
 
         .imgBox {
             width: 90%;
@@ -340,7 +340,7 @@ export const Info4 = styled.div`
 
 export const Info5 = styled.div`
     width: 100%;
-    height: 900px;
+    height: 960px;
     display: flex;
     align-items: center;
     justify-content: center;
