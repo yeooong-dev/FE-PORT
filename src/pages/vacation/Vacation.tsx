@@ -412,6 +412,8 @@ const Wrap = styled.div<darkProps>`
     }
 
     @media (max-width: 550px) {
+        height: 100vh;
+
         .page {
             p {
                 font-size: 14px;
@@ -702,7 +704,7 @@ const StyledCalendar = styled.div<StyledCalendarProps>`
         .react-calendar__tile {
             padding: 10px;
             font-size: 14px;
-            height: ${(props) => props.tileSize + 6}px;
+            height: ${(props) => props.tileSize + 10}px;
         }
 
         .tooltip {
