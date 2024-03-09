@@ -53,6 +53,7 @@ function Login() {
                         setAlertMessage("로그인에 성공했습니다.");
                         setTimeout(() => {
                             navigate("/main");
+                            localStorage.setItem("isSidebarOpen", "false");
                         }, 1000);
                     } else {
                         setAlertType("error");

@@ -238,7 +238,7 @@ export const ResultWrap = styled.div<{ darkMode: boolean }>`
         width: 100%;
         border: ${({ darkMode }) => (darkMode ? "1.5px solid #696969" : "1.5px solid #d6d6d6")};
         margin-top: 30px;
-        margin-bottom: 20px;
+        margin-bottom: 50px;
         background: ${({ darkMode }) => (darkMode ? "#323336" : "#f9f9f9")};
         border-radius: 15px;
         display: flex;
