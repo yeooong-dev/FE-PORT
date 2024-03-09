@@ -48,10 +48,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
 
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
+        const storedMode = localStorage.getItem("mode");
+
         if (storedUser) {
             const user = JSON.parse(storedUser);
             dispatch({ type: "SET_USER", payload: user });
         }
+        dispatch({ type: "SET_MODE", payload: storedMode || "IoMdPerson" });
     }, []);
 
     const updateUserContext = useCallback(

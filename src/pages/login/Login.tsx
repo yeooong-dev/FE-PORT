@@ -54,6 +54,7 @@ function Login() {
                         setTimeout(() => {
                             navigate("/main");
                             localStorage.setItem("isSidebarOpen", "false");
+                            localStorage.setItem("mode", "IoMdPerson");
                         }, 1000);
                     } else {
                         setAlertType("error");
