@@ -382,7 +382,7 @@ interface darkProps {
 const Wrap = styled.div<darkProps>`
     width: 90%;
     max-width: 900px;
-    height: 100vh;
+    height: 70vh;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -400,8 +400,6 @@ const Wrap = styled.div<darkProps>`
         border: ${({ darkMode }) => (darkMode ? "2px solid #696969" : "2px solid #d6d6d6")};
         margin-bottom: 10px;
         padding: 5px;
-        margin-top: 30px;
-
         box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
         -webkit-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
         -moz-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
@@ -704,7 +702,7 @@ const StyledCalendar = styled.div<StyledCalendarProps>`
         .react-calendar__tile {
             padding: 10px;
             font-size: 14px;
-            height: ${(props) => props.tileSize + 3}px;
+            height: ${(props) => props.tileSize + 6}px;
         }
 
         .tooltip {

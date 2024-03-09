@@ -165,14 +165,14 @@ export const Info2 = styled.div`
             position: absolute;
             top: 50%;
             transform: translate(0, -50%);
-            right: 20%;
+            right: 25%;
         }
 
         .famImg2 {
             position: absolute;
             top: 60%;
             transform: translate(0, -50%);
-            right: 0%;
+            right: 5%;
         }
     }
 
@@ -227,6 +227,7 @@ export const Info2 = styled.div`
                 white-space: normal;
                 font-size: 1rem;
                 font-weight: bold;
+                margin-bottom: 30px;
             }
         }
     }
@@ -330,7 +331,7 @@ export const Info4 = styled.div`
                 white-space: normal;
                 font-size: 1rem;
                 font-weight: bold;
-                margin-top: 50px;
+                margin-top: 250px;
                 margin-bottom: 10px;
             }
         }
@@ -397,7 +398,7 @@ export const Info5 = styled.div`
     }
 
     @media (max-width: 550px) {
-        height: 100vh;
+        height: 750px;
         flex-direction: column;
 
         .left {

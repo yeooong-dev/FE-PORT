@@ -14,7 +14,6 @@ function Info() {
     const [isLogin] = UseIsLogin();
     const [ref1, inView1] = useInView({ threshold: 0.3, triggerOnce: true });
     const [ref2, inView2] = useInView({ threshold: 0.3, triggerOnce: true });
-    const [ref3, inView3] = useInView({ threshold: 0.3, triggerOnce: true });
     const [ref4, inView4] = useInView({ threshold: 0.3, triggerOnce: true });
     const [ref5, inView5] = useInView({ threshold: 0.3, triggerOnce: true });
 
@@ -46,39 +45,42 @@ function Info() {
                         </Left>
                     </Info1>
 
-                    <Info2 ref={ref2}>
+                    <Info2>
                         <motion.div
-                            initial={{ opacity: 0, x: -50 }}
-                            animate={inView2 ? { opacity: 1, x: 0 } : {}}
+                            ref={ref2}
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={inView2 ? { opacity: 1, y: 0 } : {}}
                             transition={{ duration: 0.8 }}
                             className='imgBox'
                         >
                             <img src={famImg} alt='경조사' />
                             <img src={famImg2} alt='경조사' className='famImg2' />
-                        </motion.div>
 
-                        <div className='textBox'>
-                            <p>
-                                자주 까먹는 각종 경조사를 <br />
-                                까먹지 말고
-                            </p>
-                            <h3>한 눈에 보기쉽게 정리!</h3>
-                        </div>
+                            <div className='textBox'>
+                                <p>
+                                    자주 까먹는 각종 경조사를 <br />
+                                    까먹지 말고
+                                </p>
+                                <h3>한 눈에 보기쉽게 정리!</h3>
+                            </div>
+                        </motion.div>
                     </Info2>
 
-                    <Info4 ref={ref4}>
-                        <div className='textBox'>
-                            <h3>나만 볼수 있는</h3>
-                            <p>오늘의 할일과 캘린더!</p>
-                        </div>
+                    <Info4>
                         <motion.div
-                            initial={{ opacity: 0, x: 50 }}
-                            animate={inView4 ? { opacity: 1, x: 0 } : {}}
+                            ref={ref4}
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={inView4 ? { opacity: 1, y: 0 } : {}}
                             transition={{ duration: 1 }}
                             className='imgBox'
                         >
                             <img src={todoImg} alt='할일' />
                             <img src={calImg} alt='캘린더' className='cal' />
+
+                            <div className='textBox'>
+                                <h3>나만 볼수 있는</h3>
+                                <p>오늘의 할일과 캘린더!</p>
+                            </div>
                         </motion.div>
                     </Info4>
 
