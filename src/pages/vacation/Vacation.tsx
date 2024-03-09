@@ -399,6 +399,7 @@ const Wrap = styled.div<darkProps>`
         border-radius: 20px;
         border: ${({ darkMode }) => (darkMode ? "2px solid #696969" : "2px solid #d6d6d6")};
         margin-bottom: 10px;
+        margin-top: 50px;
         padding: 5px;
         box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
         -webkit-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
