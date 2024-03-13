@@ -1,4 +1,3 @@
-import axios from "axios";
 import instance from "./instance";
 
 // 이메일 중복 체크

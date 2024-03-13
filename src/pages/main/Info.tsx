@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import UseIsLogin from "../../hook/UseIsLogin";
-import { InfoWrap, Bottom, Center, LeftFooter, RightFooter, Left, Info1, Info2, Info4, Wrap, Info5 } from "./StInfo";
+import { InfoWrap, Bottom, Center, LeftFooter, RightFooter, Left, Info1, Info2, Wrap, Info3, Info4 } from "./StInfo";
 import famImg from "../../image/fam.png";
 import famImg2 from "../../image/fam2.png";
 import todoImg from "../../image/todo.png";
@@ -14,8 +14,8 @@ function Info() {
     const [isLogin] = UseIsLogin();
     const [ref1, inView1] = useInView({ threshold: 0.3, triggerOnce: true });
     const [ref2, inView2] = useInView({ threshold: 0.3, triggerOnce: true });
+    const [ref3, inView3] = useInView({ threshold: 0.3, triggerOnce: true });
     const [ref4, inView4] = useInView({ threshold: 0.3, triggerOnce: true });
-    const [ref5, inView5] = useInView({ threshold: 0.3, triggerOnce: true });
 
     const startLink = isLogin ? "/main" : "/login";
 
@@ -45,17 +45,13 @@ function Info() {
                         </Left>
                     </Info1>
 
-                    <Info2>
+                    <Info2 ref={ref2}>
                         <motion.div
-                            ref={ref2}
                             initial={{ opacity: 0, y: 50 }}
                             animate={inView2 ? { opacity: 1, y: 0 } : {}}
                             transition={{ duration: 0.8 }}
-                            className='imgBox'
+                            className='wrap'
                         >
-                            <img src={famImg} alt='경조사' />
-                            <img src={famImg2} alt='경조사' className='famImg2' />
-
                             <div className='textBox'>
                                 <p>
                                     자주 까먹는 각종 경조사를 <br />
@@ -63,30 +59,52 @@ function Info() {
                                 </p>
                                 <h3>한 눈에 보기쉽게 정리!</h3>
                             </div>
+
+                            <div className='imgBox'>
+                                <img src={famImg} alt='경조사' />
+                                <img src={famImg2} alt='경조사' className='famImg2' />
+                            </div>
                         </motion.div>
                     </Info2>
 
-                    <Info4>
+                    <Info3 ref={ref3}>
                         <motion.div
-                            ref={ref4}
                             initial={{ opacity: 0, y: 50 }}
-                            animate={inView4 ? { opacity: 1, y: 0 } : {}}
-                            transition={{ duration: 1 }}
-                            className='imgBox'
+                            animate={inView3 ? { opacity: 1, y: 0 } : {}}
+                            transition={{ duration: 0.8 }}
+                            className='wrap'
                         >
-                            <img src={todoImg} alt='할일' />
-                            <img src={calImg} alt='캘린더' className='cal' />
-
                             <div className='textBox'>
                                 <h3>나만 볼수 있는</h3>
                                 <p>오늘의 할일과 캘린더!</p>
                             </div>
-                        </motion.div>
-                    </Info4>
 
-                    <Info5 ref={ref5}>
-                        <div className='left'>
-                            <p>보기 쉽게 정리된 조직도!</p>
+                            <div className='imgBox'>
+                                <img src={todoImg} alt='할일' />
+                                <img src={calImg} alt='캘린더' className='famImg2' />
+                            </div>
+                        </motion.div>
+                    </Info3>
+
+                    <Info4 ref={ref4}>
+                        <motion.div
+                            initial={{ opacity: 0, y: 50 }}
+                            animate={inView4 ? { opacity: 1, y: 0 } : {}}
+                            transition={{ duration: 0.8 }}
+                            className='wrap'
+                        >
+                            <div className='textBox'>
+                                <p>보기 쉽게 정리된 조직도와</p>
+                                <p>선착순 연차 신청 기능</p>
+                            </div>
+
+                            <div className='imgBox'>
+                                <img src={chartImg} alt='조직도' />
+                                <img src={vacImg} alt='연차신청' className='famImg2' />
+                            </div>
+                        </motion.div>
+
+                        {/* <div className='left'>
                             <motion.img
                                 src={chartImg}
                                 alt='조직도'
@@ -98,7 +116,7 @@ function Info() {
                         </div>
 
                         <div className='right'>
-                            <p>선착순 연차 신청 가능!</p>
+                            <p></p>
                             <motion.img
                                 src={vacImg}
                                 alt='연차'
@@ -107,8 +125,8 @@ function Info() {
                                 animate={inView5 ? { opacity: 1, y: 0 } : {}}
                                 transition={{ duration: 1 }}
                             />
-                        </div>
-                    </Info5>
+                        </div> */}
+                    </Info4>
                 </Center>
                 <Bottom>
                     <LeftFooter>

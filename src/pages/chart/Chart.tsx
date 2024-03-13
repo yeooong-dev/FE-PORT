@@ -235,77 +235,76 @@ export const Employee = styled.div<darkProps>`
 `;
 
 export const Team = styled.div<darkProps>`
-  width: 200px;
-  height: 350px;
-  overflow-x: hidden;
-  overflow-y: scroll;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  flex-direction: column;
-  background: ${({ darkMode }) => (darkMode ? "#636363" : "#f9f9f9")};
-  border-radius: 20px;
-  padding: 30px;
-  margin: 15px;
-  position: relative;
-  box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
-  -webkit-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
-  -moz-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
-
-
-  h1 {
-    font-size: 25px;
-    margin-bottom: 5px;
-  }
-
-  .icon {
-    position: absolute;
-    top: -10px;
-    left: 20px;
-    z-index: 99;
-  }
-
-  .employee {
-    width: 100%;
-    min-height: 200px
-    max-height: 200px;
-    margin: 10px;
-    padding: 6px;
-    border: 2px dotted #c9c9c9;
-    border-radius: 10px;
+    width: 200px;
+    height: 350px;
+    overflow-x: hidden;
+    overflow-y: scroll;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex-direction: column;
+    background: ${({ darkMode }) => (darkMode ? "#636363" : "#f9f9f9")};
+    border-radius: 20px;
+    padding: 30px;
+    margin: 15px;
     position: relative;
+    box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
+    -webkit-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
+    -moz-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
 
-    p:first-child {
-      font-size: 18px;
-      font-weight: bold;
+    h1 {
+        font-size: 25px;
+        margin-bottom: 5px;
     }
 
-    p {
-      padding: 5px;
+    .icon {
+        position: absolute;
+        top: -10px;
+        left: 20px;
+        z-index: 99;
     }
 
-    .joinYear {
-      font-size: 14px;
-      font-weight: bold;
-    }
+    .employee {
+        width: 100%;
+        min-height: 200px;
+        max-height: 200px;
+        margin: 10px;
+        padding: 6px;
+        border: 2px dotted #c9c9c9;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        position: relative;
 
-    button {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      cursor: pointer;
-      background: white;
-      border-radius: 50px;
-      width: 20px;
-      height: 20px;
-      color: #adadad;
-      box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
-      -webkit-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
-      -moz-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
+        p:first-child {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        p {
+            padding: 5px;
+        }
+
+        .joinYear {
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        button {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            cursor: pointer;
+            background: white;
+            border-radius: 50px;
+            width: 20px;
+            height: 20px;
+            color: #adadad;
+            box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
+            -webkit-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
+            -moz-box-shadow: 5px 5px 6px 4px rgba(0, 0, 0, 0.09);
+        }
     }
-  }
 `;
