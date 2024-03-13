@@ -213,6 +213,9 @@ function Mypage() {
                     ...state,
                     profileImage: "/default-profile.png",
                 });
+                setAlertType("success");
+                setAlertMessage("이미지가 성공적으로 삭제되었습니다.");
+                window.location.reload();
             } catch (error) {
                 console.error(error);
                 setAlertType("error");
@@ -443,7 +446,8 @@ function Mypage() {
                             height: "40px",
                             fontSize: "1rem",
                             cursor: "pointer",
-                            backgroundColor: "#ccc",
+                            backgroundColor: "#3c57b3",
+                            color: "white",
                         }}
                     >
                         프로필 변경

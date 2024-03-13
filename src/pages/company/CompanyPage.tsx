@@ -356,6 +356,8 @@ export const Info = styled.div<darkProps>`
     height: auto;
     overflow-y: scroll;
     display: flex;
+    align-items: flex-start;
+    justify-items: flex-start;
     flex-direction: column;
     font-size: 1.2rem;
 `;
@@ -367,7 +369,7 @@ const TabContainer = styled.div<darkProps>`
     max-width: 900px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     flex-direction: column;
     margin-bottom: 20px;
     color: ${({ darkMode }) => (darkMode ? "white" : "#2e2e2e")};
@@ -417,7 +419,7 @@ export const Setting = styled.div<darkProps>`
     flex-direction: column;
     justify-content: flex-start;
     align-items: center;
-    margin-top: 150px;
+    margin-top: 20px;
 
     .page {
         width: 80%;
@@ -584,8 +586,6 @@ export const Setting = styled.div<darkProps>`
     }
 
     @media (max-width: 550px) {
-        margin-top: 60px;
-
         .page {
             .listBox {
                 width: 80%;

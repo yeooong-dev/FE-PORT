@@ -6,13 +6,13 @@ interface darkProps {
 
 export const Wrap = styled.div`
     width: 90%;
-    height: 100vh;
+    height: auto;
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     overflow-x: hidden;
     overflow-y: scroll;
-    padding: 80px;
+    padding: 30px;
 
     @media (max-width: 550px) {
         height: auto;
@@ -25,7 +25,7 @@ export const Wrap = styled.div`
 
 export const WrapLeft = styled.div`
     width: 60%;
-    height: 100vh;
+    height: auto;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -182,7 +182,7 @@ export const WrapEvent = styled.div<darkProps>`
 
 export const WrapRight = styled.div<darkProps>`
     width: 40%;
-    height: 100vh;
+    height: auto;
     display: flex;
     align-items: center;
     justify-content: flex-start;
@@ -229,27 +229,31 @@ export const WrapCalendar = styled.div<darkProps>`
 
 export const SchedulesList = styled.div<darkProps>`
     width: 50%;
-    height: 700px;
+    height: 230px;
     display: flex;
     justify-content: flex-start;
     flex-direction: column;
     align-items: center;
-    padding: 50px;
+    padding: 25px 50px 20px 50px;
     border-radius: 20px;
     background: ${({ darkMode }) => (darkMode ? "#2a2a2a" : "#ffffff")};
-    margin-bottom: 50px;
+    margin-bottom: 30px;
+    overflow-y: auto;
 
     .schedule-item {
         width: 100%;
-        overflow-y: auto;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        line-height: 2.5rem;
         text-align: left;
+
+        p:first-child {
+            margin-bottom: 5px;
+        }
 
         p:last-child {
             color: #afafaf;
+            margin-bottom: 25px;
         }
     }
     @media (max-width: 550px) {
@@ -259,7 +263,6 @@ export const SchedulesList = styled.div<darkProps>`
 
         .schedule-item {
             width: 100%;
-            overflow-y: auto;
             display: flex;
             flex-direction: column;
             justify-content: center;
