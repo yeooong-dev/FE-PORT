@@ -211,7 +211,6 @@ export const WrapCalendar = styled.div<darkProps>`
         text-align: left;
         font-family: var(--font-title);
         padding: 25px 20px;
-        /* margin-bottom: 40px; */
     }
 
     div {
@@ -219,6 +218,7 @@ export const WrapCalendar = styled.div<darkProps>`
         max-width: 500px;
         height: auto;
         max-height: 400px;
+        margin: 0 auto;
     }
 
     @media (max-width: 550px) {
@@ -237,6 +237,7 @@ export const SchedulesList = styled.div<darkProps>`
     padding: 25px 50px 20px 50px;
     border-radius: 20px;
     background: ${({ darkMode }) => (darkMode ? "#2a2a2a" : "#ffffff")};
+    margin-top: 20px;
     margin-bottom: 30px;
     overflow-y: auto;
 
