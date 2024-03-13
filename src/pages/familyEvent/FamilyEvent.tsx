@@ -609,7 +609,7 @@ function FamilyEvent() {
                         value={target}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             const input = e.target.value;
-                            if (input.length > 5) {
+                            if (input.length > 6) {
                                 setAlertMessage("5글자까지 작성가능합니다.");
                                 setAlertType("error");
                             } else {
